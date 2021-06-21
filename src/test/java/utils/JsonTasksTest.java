@@ -21,7 +21,7 @@ public class JsonTasksTest {
 	public static final String LOGGER_JSONPATH = "com.jayway.jsonpath.internal.path.CompiledPath";
 
 	private static final Logger LOGGER = Logger.getLogger( JsonTasksTest.class.getName( ) );
-	private static final String BASE_PATH = "C:/workspace/training/javatools/src/main/java/utils/";
+	private static final String BASE_PATH = "static/";
 
 	private static final String jsonFile = BASE_PATH + "owner.json";
 	private String json = "";
@@ -32,7 +32,7 @@ public class JsonTasksTest {
 		ch.qos.logback.classic.Logger logger = loggerContext.getLogger( LOGGER_JSONPATH );
 		logger.setLevel( Level.INFO );
 		//
-		json = UtilityMain.getFileLines( jsonFile, "" );
+		json = UtilityMain.getFileLocal( jsonFile, "" );
 	}
 
 	@Test public void getJsonPath() {
