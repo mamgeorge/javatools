@@ -1,0 +1,28 @@
+// cd C:\workspace\training\javatools
+// https://docs.gradle.org/6.8.1/userguide/java_testing.html
+
+plugins { id "application" }
+apply plugin: "java"
+repositories { mavenCentral() }
+
+println "#### build.gradle sample groovy print ####"
+task runany { println "[[[[ gradle Java tasks ]]]]" }
+
+// gradle run: AnyClass, Aws1Class, &2, JsonTasks, SwingSample, SwingMove, UtilityMain
+application { mainClass.set( 'utils.SwingSample' ) }
+
+dependencies {
+
+	implementation 'com.amazonaws:aws-java-sdk-s3:1.11.1015'		// for AWS1 1.11.1005
+	implementation 'com.amazonaws:aws-java-sdk-sts:1.11.1015'		// for AWS1 services access
+	implementation 'software.amazon.awssdk:s3:2.16.48'				// for AWS2 2.16.48 > 2.16.59
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'	// for json processing
+	implementation 'com.jayway.jsonpath:json-path:2.6.0'			// for json processing
+	implementation 'org.springframework.boot:spring-boot-starter-logging:2.5.0' // for slf4j & logback in json-path
+	//
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0-M1'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0-M1'
+}
+
+// gradle clean build test --i | findstr /i INFO:
+test { useJUnitPlatform() }

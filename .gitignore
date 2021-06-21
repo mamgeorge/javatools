@@ -1,0 +1,10 @@
+# maven
+target/
+
+# SCM gradle
+build/
+.gradle/
+
+# IDE
+.idea/
+*.iml
