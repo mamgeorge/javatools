@@ -18,11 +18,10 @@ import java.util.Arrays;
 // C:/workspace/training/javatools/src/test/java/utils
 public class JsonTasksTest {
 	//
-	public static final String LOGGER_JSONPATH = "com.jayway.jsonpath.internal.path.CompiledPath";
-
 	private static final Logger LOGGER = Logger.getLogger( JsonTasksTest.class.getName( ) );
-	private static final String BASE_PATH = "static/";
 
+	private static final String LOGGER_JSONPATH = "com.jayway.jsonpath.internal.path.CompiledPath";
+	private static final String BASE_PATH = "static/";
 	private static final String jsonFile = BASE_PATH + "owner.json";
 	private String json = "";
 
