@@ -80,15 +80,15 @@ public class UtilityMain {
 		return txtLine;
 	}
 
-	public static String getFileLines( String fileName , String delim ) {
+	public static String getFileLines( String pathFile , String delim ) {
 		//
 		// https://mkyong.com/java8/java-8-stream-read-a-file-line-by-line/
 		String txtLines = "";
-		if ( fileName == null || fileName.equals( "" ) ) { fileName = FLD_SAMPLE + TXT_SAMPLE; }
+		if ( pathFile == null || pathFile.equals( "" ) ) { pathFile = FLD_SAMPLE + TXT_SAMPLE; }
 		if ( delim == null || delim.equals( "" ) ) { delim = DLM; }
 		//
 		List<String> list = new ArrayList<>( );
-		try ( BufferedReader bReader = Files.newBufferedReader( Paths.get( fileName) ) ) {
+		try ( BufferedReader bReader = Files.newBufferedReader( Paths.get( pathFile) ) ) {
 			//
 			list = bReader.lines( ).collect( Collectors.toList( ) );
 			txtLines = String.join( "\n" , list );
@@ -99,28 +99,28 @@ public class UtilityMain {
 		return txtLines;
 	}
 
-	public static String getFileLocal( String fileName , String delim ) {
+	public static String getFileLocal( String pathFile , String delim ) {
 		//
 		// https://howtodoinjava.com/java/io/read-file-from-resources-folder/
 		// File file = ResourceUtils.getFile("classpath:config/sample.txt")
 		String txtLines = "";
 		String urlFile = "";
-		if ( fileName == null || fileName.equals( "" ) ) { fileName = FLD_SAMPLE + TXT_SAMPLE; }
+		if ( pathFile == null || pathFile.equals( "" ) ) { pathFile = FLD_SAMPLE + TXT_SAMPLE; }
 		if ( delim == null || delim.equals( "" ) ) { delim = DLM; }
 		try {
-			//
+			/*
 			ClassLoader classLoader = ClassLoader.getSystemClassLoader( );
+			URL url = classLoader.getResource( fileName );
+			urlFile = url.getFile( );
 			// fails if run in: mvn exec:java -Dexec.mainClass
 			// URL[] urls = ( (URLClassLoader) classLoader ).getURLs();
 			// for(URL url: urls){ System.out.println(url.getFile( ) ); }
-			//
-			URL url = classLoader.getResource( fileName );
-			urlFile = url.getFile( );
-			File file = new File( urlFile );
-			txtLines = new String( Files.readAllBytes( file.toPath( ) ), UTF_8 );
-			txtLines = txtLines.replaceAll( "\n" , delim );
+			*/
+			File fileLocal = new File( pathFile );
+			File pathFileLocal = new File( fileLocal.getAbsolutePath() );
+			txtLines = new String( Files.readAllBytes( pathFileLocal.toPath( ) ), UTF_8 );
 		}
-		catch (IOException ex) { LOGGER.warning( ex.getMessage( ) ); }
+		catch (IOException | NullPointerException ex ) { LOGGER.warning( ex.getMessage( ) ); }
 		return txtLines;
 	}
 

@@ -1,24 +1,20 @@
 package utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import utils.Owner;
-
-import java.util.logging.Logger;
 import java.util.Arrays;
+import java.util.logging.Logger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // C:/workspace/training/javatools/src/test/java/utils
 public class JsonTasksTest {
 	//
-	private static final Logger LOGGER = Logger.getLogger( JsonTasksTest.class.getName( ) );
+	private static final Logger LOGGER = Logger.getLogger(JsonTasksTest.class.getName());
 
 	private static final String LOGGER_JSONPATH = "com.jayway.jsonpath.internal.path.CompiledPath";
 	private static final String BASE_PATH = "static/";
