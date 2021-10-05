@@ -17,6 +17,7 @@ dependencies {
 	implementation 'com.amazonaws:aws-java-sdk-sts:1.11.1015'		// for AWS1 services access
 	implementation 'software.amazon.awssdk:s3:2.16.48'				// for AWS2 2.16.48 > 2.16.59
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'	// for json processing
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml' // 2.11.2'
 	implementation 'com.jayway.jsonpath:json-path:2.6.0'			// for json processing
 	implementation 'org.springframework.boot:spring-boot-starter-logging:2.5.0' // for slf4j & logback in json-path
 	//

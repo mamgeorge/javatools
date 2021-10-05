@@ -16,7 +16,7 @@ public class UtilityMainTest {
 		String txtLines = "";
 		txtLines = UtilityMain.getFileLocal(PATHFILE_LOCALJSON, "");
 		//
-		System.out.println(txtLines);
+		LOGGER.info(txtLines); // System.out.println(txtLines);
 		Assert.isTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 }
