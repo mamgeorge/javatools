@@ -31,7 +31,7 @@ public class RestTemplateTest {
 
 	private static final Logger LOGGER = Logger.getLogger(RestTemplateTest.class.getName());
 	private static final String TXT_URL = "http://localhost:3000";
-	private static final String PATHFILE_LOCALJSON = "src/test/resources/" + "bodyCatalog.json";
+	private static final String PATHFILE_LOCALJSON = "src/test/resources/" + "booksCatalog.json";
 	private static final String JSON_PATH = "/catalog/book/0/author";
 	private static final String ASSERT_MSG = "ASSERT_MSG";
 	private static final String TESTSERVER_DOWNMSG = "I/O error on GET Connection refused; using Mock";

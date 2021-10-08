@@ -5,26 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -61,6 +43,27 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import org.springframework.http.MediaType;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
@@ -505,29 +508,55 @@ public class UtilityMain {
 			StringReader stringReader = new StringReader(xmlOld);
 			InputSource inputSource = new InputSource(stringReader);
 			document = documentBuilder.parse(inputSource);
-		} catch (ParserConfigurationException ex) {
-			LOGGER.warning(ex.getMessage());
-		} catch (SAXException ex) { LOGGER.warning(ex.getMessage()); } catch (IOException ex) {
-			LOGGER.warning(ex.getMessage());
 		}
+		catch (ParserConfigurationException ex) { LOGGER.severe(ex.getMessage()); }
+		catch (SAXException ex) { LOGGER.severe(ex.getMessage()); }
+		catch (IOException ex) { LOGGER.severe(ex.getMessage()); }
 		try {
 			StringWriter stringWriter = new StringWriter();
-			StreamResult xmlOutput = new StreamResult(stringWriter);
-			TransformerFactory tf = TransformerFactory.newInstance();
+			StreamResult streamResultXML = new StreamResult(stringWriter);
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			// tf.setAttribute( "indent-number", 4 );
-			Transformer transformer = tf.newTransformer();
+			Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty(OutputKeys.ENCODING, UTF_8.toString());
 			DOMSource domSource = new DOMSource(document);
-			transformer.transform(domSource, xmlOutput);
-			xml = xmlOutput.getWriter().toString();
-		} catch (TransformerConfigurationException ex) {
-			LOGGER.warning(ex.getMessage());
-		} catch (TransformerException ex) { LOGGER.warning(ex.getMessage()); }
+			transformer.transform(domSource, streamResultXML);
+			xml = streamResultXML.getWriter().toString();
+		}
+		catch (TransformerConfigurationException ex) { LOGGER.severe(ex.getMessage()); }
+		catch (TransformerException ex) { LOGGER.severe(ex.getMessage()); }
 		return xml;
+	}
+
+	public static String transformXslt(String xml, String xsl){
+		//
+		String txtLines = "";
+		try {
+			// bring in data in a way that can be processed
+			StreamSource streamSourceXML = new StreamSource(new StringReader(xml));
+			StreamSource streamSourceXSL = new StreamSource(new StringReader(xsl));
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			Result result = new StreamResult(baos);
+			//
+			// setup transformers
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer(streamSourceXSL);
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty(OutputKeys.MEDIA_TYPE, MediaType.TEXT_XML_VALUE);
+			transformer.setOutputProperty(OutputKeys.ENCODING, UTF_8.toString());
+			//
+			// transform it
+			transformer.transform(streamSourceXML, result);
+			txtLines = baos.toString();
+		}
+		catch (TransformerConfigurationException ex) { LOGGER.severe(ex.getMessage()); }
+		catch (TransformerException ex) { LOGGER.severe(ex.getMessage()); }
+		//
+		return txtLines;
 	}
 
 	public static String parseYaml2JsonNode(String yamlFileName, String applicationNode) {

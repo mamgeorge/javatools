@@ -8,6 +8,9 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
@@ -27,7 +30,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class UtilityMainTest {
 
 	private static final Logger LOGGER = Logger.getLogger(UtilityMainTest.class.getName());
-	private static final String PATHFILE_LOCALJSON = "src/test/resources/" + "bodyCatalog.json";
+	private static final String PATHFILE_LOCAL = "src/test/resources/";
 	private static final String ASSERT_MSG = "ASSERT_MSG";
 
 	@Test public void test_showSys() {
@@ -77,7 +80,7 @@ public class UtilityMainTest {
 	@Test public void test_getFileLocal() {
 
 		String txtLines = "";
-		txtLines = UtilityMain.getFileLocal(PATHFILE_LOCALJSON, "");
+		txtLines = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.json", "");
 		//
 		LOGGER.info(txtLines); // System.out.println(txtLines);
 		Assert.isTrue(txtLines.length() > 20, ASSERT_MSG);
@@ -86,7 +89,7 @@ public class UtilityMainTest {
 	@Test public void test_getJsonValue_fromPath() {
 
 		String txtLine = "";
-		String json = UtilityMain.getFileLocal(PATHFILE_LOCALJSON, "");
+		String json = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.json", "");
 		String jsonPath = "catalog.book[0].price"; // "/catalog/book/0/price";
 		//
 		// JsonPath.parse(json).read(fieldPath).toString();
@@ -96,6 +99,22 @@ public class UtilityMainTest {
 		//
 		LOGGER.info("jsonVal: " + txtLine); // System.out.println(txtLines);
 		Assert.isTrue(txtLine.equals("44.95"), ASSERT_MSG);
+	}
+
+	@Test public void test_transformXslt() {
+		//
+		String txtLines = "";
+		String filename_XML = PATHFILE_LOCAL + "booksCatalog" + ".xml";
+		String filename_XSL = PATHFILE_LOCAL + "booksXml2Html" + ".xslt";
+		String xml = UtilityMain.getFileLocal(filename_XML, "");
+		String xsl = UtilityMain.getFileLocal(filename_XSL, "");
+		//
+		txtLines = UtilityMain.transformXslt(xml, xsl);
+		//
+		System.out.println(txtLines);
+		try { Files.write(Paths.get(PATHFILE_LOCAL+"booksCatalog.html"), txtLines.getBytes(UTF_8)); }
+		catch (IOException ex) { ex.printStackTrace(); }
+		Assert.isTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
 	@Test public void test_sampleServer() {
@@ -232,7 +251,7 @@ public class UtilityMainTest {
 	}
 }
 
-class AnyException extends IllegalStateException{ }
+class AnyException extends IllegalStateException {}
 
 class AnyObject {
 
@@ -246,9 +265,12 @@ class AnyObject {
 
 	//
 	public String getStringValue() { return stringValue; }
+
 	public String getStrongValue() { return strongValue; }
+
 	//
 	public void setStringValue(String stringValue) { this.stringValue = stringValue; }
+
 	public void setStrongValue(String strongValue) { this.strongValue = strongValue; }
 }
 
