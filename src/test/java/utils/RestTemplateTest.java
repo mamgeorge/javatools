@@ -3,6 +3,9 @@ package utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -16,24 +19,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.Assert;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
 
+// @RunWith( MockitoJUnitRunner.class ) JUnit 4
 public class RestTemplateTest {
 
 	private static final Logger LOGGER = Logger.getLogger(RestTemplateTest.class.getName());
 	private static final String TXT_URL = "http://localhost:3000";
-	private static final String PATHFILE_LOCALJSON = "src/test/resources/" + "bodyCatalog.json";
+	private static final String PATHFILE_LOCALJSON = "src/test/resources/" + "booksCatalog.json";
 	private static final String JSON_PATH = "/catalog/book/0/author";
 	private static final String ASSERT_MSG = "ASSERT_MSG";
 	private static final String TESTSERVER_DOWNMSG = "I/O error on GET Connection refused; using Mock";
@@ -50,44 +48,11 @@ public class RestTemplateTest {
 			JsonNode jsonNodeAt = jsonNodeRoot.at(JSON_PATH);
 			txtLine = jsonNodeAt.asText();
 			// txtLine = jsonNodeRoot.at(JsonPointer.compile(jsonPath)).asText();
-		} catch (JsonProcessingException ex) { LOGGER.severe(ex.getMessage()); }
+		}
+		catch (JsonProcessingException ex) { LOGGER.severe(ex.getMessage()); }
 		//
 		System.out.println("jsonNodeAt.asText(): " + txtLine);
 		Assert.isTrue(txtLine.equals("Gambardella , Matthew"), ASSERT_MSG);
-	}
-
-	private ResponseEntity<String> getForEntity_String(RestTemplate restTemplate, String txtUrl) {
-		//
-		ResponseEntity<String> responseEntity;
-		try {
-			responseEntity = restTemplate.getForEntity(txtUrl, String.class);
-		} catch (ResourceAccessException ex) {
-			System.out.println(TESTSERVER_DOWNMSG);
-			String body = UtilityMain.getFileLocal(PATHFILE_LOCALJSON, "");
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-			Map<String, Object> map = new HashMap<>();
-			map.put("AgentId", "G002875");
-			map.put("Phone", "614-377-7835");
-			HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(map, httpHeaders);
-			responseEntity = new ResponseEntity<>(body, OK);
-		}
-		return responseEntity;
-	}
-
-	private ResponseEntity<String> exchange_Entity(RestTemplate restTemplate, String txtUrl,
-		HttpMethod httpMethod, HttpEntity httpEntity)
-	{
-		//
-		ResponseEntity<String> responseEntity;
-		try {
-			responseEntity = restTemplate
-				.exchange(txtUrl, httpMethod, httpEntity, String.class);
-		} catch (ResourceAccessException ex) {
-			System.out.println(TESTSERVER_DOWNMSG);
-			responseEntity = new ResponseEntity<>(OK);
-		}
-		return responseEntity;
 	}
 
 	@Test public void test_RT_getForEntity() {
@@ -254,5 +219,41 @@ public class RestTemplateTest {
 		txtLines += String.format("\tname()....\t\t %s\n", httpStatus.name());
 		System.out.println(txtLines);
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
+	}
+
+	//############
+	private ResponseEntity<String> getForEntity_String(RestTemplate restTemplate, String txtUrl) {
+		//
+		ResponseEntity<String> responseEntity;
+		try {
+			responseEntity = restTemplate.getForEntity(txtUrl, String.class);
+		}
+		catch (ResourceAccessException ex) {
+			System.out.println(TESTSERVER_DOWNMSG);
+			String body = UtilityMain.getFileLocal(PATHFILE_LOCALJSON, "");
+			HttpHeaders httpHeaders = new HttpHeaders();
+			httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			Map<String, Object> map = new HashMap<>();
+			map.put("AgentId", "G002875");
+			map.put("Phone", "614-377-7835");
+			HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(map, httpHeaders);
+			responseEntity = new ResponseEntity<>(body, OK);
+		}
+		return responseEntity;
+	}
+
+	private ResponseEntity<String> exchange_Entity(RestTemplate restTemplate, String txtUrl,
+		HttpMethod httpMethod, HttpEntity httpEntity) {
+		//
+		ResponseEntity<String> responseEntity;
+		try {
+			responseEntity = restTemplate
+				.exchange(txtUrl, httpMethod, httpEntity, String.class);
+		}
+		catch (ResourceAccessException ex) {
+			System.out.println(TESTSERVER_DOWNMSG);
+			responseEntity = new ResponseEntity<>(OK);
+		}
+		return responseEntity;
 	}
 }

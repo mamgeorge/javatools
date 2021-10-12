@@ -4,6 +4,7 @@ target/
 # SCM gradle
 build/
 .gradle/
+out/
 
 # IDE
 .idea/
