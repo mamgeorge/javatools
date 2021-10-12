@@ -8,18 +8,20 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.Assert;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -86,6 +88,26 @@ public class UtilityMainTest {
 		Assert.isTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
+	@Test public void test_getFileLocals() {
+		//
+		StringBuilder stringBuilder = new StringBuilder();
+		String[] fileNames =
+			{"booksCatalog.html", "booksCatalog.json", "booksCatalog.xml", "booksXml2Html.xslt"};
+		//
+		AtomicInteger idx = new AtomicInteger();
+		Arrays.stream(fileNames).sequential().forEach(flnm -> {
+			String fileName = PATHFILE_LOCAL + flnm;
+			String txtLines = UtilityMain.getFileLocal(fileName, "");
+			stringBuilder.append(
+				String.format("\t%02d %s\tsize: %d \n", idx.incrementAndGet(), flnm, txtLines.length()));
+		});
+		//
+		int countFiles = stringBuilder.toString().split("\n").length;
+		System.out.println("countFiles: " + countFiles);
+		System.out.println(stringBuilder);
+		Assert.isTrue(countFiles == fileNames.length, ASSERT_MSG);
+	}
+
 	@Test public void test_getJsonValue_fromPath() {
 
 		String txtLine = "";
@@ -112,7 +134,7 @@ public class UtilityMainTest {
 		txtLines = UtilityMain.transformXslt(xml, xsl);
 		//
 		System.out.println(txtLines);
-		try { Files.write(Paths.get(PATHFILE_LOCAL+"booksCatalog.html"), txtLines.getBytes(UTF_8)); }
+		try { Files.write(Paths.get(PATHFILE_LOCAL + "booksCatalog.html"), txtLines.getBytes(UTF_8)); }
 		catch (IOException ex) { ex.printStackTrace(); }
 		Assert.isTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
