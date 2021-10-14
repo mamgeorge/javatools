@@ -164,11 +164,19 @@ public class UtilityMainTest {
 		Assert.isTrue(txtLine.equals("SECRETSTR"), ASSERT_MSG);
 	}
 
+	@Test void test_exposeObject() {
+		//
+		AnyObject anyObject = new AnyObject();
+		String txtLines = UtilityMain.exposeObject(anyObject);
+		System.out.println(txtLines);
+		Assert.isTrue(txtLines.split("\n").length >= 6, ASSERT_MSG);
+	}
+
 	@Test void test_putObject() {
 		//
 		AnyObject anyObject = new AnyObject();
 		UtilityMain.putObject(anyObject, "secretValue", "STUFF");
-		String txtLine = UtilityMain.getField(anyObject,"secretValue");
+		String txtLine = UtilityMain.getField(anyObject, "secretValue");
 		System.out.println(txtLine);
 		Assert.isTrue(txtLine.equals("STUFF"), ASSERT_MSG);
 	}
