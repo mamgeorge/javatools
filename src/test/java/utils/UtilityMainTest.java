@@ -5,6 +5,8 @@ import com.jayway.jsonpath.JsonPath;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import io.jaegertracing.Configuration;
+import io.opentracing.Tracer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -262,6 +264,16 @@ public class UtilityMainTest {
 		}
 		System.out.println(txtLines);
 		Assert.isTrue(txtLines.split("\n").length >= 7, ASSERT_MSG);
+	}
+
+	@Test void test_JaegerClient_tracing() {
+		//
+		String[] ENVVAR = {"FOO", "USERNAME"};
+		Configuration configuration = new Configuration(ENVVAR[0]);
+		Tracer tracer = configuration.getTracer();
+		String txtLines = UtilityMain.exposeObject(tracer);
+		System.out.println(txtLines);
+		Assert.isTrue(txtLines.split("\n").length >= 30, ASSERT_MSG);
 	}
 
 	@Test void test_sampleServer() {
