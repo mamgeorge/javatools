@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -397,6 +399,36 @@ public class UtilityMain {
 			LOGGER.severe(ex.getMessage());
 		}
 		return objectReturn;
+	}
+
+	public static String exposeObject(Object object) {
+		//
+		StringBuilder stringBuilder = new StringBuilder();
+		Set set = new TreeSet();
+		//
+		Method[] methods = object.getClass().getDeclaredMethods();
+		Object[] args = null;
+		int MAXLEN = 35;
+		String FRMT = "\t%-25s | %-35s | %02d | %s \n";
+		Arrays.stream(methods).forEach(mthd -> {
+			//
+			Object objectVal = "";
+			String returnType = mthd.getReturnType().toString();
+			if (returnType.length() > MAXLEN) { returnType=returnType.substring(returnType.length()-MAXLEN); }
+			mthd.setAccessible(true);
+			if (mthd.getReturnType().toString().startsWith("class") && mthd.getParameterCount() == 0) {
+				try { objectVal = mthd.invoke(object, args); }
+				catch (IllegalAccessException | InvocationTargetException ex) {
+					LOGGER.info(ex.getMessage());
+				}
+			}
+			set.add(String
+				.format(FRMT, mthd.getName(), returnType, mthd.getParameterCount(), objectVal.toString()));
+		});
+		//
+		stringBuilder.append(object.getClass().getName() + "\n\n");
+		set.stream().sorted().forEach(val -> stringBuilder.append(val));
+		return stringBuilder.toString();
 	}
 
 	public static void putObject(Object object, String objectName, Object objectValue) {
