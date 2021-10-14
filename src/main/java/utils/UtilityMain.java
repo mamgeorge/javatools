@@ -414,7 +414,9 @@ public class UtilityMain {
 			//
 			Object objectVal = "";
 			String returnType = mthd.getReturnType().toString();
-			if (returnType.length() > MAXLEN) { returnType=returnType.substring(returnType.length()-MAXLEN); }
+			if (returnType.length() > MAXLEN) {
+				returnType = returnType.substring(returnType.length() - MAXLEN);
+			}
 			mthd.setAccessible(true);
 			if (mthd.getReturnType().toString().startsWith("class") && mthd.getParameterCount() == 0) {
 				try { objectVal = mthd.invoke(object, args); }
@@ -426,7 +428,7 @@ public class UtilityMain {
 				.format(FRMT, mthd.getName(), returnType, mthd.getParameterCount(), objectVal.toString()));
 		});
 		//
-		stringBuilder.append(object.getClass().getName() + "\n\n");
+		stringBuilder.append(object.getClass().getName() + " has: [" + methods.length + "] methods\n\n");
 		set.stream().sorted().forEach(val -> stringBuilder.append(val));
 		return stringBuilder.toString();
 	}
