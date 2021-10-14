@@ -171,7 +171,8 @@ public class UtilityMain {
 			list = bReader.lines().collect(Collectors.toList());
 			txtLines = String.join("\n", list);
 			txtLines = txtLines.replaceAll("\n", delim);
-		} catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
+		}
+		catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
 		//
 		return txtLines;
 	}
@@ -196,7 +197,8 @@ public class UtilityMain {
 			File fileLocal = new File(pathFile);
 			File pathFileLocal = new File(fileLocal.getAbsolutePath());
 			txtLines = new String(Files.readAllBytes(pathFileLocal.toPath()), UTF_8);
-		} catch (IOException | NullPointerException ex) { LOGGER.warning(ex.getMessage()); }
+		}
+		catch (IOException | NullPointerException ex) { LOGGER.warning(ex.getMessage()); }
 		return txtLines;
 	}
 
@@ -227,7 +229,8 @@ public class UtilityMain {
 				stringBuilder.append(txtLine);
 			}
 			txtLines = stringBuilder.toString();
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			txtLines = ex.getMessage();
 			LOGGER.log(Level.SEVERE, "#### ERROR: {0} ", txtLines);
 		}
@@ -269,10 +272,12 @@ public class UtilityMain {
 				}
 				bufferedReader.close();
 				txtLines = stringBuffer.toString();
-			} else {
+			}
+			else {
 				LOGGER.info("POST failed to: " + link);
 			}
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			txtLines = ex.getMessage();
 			LOGGER.log(Level.SEVERE, "#### ERROR: {0} ", txtLines);
 		}
@@ -339,7 +344,8 @@ public class UtilityMain {
 			System.out.println("5 request lazily fired to get response info");
 			int responseCode = ((HttpURLConnection) urlConn).getResponseCode();
 			txtLines = "responseCode: " + responseCode; // should be 200
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			txtLines = ex.getMessage();
 			LOGGER.log(Level.SEVERE, "#### ERROR: {0} ", txtLines);
 		}
@@ -348,47 +354,60 @@ public class UtilityMain {
 	}
 
 	//############
-	public static String getField(Class clazz, String nameField) {
+	public static String getField(Object object, String nameField) {
 		//
 		String txtLine = "";
 		try {
+			Class clazz = object.getClass();
 			Field field = clazz.getDeclaredField(nameField);
 			field.setAccessible(true);
-			txtLine = (String) field.get(clazz);
-		} catch (NoSuchFieldException | IllegalAccessException ex) {
-			LOGGER.severe(ex.getMessage());
+			Object objectField = field.get(object);
+			txtLine = objectField.toString();
 		}
+		catch (NoSuchFieldException | IllegalAccessException ex) { LOGGER.severe(ex.getMessage()); }
 		return txtLine;
 	}
 
-	public static Object getMethod(Class clazz, String nameMethod, Object... parms) {
+	public static Object getMethod(Class clazz, String nameMethod, Object... objectParms) {
 		//
 		Object objectReturn = "";
 		try {
-			int parmsCount = parms.length;
+			int parmsCount = 0;
+			Object objectItem = null;
+			if (objectParms == null || objectParms.length == 0) {}
+			else { parmsCount = objectParms.length;}
 			Class<?>[] classArray = new Class<?>[parmsCount];
 			for (int ictr = 0; ictr < parmsCount; ictr++) {
-				classArray[ictr] = parms[ictr].getClass();
+				objectItem = objectParms[ictr];
+				if (objectItem == null) {
+					classArray = new Class<?>[0];
+					objectParms = null;
+				}
+				else { classArray[ictr] = objectItem.getClass(); }
 			}
 			//
+			// Class clazz = object.getClass();
 			Object objectInstance = clazz.getDeclaredConstructor().newInstance();
 			Method method = clazz.getDeclaredMethod(nameMethod, classArray);
 			method.setAccessible(true);
-			objectReturn = method.invoke(objectInstance, parms);
-		} catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException ex) {
+			objectReturn = method.invoke(objectInstance, objectParms);
+		}
+		catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException |
+			InvocationTargetException | InstantiationException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return objectReturn;
 	}
 
-	public static void putObject(Object clazz, Object object, String objectName) {
+	public static void putObject(Object object, String objectName, Object objectValue) {
 		//
-		String txtLine = "";
 		try {
-			Field field = clazz.getClass().getDeclaredField(objectName);
+			Class clazz = object.getClass();
+			Field field = clazz.getDeclaredField(objectName);
 			field.setAccessible(true);
-			field.set(clazz, object);
-		} catch (NoSuchFieldException | IllegalAccessException ex) {
+			field.set(object, objectValue);
+		}
+		catch (NoSuchFieldException | IllegalAccessException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 	}
@@ -428,7 +447,8 @@ public class UtilityMain {
 				zipEntry = zis.getNextEntry();
 				list.add(file);
 			}
-		} catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
+		}
+		catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
 		return list;
 	}
 
@@ -473,11 +493,15 @@ public class UtilityMain {
 			for (int ictr = 0; ictr < nodeList.getLength(); ictr++) {
 				txtLines += delim + nodeList.item(ictr).getNodeValue();
 			}
-		} catch (ParserConfigurationException ex) {
+		}
+		catch (ParserConfigurationException ex) {
 			LOGGER.warning(ex.getMessage());
-		} catch (SAXException ex) { LOGGER.warning(ex.getMessage()); } catch (XPathExpressionException ex) {
+		}
+		catch (SAXException ex) { LOGGER.warning(ex.getMessage()); }
+		catch (XPathExpressionException ex) {
 			LOGGER.warning(ex.getMessage());
-		} catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
+		}
+		catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
 		return txtLines;
 	}
 
@@ -492,7 +516,8 @@ public class UtilityMain {
 			InputSource inputSource = new InputSource(stringReader);
 			XPath xPath = XPathFactory.newInstance().newXPath();
 			txtLines = xPath.evaluate(xpathTxt, inputSource);
-		} catch (XPathExpressionException ex) { LOGGER.warning(ex.getMessage()); }
+		}
+		catch (XPathExpressionException ex) { LOGGER.warning(ex.getMessage()); }
 		return txtLines;
 	}
 
@@ -532,7 +557,7 @@ public class UtilityMain {
 		return xml;
 	}
 
-	public static String transformXslt(String xml, String xsl){
+	public static String transformXslt(String xml, String xsl) {
 		//
 		String txtLines = "";
 		try {
@@ -581,7 +606,8 @@ public class UtilityMain {
 			ObjectMapper objectMapperNode = new ObjectMapper();
 			JsonNode jsonNode = objectMapperNode.readTree(json);
 			txtLine = (jsonNode.get(applicationNode)).asText();
-		} catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
+		}
+		catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
 		//
 		return txtLine;
 	}
@@ -616,7 +642,8 @@ public class UtilityMain {
 				txtLines += PFX + txtKey + MID + txtVal + SFX;
 			}
 			System.out.println("txtLines: " + txtLines);
-		} catch (JsonProcessingException ex) { LOGGER.warning(ex.getMessage()); }
+		}
+		catch (JsonProcessingException ex) { LOGGER.warning(ex.getMessage()); }
 		return txtLines;
 	}
 }
