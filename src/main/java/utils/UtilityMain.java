@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -83,8 +84,9 @@ public class UtilityMain {
 
 	public static final String GREEN = "\u001b[32,1m";
 	public static final String RESET = "\u001b[0m";
-	public static final String DLM = "\n";
-	public static final String PAR = "\n\t";
+	public static final String DLM = ",";
+	public static final String TAB = "\t";
+	public static final String EOL = "\n";
 	public static final String CRLF = "\r\n";
 
 	public static final String FLD_SAMPLE = "static/";
@@ -108,7 +110,6 @@ public class UtilityMain {
 		Map<String, String> mapEnvTree = new TreeMap<String, String>(mapEnv);
 		StringBuffer stringBuffer = new StringBuffer();
 		stringBuffer.append("[");
-		// env.forEach( ( key , val ) -> stringBuffer.append( key + ": " + val + dlm ) );
 		mapEnvTree.forEach((key, val) -> {
 			//
 			val = val.replace("\\", "/");
@@ -147,7 +148,7 @@ public class UtilityMain {
 		SDFZ.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
 		String stzFormat = SDFZ.format(new Date());
 		//
-		txtLines = "showTimes()" + "\n";
+		txtLines = "showTimes()" + EOL;
 		txtLines += String.format("\t instantNow: %s \n", instantNow);
 		txtLines += String.format("\t ldtFormat : %s \n", ldtFormat);
 		txtLines += String.format("\t sdfFormat : %s \n", sdfFormat);
@@ -156,7 +157,7 @@ public class UtilityMain {
 		return txtLines;
 	}
 
-	public static String getFileLines(String pathFile, String delim) {
+	public static String getFileLines(String pathFile, String eol) {
 		/*
 			https://mkyong.com/java8/java-8-stream-read-a-file-line-by-line/
 
@@ -165,14 +166,14 @@ public class UtilityMain {
 		 */
 		String txtLines = "";
 		if (pathFile == null || pathFile.equals("")) { pathFile = FLD_SAMPLE + TXT_SAMPLE; }
-		if (delim == null || delim.equals("")) { delim = DLM; }
+		if (eol == null || eol.equals("")) { eol = EOL; }
 		//
 		List<String> list = new ArrayList<>();
 		try (BufferedReader bReader = Files.newBufferedReader(Paths.get(pathFile))) {
 			//
 			list = bReader.lines().collect(Collectors.toList());
-			txtLines = String.join("\n", list);
-			txtLines = txtLines.replaceAll("\n", delim);
+			txtLines = String.join(EOL, list);
+			txtLines = txtLines.replaceAll(EOL, eol);
 		}
 		catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
 		//
@@ -184,9 +185,8 @@ public class UtilityMain {
 		// https://howtodoinjava.com/java/io/read-file-from-resources-folder/
 		// File file = ResourceUtils.getFile("classpath:config/sample.txt")
 		String txtLines = "";
-		String urlFile = "";
 		if (pathFile == null || pathFile.equals("")) { pathFile = FLD_SAMPLE + TXT_SAMPLE; }
-		if (delim == null || delim.equals("")) { delim = DLM; }
+		if (delim == null || delim.equals("")) { delim = EOL; }
 		try {
 			/*
 			ClassLoader classLoader = ClassLoader.getSystemClassLoader( );
@@ -405,11 +405,12 @@ public class UtilityMain {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		Set set = new TreeSet();
-		//
 		Method[] methods = object.getClass().getDeclaredMethods();
+		//
 		Object[] args = null;
 		int MAXLEN = 35;
-		String FRMT = "\t%-25s | %-35s | %02d | %s \n";
+		String FRMT = "\t%02d %-25s | %-35s | %02d | %s \n";
+		AtomicInteger atomicInteger = new AtomicInteger();
 		Arrays.stream(methods).forEach(mthd -> {
 			//
 			Object objectVal = "";
@@ -418,19 +419,26 @@ public class UtilityMain {
 				returnType = returnType.substring(returnType.length() - MAXLEN);
 			}
 			mthd.setAccessible(true);
-			if (mthd.getReturnType().toString().startsWith("class") && mthd.getParameterCount() == 0) {
+			boolean boolClass = mthd.getReturnType().toString().startsWith("class");
+			boolean boolCount = mthd.getParameterCount() == 0;
+			if (boolClass & boolCount) {
 				try { objectVal = mthd.invoke(object, args); }
 				catch (IllegalAccessException | InvocationTargetException ex) {
 					LOGGER.info(ex.getMessage());
 				}
 			}
-			set.add(String
-				.format(FRMT, mthd.getName(), returnType, mthd.getParameterCount(), objectVal.toString()));
+			boolean boolAccess = mthd.getName().startsWith("access$");
+			if (boolAccess) {}
+			else {
+				set.add(String.format(FRMT, atomicInteger.incrementAndGet(),
+					mthd.getName(), returnType, mthd.getParameterCount(),objectVal.toString()));
+			}
 		});
 		//
+
 		stringBuilder.append(object.getClass().getName() + " has: [" + methods.length + "] methods\n\n");
 		set.stream().sorted().forEach(val -> stringBuilder.append(val));
-		return stringBuilder.toString();
+		return stringBuilder + "\n";
 	}
 
 	public static void putObject(Object object, String objectName, Object objectValue) {
@@ -486,13 +494,13 @@ public class UtilityMain {
 		return list;
 	}
 
-	public static String getZipFileList(String fileName, String delim) {
+	public static String getZipFileList(String fileName, String eol) {
 		//
 		String txtLines = "";
-		if (delim == null || delim.equals("")) { delim = DLM; }
+		if (eol == null || eol.equals("")) { eol = EOL; }
 		//
 		List<File> list = UtilityMain.getFilesFromZip(fileName);
-		for (File file : list) { txtLines += file.getName() + delim; }
+		for (File file : list) { txtLines += file.getName() + eol; }
 		return txtLines;
 	}
 
@@ -504,7 +512,7 @@ public class UtilityMain {
 	}
 
 	//############
-	public static String getXmlFileNode(String xmlfile, String xpathTxt, String delim) {
+	public static String getXmlFileNode(String xmlfile, String xpathTxt, String eol) {
 		//
 		// https://howtodoinjava.com/xml/evaluate-xpath-on-xml-string/
 		String txtLines = "";
@@ -512,7 +520,7 @@ public class UtilityMain {
 			xmlfile = "src/main/resources/" + FLD_SAMPLE + XML_SAMPLE;
 		}
 		if (xpathTxt == null || xpathTxt.equals("")) { xpathTxt = "/catalog/book/title"; }
-		if (delim == null || delim.equals("")) { delim = DLM; }
+		if (eol == null || eol.equals("")) { eol = EOL; }
 		//
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -525,7 +533,7 @@ public class UtilityMain {
 			String xpathNode = "/catalog/book/@id";
 			NodeList nodeList = (NodeList) xPath.evaluate(xpathNode, document, XPathConstants.NODESET);
 			for (int ictr = 0; ictr < nodeList.getLength(); ictr++) {
-				txtLines += delim + nodeList.item(ictr).getNodeValue();
+				txtLines += eol + nodeList.item(ictr).getNodeValue();
 			}
 		}
 		catch (ParserConfigurationException ex) {
@@ -539,12 +547,10 @@ public class UtilityMain {
 		return txtLines;
 	}
 
-	public static String getXmlNode(String xml, String xpathTxt, String delim) {
+	public static String getXmlNode(String xml, String xpathTxt) {
 		//
 		// https://howtodoinjava.com/xml/evaluate-xpath-on-xml-string/
 		String txtLines = "";
-		if (delim == null || delim.equals("")) { delim = DLM; }
-		//
 		try {
 			StringReader stringReader = new StringReader(xml);
 			InputSource inputSource = new InputSource(stringReader);
@@ -657,7 +663,7 @@ public class UtilityMain {
 		String txtKey = "";
 		String txtVal = "";
 		Object objVal = null;
-		String PFX = PAR;
+		String PFX = TAB;
 		String MID = " : ";
 		String SFX = "";
 		if (listFormat > 0) {

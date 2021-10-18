@@ -21,8 +21,11 @@ dependencies {
 	implementation 'com.jayway.jsonpath:json-path:2.6.0'			// for json processing
 	implementation 'org.springframework.boot:spring-boot-starter-logging:2.5.0' // for slf4j & logback in json-path
 	//
+	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// SQLite
 	implementation 'org.springframework:spring-web:4.3.8.RELEASE'	// RestTemplate
 	implementation 'io.jaegertracing:jaeger-core:1.6.0'				// Jaeger tracing
+	implementation 'io.kubernetes:client-java-extended:13.0.0'		// Kubernetes
+    implementation 'org.projectlombok:lombok:1.18.18'
 	//
 	// testImplementation 'org.mockito:mockito-all:1.10.19'			// mockito tests
 	testImplementation 'org.mockito:mockito-core:3.12.4'			// mockito handle reflection
