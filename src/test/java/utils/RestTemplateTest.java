@@ -3,6 +3,9 @@ package utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -15,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -25,6 +29,8 @@ import org.springframework.web.client.RestTemplate;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
+import static utils.UtilityMain.EOL;
+import static utils.UtilityMain.exposeObject;
 
 // @RunWith( MockitoJUnitRunner.class ) JUnit 4
 public class RestTemplateTest {
@@ -32,27 +38,24 @@ public class RestTemplateTest {
 	private static final Logger LOGGER = Logger.getLogger(RestTemplateTest.class.getName());
 	private static final String TXT_URL = "http://localhost:3000";
 	private static final String PATHFILE_LOCALJSON = "src/test/resources/" + "booksCatalog.json";
-	private static final String JSON_PATH = "/catalog/book/0/author";
 	private static final String ASSERT_MSG = "ASSERT_MSG";
 	private static final String TESTSERVER_DOWNMSG = "I/O error on GET Connection refused; using Mock";
 
-	@Test public void test_objectMapper() {
+	//#### RestTemplate
+	@Test public void test_RT_objects() throws URISyntaxException {
 		//
-		String txtLine = "", txtURL = TXT_URL + "/json";
+		StringBuilder sb = new StringBuilder();
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, txtURL);
-		String body = responseEntity.getBody();
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			JsonNode jsonNodeRoot = objectMapper.readTree(body);
-			JsonNode jsonNodeAt = jsonNodeRoot.at(JSON_PATH);
-			txtLine = jsonNodeAt.asText();
-			// txtLine = jsonNodeRoot.at(JsonPointer.compile(jsonPath)).asText();
-		}
-		catch (JsonProcessingException ex) { LOGGER.severe(ex.getMessage()); }
+		HttpEntity<String> httpEntity = new HttpEntity<>("http_text");
+		RequestEntity<String> requestEntity = RequestEntity.post(new URI(TXT_URL)).body("request_text");
+		ResponseEntity<String> responseEntity = new ResponseEntity<>("response_text", OK);
+		Object[] objects = {restTemplate, httpEntity,requestEntity,responseEntity};
 		//
-		System.out.println("jsonNodeAt.asText(): " + txtLine);
-		Assert.isTrue(txtLine.equals("Gambardella , Matthew"), ASSERT_MSG);
+		Arrays.stream(objects).forEach(obj -> sb.append(exposeObject(obj)));
+		//
+		String txtLines = sb.toString();
+		System.out.print(txtLines);
+		Assert.isTrue(txtLines.split(EOL).length >= 7, ASSERT_MSG);
 	}
 
 	@Test public void test_RT_getForEntity() {
@@ -182,6 +185,7 @@ public class RestTemplateTest {
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
 
+	//#### ResponseEntity
 	@Test public void test_RE_getStatusCode() {
 		//
 		RestTemplate restTemplate = new RestTemplate();
@@ -198,7 +202,7 @@ public class RestTemplateTest {
 		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
-		String txtLines = "ResponseEntity" + "\n";
+		String txtLines = "ResponseEntity" + EOL;
 		txtLines += String.format("\tgetStatusCode()\t\t %s\n", responseEntity.getStatusCode());
 		txtLines += String.format("\tgetHeaders()...\t\t %s\n", responseEntity.getHeaders());
 		txtLines += String.format("\tgetBody()......\t\t %s\n", responseEntity.getBody().substring(0, 20));
@@ -206,13 +210,14 @@ public class RestTemplateTest {
 		Assert.isTrue(httpStatus == OK, ASSERT_MSG);
 	}
 
+	//#### HttpStatus
 	@Test public void test_httpStatus() {
 		//
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
-		String txtLines = "HttpStatus" + "\n";
+		String txtLines = "HttpStatus" + EOL;
 		txtLines += String.format("\ttoString()\t\t %s\n", httpStatus.toString());
 		txtLines += String.format("\tseries()..\t\t %s\n", httpStatus.series());
 		txtLines += String.format("\tvalue()...\t\t %s\n", httpStatus.value());

@@ -1,19 +1,43 @@
 package utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import io.jaegertracing.Configuration;
+import io.kubernetes.client.extended.controller.Controller;
+import io.kubernetes.client.extended.controller.builder.ControllerBuilder;
+import io.kubernetes.client.extended.controller.reconciler.Reconciler;
+import io.kubernetes.client.extended.controller.reconciler.Request;
+import io.kubernetes.client.extended.controller.reconciler.Result;
+import io.kubernetes.client.informer.SharedIndexInformer;
+import io.kubernetes.client.informer.SharedInformerFactory;
+import io.kubernetes.client.informer.cache.Lister;
+import io.kubernetes.client.openapi.ApiCallback;
+import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.models.V1Node;
+import io.kubernetes.client.openapi.models.V1NodeList;
+import io.kubernetes.client.util.CallGeneratorParams;
 import io.opentracing.Tracer;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
@@ -32,6 +56,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.collections4.list.TreeList;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpMethod;
@@ -44,6 +72,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
+import static utils.UtilityMain.EOL;
+import static utils.UtilityMain.TAB;
 
 public class UtilityMainTest {
 
@@ -51,7 +81,33 @@ public class UtilityMainTest {
 	static final String PATHFILE_LOCAL = "src/test/resources/";
 	static final String ASSERT_MSG = "ASSERT_MSG";
 
-	private enum DATABASES {sqlite, mysql, cassandra, oracle}
+	//#### basics
+	@Test void test_template() {
+		//
+		StringBuilder stringBuilder = new StringBuilder();
+		//
+		stringBuilder.append("template");
+		//
+		String txtLines = stringBuilder.toString();
+		System.out.println("txtLines: " + txtLines);
+		Assert.isTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
+	}
+
+	@Test void test_booleans() {
+		//
+		String txtLines = EOL, expected = "";
+		//
+		txtLines += String.format("\t true & true \t %s \n", true & true);
+		txtLines += String.format("\t true | false\t %s \n", true | false);
+		txtLines += String.format("\t true | true \t %s \n", true | true);
+		txtLines += String.format("\t false | true\t %s \n", false | true);
+		txtLines += String.format("\t false | false\t %s \n", false | false);
+		txtLines += String.format("\t true & true & false\t %s \n", true & true & false);
+		txtLines += String.format("\t true && true && false\t %s \n", true && true && false);
+		//
+		System.out.println("txtLines: " + txtLines);
+		Assert.isTrue(txtLines.length() >= 1, ASSERT_MSG);
+	}
 
 	@Test void test_showSys() {
 
@@ -60,7 +116,8 @@ public class UtilityMainTest {
 		String[] envr = txtLines.split(",");
 		//
 		StringBuilder stringBuilder = new StringBuilder();
-		Arrays.stream(envr).forEach(str -> stringBuilder.append(str + "\n"));
+		Arrays.stream(envr).forEach(str -> stringBuilder.append(str + EOL));
+		//
 		System.out.println(stringBuilder);
 		System.out.println("envr: " + envr.length);
 		Assert.isTrue(envr.length > 60, ASSERT_MSG);
@@ -81,7 +138,7 @@ public class UtilityMainTest {
 
 		String showTimes = UtilityMain.showTimes();
 		//
-		int showTimesLen = showTimes.split("\n").length;
+		int showTimesLen = showTimes.split(EOL).length;
 		System.out.println("showTimes: " + showTimes);
 		System.out.println("showTimesLen: " + showTimesLen);
 		Assert.isTrue(showTimesLen > 4, ASSERT_MSG);
@@ -92,9 +149,9 @@ public class UtilityMainTest {
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
 		//
-		Collections.list(enums).stream().forEach(nifc -> set.add("\t" + nifc.getDisplayName()));
+		Collections.list(enums).stream().forEach(nifc -> set.add(TAB + nifc.getDisplayName()));
 		//
-		System.out.println("Stream & sort" + "\t" + "size: " + set.size());
+		System.out.println("Stream & sort" + TAB + "size: " + set.size());
 		set.stream().forEach(System.out::println);
 		Assert.isTrue(set.size() >= 7, ASSERT_MSG);
 	}
@@ -115,9 +172,9 @@ public class UtilityMainTest {
 				})
 				.collect(Collectors.toList());
 		//
-		listFilt.forEach(nifc -> set.add("\t" + nifc.getDisplayName()));
+		listFilt.forEach(nifc -> set.add(TAB + nifc.getDisplayName()));
 		//
-		System.out.println("Stream & filter" + "\t" + "size: " + set.size());
+		System.out.println("Stream & filter" + TAB + "size: " + set.size());
 		set.stream().forEach(System.out::println);
 		Assert.isTrue(set.size() >= 5, ASSERT_MSG);
 	}
@@ -126,13 +183,13 @@ public class UtilityMainTest {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
-		// stringBuilder.delete(0, stringBuilder.length()).append("Iterator Stream" + "\n");
+		// stringBuilder.delete(0, stringBuilder.length()).append("Iterator Stream" + EOL);
 		//
-		stringBuilder.append("Collections Stream" + "\n");
+		stringBuilder.append("Collections Stream" + EOL);
 		Collections.list(enums).stream().forEach(nifc -> stringBuilder.append(getNetIface(nifc, 0)));
 		//
 		System.out.println(stringBuilder);
-		Assert.isTrue(stringBuilder.toString().split("\n").length >= 7, ASSERT_MSG);
+		Assert.isTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
 	@Test void test_Stream_Iterator() throws SocketException {
@@ -141,13 +198,13 @@ public class UtilityMainTest {
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
 		Iterator iterator = NetworkInterface.getNetworkInterfaces().asIterator();
 		//
-		stringBuilder.append("Iterator Stream" + "\n");
+		stringBuilder.append("Iterator Stream" + EOL);
 		Stream<NetworkInterface> stream = StreamSupport.stream(
 			Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
 		stream.forEach(nifc -> stringBuilder.append(getNetIface(nifc, 0)));
 		//
 		System.out.println(stringBuilder);
-		Assert.isTrue(stringBuilder.toString().split("\n").length >= 7, ASSERT_MSG);
+		Assert.isTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
 	@Test void test_getField() {
@@ -171,7 +228,7 @@ public class UtilityMainTest {
 		AnyObject anyObject = new AnyObject();
 		String txtLines = UtilityMain.exposeObject(anyObject);
 		System.out.println(txtLines);
-		Assert.isTrue(txtLines.split("\n").length >= 6, ASSERT_MSG);
+		Assert.isTrue(txtLines.split(EOL).length >= 6, ASSERT_MSG);
 	}
 
 	@Test void test_putObject() {
@@ -183,7 +240,7 @@ public class UtilityMainTest {
 		Assert.isTrue(txtLine.equals("STUFF"), ASSERT_MSG);
 	}
 
-	//############
+	//#### files
 	@Test void test_getFileLines() {
 
 		String txtLines = "";
@@ -216,10 +273,29 @@ public class UtilityMainTest {
 				String.format("\t%02d %s\tsize: %d \n", idx.incrementAndGet(), flnm, txtLines.length()));
 		});
 		//
-		int countFiles = stringBuilder.toString().split("\n").length;
+		int countFiles = stringBuilder.toString().split(EOL).length;
 		System.out.println("countFiles: " + countFiles);
 		System.out.println(stringBuilder);
 		Assert.isTrue(countFiles == fileNames.length, ASSERT_MSG);
+	}
+
+	@Test void test_objectMapper() {
+		//
+		String txtLine = "";
+		String JSON_PATH = "/catalog/book/0/author";
+		String PATHFILE_LOCALJSON = PATHFILE_LOCAL + "booksCatalog.json";
+		String body = UtilityMain.getFileLocal(PATHFILE_LOCALJSON, "");
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			JsonNode jsonNodeRoot = objectMapper.readTree(body);
+			JsonNode jsonNodeAt = jsonNodeRoot.at(JSON_PATH);
+			txtLine = jsonNodeAt.asText();
+			// txtLine = jsonNodeRoot.at(JsonPointer.compile(jsonPath)).asText();
+		}
+		catch (JsonProcessingException ex) { LOGGER.severe(ex.getMessage()); }
+		//
+		System.out.println("jsonNodeAt.asText(): " + txtLine);
+		Assert.isTrue(txtLine.equals("Gambardella , Matthew"), ASSERT_MSG);
 	}
 
 	@Test void test_getJsonValue_fromPath() {
@@ -253,17 +329,47 @@ public class UtilityMainTest {
 		Assert.isTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
+	//#### special
 	@Test void test_NetworkAddress() throws SocketException { /**/
 		//
-		// retrieve networkInterface SSIDs
-		String txtLines = "";
+		String txtLines = EOL + "InetAddress" + EOL;
+		try {
+			InetAddress INA = InetAddress.getLocalHost();
+			txtLines += String.format(
+				"\tlocalhost: %s\n\t" + "hostName : %s\n\t" + "hostAddr : %s\n\t" + "canonical: %s\n\n",
+				INA.toString(),
+				INA.getHostName(),
+				INA.getHostAddress(),
+				INA.getCanonicalHostName());
+		}
+		catch (Exception ex) { LOGGER.info(ex.getMessage()); }
+		//
+		txtLines += "NetworkInterface SSIDs" + EOL;
+		List<String> list = new TreeList<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
 		while (enums.hasMoreElements()) {
 			NetworkInterface netIface = enums.nextElement();
-			txtLines += getNetIface(netIface, 1);
+			list.add(getNetIface(netIface, 1));
 		}
+		//
+		StringBuilder stringBuilder = new StringBuilder();
+		list.stream().sorted()
+			.forEach(txt -> stringBuilder.append(txt));
+		txtLines += stringBuilder.toString();
 		System.out.println(txtLines);
-		Assert.isTrue(txtLines.split("\n").length >= 7, ASSERT_MSG);
+		Assert.isTrue(list.size() >= 7, ASSERT_MSG);
+	}
+
+	@Test void testDB_read() {
+		//
+		DbProfile DPB = DbProfile.init(DbProfile.DATABASES.sqlite);
+		DPB.setSql("SELECT FirstName as FIRST, LastName as LAST, Email FROM  customers " +
+			"WHERE State = 'CA' ORDER BY LastName ASC");
+		//
+		String txtLines = DPB.dbRead();
+		//
+		System.out.println("txtLines: " + txtLines);
+		Assert.isTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
 	}
 
 	@Test void test_JaegerClient_tracing() {
@@ -273,7 +379,65 @@ public class UtilityMainTest {
 		Tracer tracer = configuration.getTracer();
 		String txtLines = UtilityMain.exposeObject(tracer);
 		System.out.println(txtLines);
-		Assert.isTrue(txtLines.split("\n").length >= 30, ASSERT_MSG);
+		Assert.isTrue(txtLines.split(EOL).length >= 20, ASSERT_MSG);
+	}
+
+	@Test void test_K8Controller() {
+		//
+		// JIB, Dekorate, JKube
+		// io.kubernetes:client-java-extended:6.0.1
+		SharedInformerFactory SIF = new SharedInformerFactory();
+		CoreV1Api coreV1Api = new CoreV1Api();
+		String pretty = "", continues = "", fieldSelector = "", labelSelector = "",
+			resourceVersionMatch =
+				"";
+		int limit = 0;
+		boolean allowWatchBookmarks = true, watch = true;
+		Integer timeoutSeconds = null;
+		ApiCallback apiCallback = null;
+		//
+		SharedIndexInformer<V1Node> SII =
+			SIF.sharedIndexInformerFor(
+				(CallGeneratorParams params) -> {
+					return coreV1Api.listNodeCall(
+						pretty, allowWatchBookmarks, continues, fieldSelector, labelSelector, limit,
+						params.resourceVersion, resourceVersionMatch,
+						timeoutSeconds, watch, apiCallback);
+				},
+				V1Node.class, V1NodeList.class);
+		SIF.startAllRegisteredInformers();
+		//
+		class NodePrintingReconciler implements Reconciler {
+			//
+			final Lister<V1Node> listerV1Node;
+
+			//
+			public NodePrintingReconciler(SharedIndexInformer<V1Node> nodeInformer) {
+				this.listerV1Node = new Lister<>(nodeInformer.getIndexer());
+			}
+
+			//
+			@Override public Result reconcile(Request request) {
+				V1Node v1Node = this.listerV1Node.get(request.getName());
+				System.out.println("triggered reconciling " + v1Node.getMetadata().getName());
+				return new Result(false);
+			}
+		}
+		//
+		NodePrintingReconciler NPR = new NodePrintingReconciler(SII);
+		//
+		Controller controller =
+			ControllerBuilder.defaultBuilder(SIF)
+				.watch(
+					(workQueue) -> ControllerBuilder.controllerWatchBuilder(V1Node.class, workQueue)
+						.build())
+				.withReconciler(NPR) // required, set the actual reconciler
+				.withName("node-printing-controller") // optional, set name for logging, thread-tracing
+				.withWorkerCount(4) // optional, set worker thread count
+				.withReadyFunc(SII::hasSynced) // optional, only starts when cache synced up
+				.build();
+
+		// controller.run();
 	}
 
 	@Test void test_sampleServer() {
@@ -281,7 +445,7 @@ public class UtilityMainTest {
 		System.out.println("HttpStatus.OK.value: " + OK.value() + " / " + OK.getReasonPhrase());
 	}
 
-	//############
+	//#### mock tests
 	@Test void testmock_when_thenReturn() {
 		//
 		String txtLines = "";
@@ -390,7 +554,7 @@ public class UtilityMainTest {
 		Assert.isTrue(anyObjectSpy.getStrongValue().equals(SAMPLE2), ASSERT_MSG);
 	}
 
-	//############
+	//#### statics
 	private static String getNetIface(NetworkInterface netIface, int mode) {
 		//
 		String txtLines = "", address = "";
@@ -403,12 +567,14 @@ public class UtilityMainTest {
 				txtLines += String.format("\t%02d %s\n", netIface.getIndex(), netIface.getDisplayName());
 			}
 			else {
-				txtLines += String.format("\t%02d %04d %6s %s %s\n",
-					netIface.getIndex(),
-					netIface.getMTU(), // Maximum Transmission Unit (MTU) of this interface
-					netIface.getName(),
-					address,
-					netIface.getDisplayName());
+				if (bytes != null) {
+					txtLines += String.format("\t%6s %2d %04d %s %s\n",
+						netIface.getName(),
+						netIface.getIndex(),
+						netIface.getMTU(), // Maximum Transmission Unit (MTU) of this interface
+						address,
+						netIface.getDisplayName());
+				}
 			}
 		}
 		catch (Exception ex) { LOGGER.info(ex.getMessage()); }
@@ -434,7 +600,101 @@ public class UtilityMainTest {
 	}
 }
 
-class AnyException extends IllegalStateException {}
+/*
+	add 4 "lombok" refs & plugin to build?
+	add "lombok.config" with "lombok.addLombokGeneratedAnnotation=true"?
+	add @Getter @Setter @EqualsAndHashCode @NoArgsConstructor to POJO
+*/
+@Getter @Setter @EqualsAndHashCode
+class DbProfile {
+	//
+	public enum DATABASES {sqlite, derby, mysql, oracle, cassandra}
+
+	private static final Logger LOGGER = Logger.getLogger(DbProfile.class.getName());
+	private String className;
+	private String connection;
+	public String sql;
+
+	private DbProfile dbProfile;
+
+	private DbProfile(String className, String connection, String sql) {
+		this.className = className;
+		this.connection = connection;
+		this.sql = sql;
+	}
+
+	public static DbProfile init(DATABASES dbtype) {
+		//
+		String className = "";
+		String connection = "";
+		String sql = "";
+		switch (dbtype) {
+			case sqlite:
+				className = "org.sqlite.JDBC";
+				connection = "jdbc:sqlite:C:/dbase/sqlite/chinook.db";
+				sql = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
+				break;
+			case derby:
+				className = "org.apache.derby.jdbc.ClientDriver";
+				connection = "jdbc:derby://localhost:1527/testDb";
+				sql = "";
+				break;
+			case mysql:
+				className = "com.mysql.jdbc.Driver";
+				connection = "jdbc:mysql://ohit014:3306/db";
+				sql = "";
+				break;
+			case oracle:
+				className = "oracle.jdbc.driver.OracleDriver";
+				connection = "jdbc:oracle:thin:@localhost:1521:db";
+				sql = "";
+				break;
+			case cassandra:
+				className = "";
+				connection = "";
+				sql = "";
+				break;
+		}
+		DbProfile dbProfile = new DbProfile(className, connection, sql);
+		return dbProfile;
+	}
+
+	public String dbRead() {
+		//
+		StringBuilder stringBuilder = new StringBuilder();
+		String DLM = ",\t";
+		try {
+			Class.forName(getClassName());
+			Connection connection = DriverManager.getConnection(getConnection());
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(getSql());
+			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+			int intColumnCount = resultSetMetaData.getColumnCount();
+			// get column titles
+			stringBuilder.append(EOL);
+			for (int ictr = 1; ictr < intColumnCount + 1; ictr++) {
+				stringBuilder.append(resultSetMetaData.getColumnName(ictr) + TAB);
+			}
+			stringBuilder.append(EOL);
+			// get rows
+			Object object = null;
+			while (resultSet.next()) {
+				//
+				stringBuilder.append(TAB);
+				for (int ictr = 1; ictr < intColumnCount + 1; ictr++) {
+					object = resultSet.getObject(ictr);
+					if (object instanceof Clob) { object = object.getClass().getName(); }
+					if (object == null) { object = "NULL"; }
+					if (ictr < intColumnCount) { stringBuilder.append(object + DLM); }
+					else {stringBuilder.append(object);}
+				}
+				stringBuilder.append(EOL);
+			}
+		}
+		catch (ClassNotFoundException | SQLException ex) { LOGGER.info(ex.getMessage());}
+		return stringBuilder.toString();
+	}
+}
 
 class AnyObject {
 
@@ -509,4 +769,7 @@ class AnyHttpHandler implements HttpHandler {
 		catch (IOException ex) { LOGGER.severe(ex.getMessage());}
 	}
 }
+
+class AnyException extends IllegalStateException {}
+
 //----
