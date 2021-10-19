@@ -426,6 +426,7 @@ public class UtilityMain {
 				catch (IllegalAccessException | InvocationTargetException ex) {
 					LOGGER.info(ex.getMessage());
 				}
+				if (objectVal==null) { objectVal = "NULL or EMPTY"; }
 			}
 			boolean boolAccess = mthd.getName().startsWith("access$");
 			if (boolAccess) {}
