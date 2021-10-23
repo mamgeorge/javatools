@@ -226,7 +226,7 @@ public class RestTemplateTest {
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
 
-	//############
+	//#### helpers ####
 	private ResponseEntity<String> getForEntity_String(RestTemplate restTemplate, String txtUrl) {
 		//
 		ResponseEntity<String> responseEntity;

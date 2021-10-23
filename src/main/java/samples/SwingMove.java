@@ -1,23 +1,18 @@
 // https://codereview.stackexchange.com/questions/29630/simple-java-animation-with-swing
 
-package utils;
+package samples;
 
 import static java.awt.Color.BLUE;
 import static java.awt.Color.GREEN;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.WHITE;
 
-import static utils.SwingSample.EXIT;
-import static utils.SwingSample.TIME;
-import static utils.SwingSample.MOVE;
-import static utils.SwingSample.COLOR_RED;
-import static utils.SwingSample.COLOR_GRN;
-import static utils.SwingSample.COLOR_BLU;
-import static utils.SwingSample.COLOR_PUR;
-import static utils.SwingSample.ACTION_EXIT;
-import static utils.SwingSample.ACTION_TIME;
-import static utils.SwingSample.DIMENSION_BTNS;
-import static utils.SwingSample.getJButton;
+import static samples.SwingSample.COLOR_RED;
+import static samples.SwingSample.COLOR_GRN;
+import static samples.SwingSample.COLOR_PUR;
+import static samples.SwingSample.ACTION_EXIT;
+import static samples.SwingSample.ACTION_TIME;
+import static samples.SwingSample.getJButton;
 
 import java.awt.BorderLayout;
 import java.awt.Container;

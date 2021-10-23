@@ -1,8 +1,7 @@
-package utils;
+package samples;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import java.util.logging.Logger;
-import java.util.Date;
 import java.util.Random;
 import java.time.LocalDateTime;
 

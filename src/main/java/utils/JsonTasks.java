@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.logging.Logger;
+import samples.Owner;
 
 public class JsonTasks {
 	//
@@ -17,18 +18,18 @@ public class JsonTasks {
 	}
 
 	public static String getJsonPath(String json, String fieldPath) {
+		//
 		return JsonPath.parse(json).read(fieldPath).toString();
 	}
 
-	public static String getJsonNodeObject(String json) {
+	public static Object getJsonNodeObject(Class clazz, String json) {
 		//
-		String txtLines = "";
+		Object object = null;
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
-			Owner owner = objectMapper.readValue(json, Owner.class);
-			txtLines = owner.id + " / " + owner.name;
+			object = objectMapper.readValue(json, clazz);
 		} catch (JsonProcessingException ex) { System.err.println(ex.getMessage()); }
-		return txtLines;
+		return object;
 	}
 
 	public static String getJsonNode(String json, String fieldName) {

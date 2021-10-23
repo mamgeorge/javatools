@@ -1,4 +1,4 @@
-package utils;
+package samples;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpMethod;
 
 import static org.springframework.http.HttpStatus.OK;
 
-class AnyHttpHandler implements HttpHandler {
+public class AnyHttpHandler implements HttpHandler {
 
 	// https://dzone.com/articles/simple-http-server-in-java
 	private static final Logger LOGGER = Logger.getLogger(AnyHttpHandler.class.getName());
