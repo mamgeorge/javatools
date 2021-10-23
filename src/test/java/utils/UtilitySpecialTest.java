@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import org.apache.commons.collections4.list.TreeList;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.Assert;
+import samples.AnyHttpHandler;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

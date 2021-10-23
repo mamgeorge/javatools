@@ -1,4 +1,4 @@
-package utils;
+package samples;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import java.util.Date;

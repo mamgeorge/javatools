@@ -1,6 +1,6 @@
-package utils;
+package samples;
 
-class AnyObject {
+public class AnyObject {
 
 	private String stringValue = "";
 	private String strongValue = "";

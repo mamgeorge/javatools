@@ -1,68 +1,64 @@
 package utils;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
+import samples.BooksCatalog;
 
-import java.util.Arrays;
-import java.util.logging.Logger;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static utils.UtilityMain.EOL;
 
 // C:/workspace/training/javatools/src/test/java/utils
 public class JsonTasksTest {
 	//
-	private static final Logger LOGGER = Logger.getLogger(JsonTasksTest.class.getName());
-
-	private static final String LOGGER_JSONPATH = "com.jayway.jsonpath.internal.path.CompiledPath";
-	private static final String BASE_PATH = "static/";
-	private static final String jsonFile = BASE_PATH + "owner.json";
+	private static final String BASE_PATH = "src/test/resources/";
+	private static final String jsonFile = BASE_PATH + "booksCatalog.json";
 	private String json = "";
 
-	@BeforeEach public void init( ) throws Exception {
+	@BeforeEach void init() {
 		//
-		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-		ch.qos.logback.classic.Logger logger = loggerContext.getLogger( LOGGER_JSONPATH );
-		logger.setLevel( Level.INFO );
-		//
-		json = UtilityMain.getFileLocal( jsonFile, "" );
+		json = UtilityMain.getFileLocal(jsonFile, "");
+		System.out.println(json.substring(0, 20));
 	}
 
-	@Test public void getJsonPath() {
+	@Test void getJsonPath() {
 		//
-		String txtLines = "#### getJsonPath" + "\n";
-		String[] fieldNames = { "name", "date", "address.continent", "vehicle[*].model" };
+		String txtLines = "#### getJsonPath" + EOL;
+		String[] fieldNames = {"id", "author", "price", "title"}; // catalog.book[*].
+		int aint = 1;
 		//
 		// txtLines += JsonTasks.getJsonPath(json, "vehicle[*].model");
 		StringBuilder stringBuilder = new StringBuilder();
-		Arrays.stream(fieldNames).forEach( jpath -> 
-			stringBuilder.append("\t" + JsonTasks.getJsonPath(json, jpath) + "\n") );
+		for (String jpath : fieldNames) {
+			stringBuilder
+				.append(String.format("\t%s",
+					JsonTasks.getJsonPath(json, "catalog.book[" + aint + "]." + jpath)));
+		}
 		txtLines += stringBuilder.toString();
-		//
-		JsonTasks.LOGGER.info(txtLines);
+		System.out.println(txtLines);
+		assertTrue(txtLines.contains("Midnight"));
 	}
 
-	@Test public void getJsonNodeObject() {
+	@Test void getJsonNodeObject() {
 		//
-		String txtLines = "#### getJsonNodeObject" + "\n";
-		String jsonValue = JsonTasks.getJsonNodeObject(json);
-		txtLines += "value: " + jsonValue + "\n";
+		String txtLines = "#### getJsonNodeObject" + EOL;
+		BooksCatalog booksCatalog = (BooksCatalog) JsonTasks.getJsonNodeObject(BooksCatalog.class, json);
+		String title = booksCatalog.catalog.book.get(0).title;
+		txtLines += "title: " + title + EOL;
 		//
-		JsonTasks.LOGGER.info(txtLines);
-		assertEquals( true, jsonValue.length( ) > 1, "OOPS!" );
+		System.out.println(txtLines);
+		assertTrue(title.contains("Developers"));
 	}
 
-	@Test public void getJsonNode() {
+	@Test void getJsonNode() {
 		//
-		String txtLines = "#### getJsonNode" + "\n";
-		String[] fieldName = { "/name", "/date", "/address/continent" };
+		String txtLines = "#### getJsonNode" + EOL;
+		String[] fieldNames = {"id", "author", "price", "title"};
+		int aint = 3;
 		//
-		String jsonValue = JsonTasks.getJsonNode( json, fieldName[1] );
-		txtLines += "fieldName: " + fieldName[1] + ", ";
-		txtLines += "value: " + jsonValue + "\n";
+		String jsonValue = JsonTasks.getJsonNode(json, "/catalog/book/" + aint + "/" + fieldNames[aint]);
+		txtLines += "fieldName: " + fieldNames[aint] + ", value: " + jsonValue + EOL;
 		//
-		JsonTasks.LOGGER.info(txtLines);
+		System.out.println(txtLines);
+		assertTrue(jsonValue.contains("Oberon"));
 	}
 }

@@ -1,9 +1,10 @@
-package utils;
+package samples;
 
 import java.time.Instant;
 import java.util.logging.Logger;
+import utils.UtilityMainTest;
 
-class AnyException extends IllegalStateException {
+public class AnyException extends IllegalStateException {
 
 	static final Logger LOGGER = Logger.getLogger(UtilityMainTest.class.getName());
 

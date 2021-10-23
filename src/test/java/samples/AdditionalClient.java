@@ -1,4 +1,4 @@
-package utils;
+package samples;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
