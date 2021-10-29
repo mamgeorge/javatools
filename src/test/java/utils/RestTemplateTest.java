@@ -2,6 +2,7 @@ package utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -18,23 +19,30 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import samples.AppResponse;
 import samples.OauthToken;
 
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.exposeObject;
 
@@ -104,7 +112,7 @@ public class RestTemplateTest {
 		HttpEntity<?> httpEntity = new HttpEntity<>("bar");
 		if (false) {
 			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			httpHeaders.setContentType(APPLICATION_FORM_URLENCODED);
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("AgentId", "G002875");
 			map.put("Phone", "614-377-7835");
@@ -280,7 +288,7 @@ public class RestTemplateTest {
 			String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + FILENAME_BOOKS);
 			//
 			MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
-			MVM.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+			MVM.add(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
 			MVM.add("AgentId", "G002875");
 			MVM.add("Phone", "614-377-7835");
 			responseEntity = new ResponseEntity<>(body, MVM, OK);
@@ -297,7 +305,7 @@ public class RestTemplateTest {
 			LOGGER.info(TESTSERVER_DOWNMSG);
 			String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + FILENAME_BOOKS);
 			MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
-			MVM.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+			MVM.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
 			responseEntity = new ResponseEntity<>(body, MVM, OK);
 		}
 		return responseEntity;
@@ -309,14 +317,25 @@ public class RestTemplateTest {
 		byte[] bytes = null;
 		try { bytes = Files.readAllBytes(Paths.get(fileName)); }
 		catch (Exception ex) { LOGGER.info(ex.getMessage()); }
-		System.out.println("bytes.length: " + bytes.length + " for " + fileName);
+		System.out.println("bytes.length: " + bytes.length + " for " + fileName + EOL);
 		return bytes;
+	}
+
+	public static MultipartFile getMultipartFile(String fileName) {
+		//
+		// https://www.codejava.net/java-se/file-io/how-to-read-and-write-binary-files-in-java
+		byte[] bytes = getFileBinary(fileName);
+		String MPF = MULTIPART_FORM_DATA_VALUE;
+		MultipartFile multipartFile = new MockMultipartFile("audioFile", fileName, MPF, bytes);
+		System.out.println("multipartFile: " + multipartFile.getSize() + " for " + fileName + EOL);
+		//
+		return multipartFile;
 	}
 
 	public static MultiValueMap getMvmSample() {
 		//
 		MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
-		MVM.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+		MVM.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
 		return MVM;
 	}
 
@@ -326,7 +345,7 @@ public class RestTemplateTest {
 		OauthToken oauthToken = new OauthToken();
 		//
 		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		httpHeaders.setContentType(APPLICATION_FORM_URLENCODED);
 		//
 		MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
 		MVM.add("client_id", "ANY_CLIENT");
@@ -346,26 +365,31 @@ public class RestTemplateTest {
 		catch (JsonProcessingException | IllegalArgumentException ex) { LOGGER.info(ex.getMessage()); }
 		//
 		access_token = oauthToken.getAccess_token();
-		System.out.println("access_token: " + access_token.substring(access_token.length() - 8));
+		System.out.println("oauthToken: " + access_token.substring(access_token.length() - 8));
 		return access_token;
 	}
 
 	public static String sendFiles2App(String txtUrl, String token, String pathJson, String pathWav) {
 		//
 		String textFile = UtilityMain.getFileLocal(pathJson);
-		byte[] byteWave = getFileBinary(pathWav);
+		MultipartFile multipartFile = getMultipartFile(pathWav);
+		ByteArrayResource barmFile = null;
+		try { barmFile = new ByteArrayResource(multipartFile.getBytes()); }
+		catch (IOException ex) { LOGGER.info(ex.getMessage()); }
+		System.out.println("barmFile.contentLength(): " + barmFile.contentLength());
 		//
 		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA); // APPLICATION_JSON
+		httpHeaders.setContentType(MULTIPART_FORM_DATA); // APPLICATION_JSON
 		httpHeaders.setBasicAuth(token);
 		httpHeaders.add("sessionId", "anysessionid");
 		httpHeaders.add("traceId", "anytraceid");
 		//
 		// https://www.programcreek.com/java-api-examples/?api=org.springframework.core.io.ByteArrayResource
-		// MVM.add("fileWav", new ByteArrayResource(byteWave) { @Override public String getFilename() { return pathWav; } } );
+		// MVM.add("fileWav", new ByteArrayResource(byteWave) { @Override public String getFilename() {
+		// return pathWav; } } );
 		MultiValueMap<String, Object> MVM = new LinkedMultiValueMap<>();
 		MVM.add("fileTxt", textFile);
-		MVM.add("fileWav", new ByteArrayResource(byteWave));
+		MVM.add("fileWav", barmFile); // MVM.add("fileWav", BAR);
 		//
 		HttpEntity<?> httpEntity = new HttpEntity<>(MVM, httpHeaders);
 		RestTemplate restTemplate = new RestTemplate();
