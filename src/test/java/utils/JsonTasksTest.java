@@ -16,7 +16,7 @@ public class JsonTasksTest {
 
 	@BeforeEach void init() {
 		//
-		json = UtilityMain.getFileLocal(jsonFile, "");
+		json = UtilityMain.getFileLocal(jsonFile);
 		System.out.println(json.substring(0, 20));
 	}
 
