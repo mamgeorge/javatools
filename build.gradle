@@ -27,7 +27,7 @@ dependencies {
 	implementation 'io.kubernetes:client-java-extended:13.0.0'		// Kubernetes
     implementation 'org.projectlombok:lombok:1.18.18'
 	//
-	// testImplementation 'org.mockito:mockito-all:1.10.19'			// mockito tests
+	testImplementation 'org.springframework:spring-test:5.3.12'		// for RT
 	testImplementation 'org.mockito:mockito-core:4.0.0'				// mockito handle reflection
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
