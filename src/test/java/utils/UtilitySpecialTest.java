@@ -47,13 +47,12 @@ public class UtilitySpecialTest {
 
 	@Test void test_transformXslt() {
 		//
-		String txtLines = "";
 		String filename_XML = PATHFILE_LOCAL + "booksCatalog" + ".xml";
 		String filename_XSL = PATHFILE_LOCAL + "booksXml2Html" + ".xslt";
-		String xml = UtilityMain.getFileLocal(filename_XML, "");
-		String xsl = UtilityMain.getFileLocal(filename_XSL, "");
+		String xml = UtilityMain.getFileLocal(filename_XML);
+		String xsl = UtilityMain.getFileLocal(filename_XSL);
 		//
-		txtLines = UtilityMain.transformXslt(xml, xsl);
+		String txtLines = UtilityMain.transformXslt(xml, xsl);
 		//
 		System.out.println(txtLines);
 		try { Files.write(Paths.get(PATHFILE_LOCAL + "booksCatalog.html"), txtLines.getBytes(UTF_8)); }
@@ -84,8 +83,7 @@ public class UtilitySpecialTest {
 		}
 		//
 		StringBuilder stringBuilder = new StringBuilder();
-		list.stream().sorted()
-			.forEach(txt -> stringBuilder.append(txt));
+		for (String txt : list) stringBuilder.append(txt);
 		txtLines += stringBuilder.toString();
 		System.out.println(txtLines);
 		Assert.isTrue(list.size() >= 7, ASSERT_MSG);
@@ -125,16 +123,14 @@ public class UtilitySpecialTest {
 		int limit = 0;
 		boolean allowWatchBookmarks = true, watch = true;
 		Integer timeoutSeconds = null;
-		ApiCallback apiCallback = null;
+		ApiCallback<?> apiCallback = null;
 		//
 		SharedIndexInformer<V1Node> SII =
 			SIF.sharedIndexInformerFor(
-				(CallGeneratorParams params) -> {
-					return coreV1Api.listNodeCall(
-						pretty, allowWatchBookmarks, continues, fieldSelector, labelSelector, limit,
-						params.resourceVersion, resourceVersionMatch,
-						timeoutSeconds, watch, apiCallback);
-				},
+				(CallGeneratorParams params) -> coreV1Api.listNodeCall(
+					pretty, allowWatchBookmarks, continues, fieldSelector, labelSelector, limit,
+					params.resourceVersion, resourceVersionMatch,
+					timeoutSeconds, watch, apiCallback),
 				V1Node.class, V1NodeList.class);
 		SIF.startAllRegisteredInformers();
 		//
@@ -179,7 +175,7 @@ public class UtilitySpecialTest {
 	//#### statics
 	private static String getNetIface(NetworkInterface netIface, int mode) {
 		//
-		String txtLines = "", address = "";
+		String txtLines = "", address;
 		try {
 			byte[] bytes = netIface.getHardwareAddress();
 			if (bytes == null) {address = "[empty!]"; }

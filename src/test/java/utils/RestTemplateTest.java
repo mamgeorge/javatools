@@ -1,18 +1,19 @@
 package utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,8 +24,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.Assert;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import samples.AppResponse;
+import samples.OauthToken;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -37,19 +43,28 @@ public class RestTemplateTest {
 
 	private static final Logger LOGGER = Logger.getLogger(RestTemplateTest.class.getName());
 	private static final String TXT_URL = "http://localhost:3000";
-	private static final String PATHFILE_LOCALJSON = "src/test/resources/" + "booksCatalog.json";
+	private static final String PATHFILE_LOCAL = "src/test/resources/";
+	private static final String FILENAME_BOOKS = "booksCatalog.json";
+	private static final String FILENAME_WAVE = "hal9000.wav";
 	private static final String ASSERT_MSG = "ASSERT_MSG";
 	private static final String TESTSERVER_DOWNMSG = "I/O error on GET Connection refused; using Mock";
+	public static final String DEFAULT_OAUTH =
+		"{ \"access_token\": \"TOKEN_DEFAULT\", \"token_type\": \"TYPE_DEFAULT\", \"expires_in\": " +
+			"\"EXPIRES_DEFAULT\", \"id_token\": \"ID_DEFAULT\" }";
+	public static final String DEFAULT_APIRSP = "{ \"userid\": \"1234567890\", \"ttslength\": \"8000\" }";
 
 	//#### RestTemplate
-	@Test public void test_RT_objects() throws URISyntaxException {
+	@Test public void test_RT_objects() {
 		//
 		StringBuilder sb = new StringBuilder();
 		RestTemplate restTemplate = new RestTemplate();
+		URI uri = null;
+		try { uri = new URI(TXT_URL);}
+		catch (URISyntaxException ex) { LOGGER.info(ex.getMessage()); }
 		HttpEntity<String> httpEntity = new HttpEntity<>("http_text");
-		RequestEntity<String> requestEntity = RequestEntity.post(new URI(TXT_URL)).body("request_text");
+		RequestEntity<String> requestEntity = RequestEntity.post(uri).body("request_text");
 		ResponseEntity<String> responseEntity = new ResponseEntity<>("response_text", OK);
-		Object[] objects = {restTemplate, httpEntity,requestEntity,responseEntity};
+		Object[] objects = {restTemplate, httpEntity, requestEntity, responseEntity};
 		//
 		Arrays.stream(objects).forEach(obj -> sb.append(exposeObject(obj)));
 		//
@@ -66,7 +81,7 @@ public class RestTemplateTest {
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		// RT.getForEntity( ) > RE.getStatusCode( ) > HS
-		String txtLines = String.format("httpStatus: %s\n", httpStatus.toString());
+		String txtLines = String.format("httpStatus: %s\n", httpStatus);
 		System.out.println(txtLines);
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
@@ -78,7 +93,7 @@ public class RestTemplateTest {
 		ResponseEntity<String> responseEntity = exchange_Entity(restTemplate, TXT_URL, GET, httpEntity);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
-		String txtLines = String.format("httpStatus: %s\n", httpStatus.toString());
+		String txtLines = String.format("httpStatus: %s\n", httpStatus);
 		System.out.println(txtLines);
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
@@ -99,7 +114,7 @@ public class RestTemplateTest {
 			exchange_Entity(restTemplate, TXT_URL + "/post", POST, httpEntity);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
-		String txtLines = String.format("httpStatus: %s\n", httpStatus.toString());
+		String txtLines = String.format("httpStatus: %s\n", httpStatus);
 		System.out.println(txtLines);
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
@@ -112,7 +127,7 @@ public class RestTemplateTest {
 			exchange_Entity(restTemplate, TXT_URL + "/post", POST, httpEntity);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
-		String txtLines = String.format("httpStatus: %s\n", httpStatus.toString());
+		String txtLines = String.format("httpStatus: %s\n", httpStatus);
 		System.out.println(txtLines);
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
@@ -192,7 +207,7 @@ public class RestTemplateTest {
 		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
-		System.out.println("responseEntity.getStatusCode(): " + httpStatus.toString());
+		System.out.println("responseEntity.getStatusCode(): " + httpStatus);
 		Assert.isTrue(httpStatus == OK, ASSERT_MSG);
 	}
 
@@ -210,7 +225,6 @@ public class RestTemplateTest {
 		Assert.isTrue(httpStatus == OK, ASSERT_MSG);
 	}
 
-	//#### HttpStatus
 	@Test public void test_httpStatus() {
 		//
 		RestTemplate restTemplate = new RestTemplate();
@@ -218,12 +232,40 @@ public class RestTemplateTest {
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		String txtLines = "HttpStatus" + EOL;
-		txtLines += String.format("\ttoString()\t\t %s\n", httpStatus.toString());
+		txtLines += String.format("\ttoString()\t\t %s\n", httpStatus);
 		txtLines += String.format("\tseries()..\t\t %s\n", httpStatus.series());
 		txtLines += String.format("\tvalue()...\t\t %s\n", httpStatus.value());
 		txtLines += String.format("\tname()....\t\t %s\n", httpStatus.name());
 		System.out.println(txtLines);
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
+	}
+
+	//#### implementations
+	@Test public void test_getOauthToken() {
+		//
+		String access_token = getOauthToken(TXT_URL + "/OAUTH", "ANY_PASSWORD");
+		System.out.println(access_token);
+		Assert.isTrue(access_token.length() >= 8, ASSERT_MSG);
+	}
+
+	@Test public void test_sendFiles2App() {
+		//
+		String txtUrl = TXT_URL + "/API";
+		String token = getOauthToken(TXT_URL + "/OAUTH", "ANY_PASSWORD");
+		String pathJson = PATHFILE_LOCAL + FILENAME_BOOKS;
+		String pathWav = PATHFILE_LOCAL + FILENAME_WAVE;
+		//
+		String body = sendFiles2App(txtUrl, token, pathJson, pathWav);
+		AppResponse appResponse = null;
+		try { appResponse = new ObjectMapper().readValue(body, AppResponse.class);}
+		catch (JsonProcessingException | IllegalArgumentException ex) { LOGGER.info(ex.getMessage()); }
+		//
+		String txtLines = "body: " + body + EOL;
+		txtLines += "getUserid: " + appResponse.getUserid() + EOL;
+		txtLines += "getTtslength: " + appResponse.getTtslength() + EOL;
+		int ttsLength = Integer.valueOf(appResponse.getTtslength());
+		System.out.println(txtLines);
+		Assert.isTrue(ttsLength > 1000, ASSERT_MSG);
 	}
 
 	//#### helpers ####
@@ -234,31 +276,103 @@ public class RestTemplateTest {
 			responseEntity = restTemplate.getForEntity(txtUrl, String.class);
 		}
 		catch (ResourceAccessException ex) {
-			System.out.println(TESTSERVER_DOWNMSG);
-			String body = UtilityMain.getFileLocal(PATHFILE_LOCALJSON, "");
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-			Map<String, Object> map = new HashMap<>();
-			map.put("AgentId", "G002875");
-			map.put("Phone", "614-377-7835");
-			HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(map, httpHeaders);
-			responseEntity = new ResponseEntity<>(body, OK);
+			LOGGER.info(TESTSERVER_DOWNMSG);
+			String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + FILENAME_BOOKS);
+			//
+			MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
+			MVM.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+			MVM.add("AgentId", "G002875");
+			MVM.add("Phone", "614-377-7835");
+			responseEntity = new ResponseEntity<>(body, MVM, OK);
 		}
 		return responseEntity;
 	}
 
-	private ResponseEntity<String> exchange_Entity(RestTemplate restTemplate, String txtUrl,
+	private ResponseEntity<String> exchange_Entity(RestTemplate RT, String txtUrl,
 		HttpMethod httpMethod, HttpEntity httpEntity) {
 		//
 		ResponseEntity<String> responseEntity;
-		try {
-			responseEntity = restTemplate
-				.exchange(txtUrl, httpMethod, httpEntity, String.class);
-		}
+		try { responseEntity = RT.exchange(txtUrl, httpMethod, httpEntity, String.class); }
 		catch (ResourceAccessException ex) {
-			System.out.println(TESTSERVER_DOWNMSG);
-			responseEntity = new ResponseEntity<>(OK);
+			LOGGER.info(TESTSERVER_DOWNMSG);
+			String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + FILENAME_BOOKS);
+			MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
+			MVM.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+			responseEntity = new ResponseEntity<>(body, MVM, OK);
 		}
 		return responseEntity;
+	}
+
+	public static byte[] getFileBinary(String fileName) {
+		//
+		// https://www.codejava.net/java-se/file-io/how-to-read-and-write-binary-files-in-java
+		byte[] bytes = null;
+		try { bytes = Files.readAllBytes(Paths.get(fileName)); }
+		catch (Exception ex) { LOGGER.info(ex.getMessage()); }
+		System.out.println("bytes.length: " + bytes.length + " for " + fileName);
+		return bytes;
+	}
+
+	public static MultiValueMap getMvmSample() {
+		//
+		MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
+		MVM.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+		return MVM;
+	}
+
+	public static String getOauthToken(String txtUrl, String password) {
+		//
+		String access_token;
+		OauthToken oauthToken = new OauthToken();
+		//
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		//
+		MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
+		MVM.add("client_id", "ANY_CLIENT");
+		MVM.add("resource", "ANY_RESOURCE");
+		MVM.add("username", "ANY_USERNAME");
+		MVM.add("password", password);
+		MVM.add("grant_typr", "password");
+		//
+		HttpEntity<?> httpEntity = new HttpEntity<>(MVM, httpHeaders);
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> responseEntity = new ResponseEntity<>(DEFAULT_OAUTH, getMvmSample(), OK);
+		try { responseEntity = restTemplate.postForEntity(txtUrl, httpEntity, String.class); }
+		catch (ResourceAccessException ex) { System.out.println("RAE ERROR: " + ex.getMessage()); }
+		//
+		String body = responseEntity.getBody();
+		try { oauthToken = new ObjectMapper().readValue(body, OauthToken.class);}
+		catch (JsonProcessingException | IllegalArgumentException ex) { LOGGER.info(ex.getMessage()); }
+		//
+		access_token = oauthToken.getAccess_token();
+		System.out.println("access_token: " + access_token.substring(access_token.length() - 8));
+		return access_token;
+	}
+
+	public static String sendFiles2App(String txtUrl, String token, String pathJson, String pathWav) {
+		//
+		String textFile = UtilityMain.getFileLocal(pathJson);
+		byte[] byteWave = getFileBinary(pathWav);
+		//
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA); // APPLICATION_JSON
+		httpHeaders.setBasicAuth(token);
+		httpHeaders.add("sessionId", "anysessionid");
+		httpHeaders.add("traceId", "anytraceid");
+		//
+		// https://www.programcreek.com/java-api-examples/?api=org.springframework.core.io.ByteArrayResource
+		// MVM.add("fileWav", new ByteArrayResource(byteWave) { @Override public String getFilename() { return pathWav; } } );
+		MultiValueMap<String, Object> MVM = new LinkedMultiValueMap<>();
+		MVM.add("fileTxt", textFile);
+		MVM.add("fileWav", new ByteArrayResource(byteWave));
+		//
+		HttpEntity<?> httpEntity = new HttpEntity<>(MVM, httpHeaders);
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> responseEntity = new ResponseEntity<>(DEFAULT_APIRSP, getMvmSample(), OK);
+		try { responseEntity = restTemplate.exchange(txtUrl, POST, httpEntity, String.class); }
+		catch (HttpClientErrorException | ResourceAccessException ex) { LOGGER.info(ex.getMessage()); }
+		//
+		return responseEntity.getBody();
 	}
 }
