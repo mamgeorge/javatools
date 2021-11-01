@@ -261,7 +261,7 @@ public class UtilityMain {
 			StringBuilder stringBuilder = new StringBuilder();
 			String txtLine;
 			while ((txtLine = bufferedReader.readLine()) != null) {
-				stringBuilder.append(txtLine);
+				stringBuilder.append(txtLine + EOL);
 			}
 			txtLines = stringBuilder.toString();
 		}
@@ -490,36 +490,6 @@ public class UtilityMain {
 	}
 
 	//#### xml/yml/json
-	public static String getXmlFileNode(String xmlfile, String xpathTxt, String eol) {
-		//
-		// https://howtodoinjava.com/xml/evaluate-xpath-on-xml-string/
-		String txtLines = "";
-		if (xmlfile == null || xmlfile.equals("")) {
-			xmlfile = "src/main/resources/" + FLD_SAMPLE + XML_SAMPLE;
-		}
-		if (xpathTxt == null || xpathTxt.equals("")) { xpathTxt = "/catalog/book/title"; }
-		if (eol == null || eol.equals("")) { eol = EOL; }
-		//
-		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder documentBuilder = dbf.newDocumentBuilder(); // PCE
-			Document document = documentBuilder.parse(xmlfile); // SAXException
-			XPathFactory xpf = XPathFactory.newInstance();
-			XPath xPath = xpf.newXPath();
-			txtLines = (String) xPath.evaluate(xpathTxt, document, XPathConstants.STRING);
-			//
-			String xpathNode = "/catalog/book/@id";
-			NodeList nodeList = (NodeList) xPath.evaluate(xpathNode, document, XPathConstants.NODESET);
-			for (int ictr = 0; ictr < nodeList.getLength(); ictr++) {
-				txtLines += eol + nodeList.item(ictr).getNodeValue();
-			}
-		}
-		catch (ParserConfigurationException | SAXException | XPathExpressionException | IOException ex) {
-			LOGGER.warning(ex.getMessage());
-		}
-		return txtLines;
-	}
-
 	public static String getXmlNode(String xml, String xpathTxt) {
 		//
 		// https://howtodoinjava.com/xml/evaluate-xpath-on-xml-string/

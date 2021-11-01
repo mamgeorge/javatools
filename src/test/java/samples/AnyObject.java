@@ -1,28 +1,18 @@
 package samples;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
 public class AnyObject {
 
-	private String stringValue = "";
-	private String strongValue = "";
-	private String secretValue = "";
+	private String alpha = "";
+	private String beta = "";
+	private String gamma = "";
 
 	public AnyObject() {
-		stringValue = "ANYSTRING";
-		strongValue = "OTHSTRING";
-		secretValue = "SECRETSTR";
+		alpha = "ALEPH";
+		beta = "BETH";
+		gamma = "GIMMEL";
 	}
-
-	//
-	public String getStringValue() { return stringValue; }
-
-	public String getStrongValue() { return strongValue; }
-
-	private String getSecretValue() { return secretValue; }
-
-	//
-	public void setStringValue(String stringValue) { this.stringValue = stringValue; }
-
-	public void setStrongValue(String strongValue) { this.strongValue = strongValue; }
-
-	private void setSecretValue(String secretValue) { this.secretValue = secretValue; }
 }
