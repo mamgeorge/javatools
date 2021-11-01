@@ -3,6 +3,10 @@ package utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.net.NetworkInterface;
@@ -187,7 +191,12 @@ public class UtilityMainTest {
 	@Test void putFilesIntoZip() { }
 
 	//#### url
-	@Test void urlGet() { }
+	@Test void urlGet() {
+		//
+		String html = UtilityMain.urlGet("https://mamgeorge.altervista.org");
+		System.out.println("html: " + html);
+		Assert.isTrue(html.contains("DOCTYPE"), ASSERT_MSG);
+	}
 
 	@Test void urlPost() { }
 
@@ -261,11 +270,43 @@ public class UtilityMainTest {
 		Assert.isTrue(txtLine.equals("44.95"), ASSERT_MSG);
 	}
 
-	@Test void getXmlFileNode() { }
+	@Test void getXmlNode() {
+		//
+		String xml = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.xml");
+		String xmlPath = "/catalog/book[5]/price";
+		String txtLines = UtilityMain.getXmlNode(xml, xmlPath);
+		System.out.println(txtLines);
+		Assert.isTrue(txtLines.contains("5.95"), ASSERT_MSG);
+	}
 
-	@Test void getXmlNode() { }
+	@Test void formatXml() {
+		//
+		String xml = "<a><b><c>Boo</c></b></a>";
+		String txtLines = UtilityMain.formatXml(xml);
+		System.out.println(txtLines);
+		Assert.isTrue(txtLines.split("\n").length >= 5, ASSERT_MSG);
+	}
 
-	@Test void formatXml() { }
+	@Test void formatJson() {
+		//
+		String json = "{\"a\":\"aleph\",\"b\":\"beth\",\"g\":\"gimmel\"}";
+		String txtLines = "";
+		try {
+			// JACKSON
+			ObjectMapper objectMapper = new ObjectMapper();
+			Object object = objectMapper.readValue(json, Object.class);
+			txtLines += objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object) + EOL;
+		}
+		catch (Exception ex) { LOGGER.info(ex.getMessage()); }
+		//
+		// GSON
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		JsonElement jsonElement = JsonParser.parseString(json);
+		txtLines += gson.toJson(jsonElement);
+		//
+		System.out.println(txtLines);
+		Assert.isTrue(txtLines.split("\n").length >= 5, ASSERT_MSG);
+	}
 
 	@Test void parseYaml2JsonNode() { }
 

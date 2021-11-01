@@ -10,6 +10,6 @@ public class AnyException extends IllegalStateException {
 
 	public AnyException() {
 		//
-		LOGGER.info(Instant.now().toString());
+		LOGGER.info("AnyException(" + Instant.now().toString() + ")");
 	}
 }

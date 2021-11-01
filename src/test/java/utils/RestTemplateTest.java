@@ -373,10 +373,10 @@ public class RestTemplateTest {
 		//
 		String textFile = UtilityMain.getFileLocal(pathJson);
 		MultipartFile multipartFile = getMultipartFile(pathWav);
-		ByteArrayResource barmFile = null;
-		try { barmFile = new ByteArrayResource(multipartFile.getBytes()); }
+		ByteArrayResource byteArrayResource_MPF = null;
+		try { byteArrayResource_MPF = new ByteArrayResource(multipartFile.getBytes()); }
 		catch (IOException ex) { LOGGER.info(ex.getMessage()); }
-		System.out.println("barmFile.contentLength(): " + barmFile.contentLength());
+		System.out.println("barmFile.contentLength(): " + byteArrayResource_MPF.contentLength());
 		//
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MULTIPART_FORM_DATA); // APPLICATION_JSON
@@ -389,7 +389,7 @@ public class RestTemplateTest {
 		// return pathWav; } } );
 		MultiValueMap<String, Object> MVM = new LinkedMultiValueMap<>();
 		MVM.add("fileTxt", textFile);
-		MVM.add("fileWav", barmFile); // MVM.add("fileWav", BAR);
+		MVM.add("fileWav", byteArrayResource_MPF);
 		//
 		HttpEntity<?> httpEntity = new HttpEntity<>(MVM, httpHeaders);
 		RestTemplate restTemplate = new RestTemplate();
