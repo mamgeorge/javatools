@@ -1,5 +1,9 @@
 package utils;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,9 +12,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.TAB;
@@ -98,15 +99,23 @@ public class DbProfile {
 				stringBuilder.append(TAB);
 				for (int ictr = 1; ictr < intColumnCount + 1; ictr++) {
 					object = resultSet.getObject(ictr);
-					if (object instanceof Clob) { object = object.getClass().getName(); }
-					if (object == null) { object = "NULL"; }
-					if (ictr < intColumnCount) { stringBuilder.append(object + DLM); }
-					else {stringBuilder.append(object);}
+					if (object instanceof Clob) {
+						object = object.getClass().getName();
+					}
+					if (object == null) {
+						object = "NULL";
+					}
+					if (ictr < intColumnCount) {
+						stringBuilder.append(object + DLM);
+					} else {
+						stringBuilder.append(object);
+					}
 				}
 				stringBuilder.append(EOL);
 			}
+		} catch (ClassNotFoundException | SQLException ex) {
+			LOGGER.info(ex.getMessage());
 		}
-		catch (ClassNotFoundException | SQLException ex) { LOGGER.info(ex.getMessage());}
 		return stringBuilder.toString();
 	}
 }

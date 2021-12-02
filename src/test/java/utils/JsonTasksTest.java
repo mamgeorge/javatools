@@ -14,19 +14,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.util.Assert;
 import samples.BooksCatalog;
 
+import java.util.logging.Logger;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
 
 // C:/workspace/training/javatools/src/test/java/utils
 public class JsonTasksTest {
 	//
+	private static final Logger LOGGER = Logger.getLogger(JsonTasksTest.class.getName());
 	private static final String BASE_PATH = "src/test/resources/";
-	private static final String jsonFile = BASE_PATH + "booksCatalog.json";
+	private static final String JSONFILE = BASE_PATH + "booksCatalog.json";
+	private static final String PATHFILE_LOCAL = "src/test/resources/";
+	private static final String ASSERT_MSG = "ASSERT_MSG";
 	private String json = "";
 
 	@BeforeEach void init() {
 		//
-		json = UtilityMain.getFileLocal(jsonFile);
+		json = UtilityMain.getFileLocal(JSONFILE);
 		System.out.println(json.substring(0, 20));
 	}
 
@@ -40,8 +45,8 @@ public class JsonTasksTest {
 		StringBuilder stringBuilder = new StringBuilder();
 		for (String jpath : fieldNames) {
 			stringBuilder
-				.append(String.format("\t%s",
-					JsonTasks.getJsonPath(json, "catalog.book[" + aint + "]." + jpath)));
+					.append(String.format("\t%s",
+							JsonTasks.getJsonPath(json, "catalog.book[" + aint + "]." + jpath)));
 		}
 		txtLines += stringBuilder.toString();
 		System.out.println(txtLines);
@@ -84,8 +89,9 @@ public class JsonTasksTest {
 			JsonNode jsonNodeAt = jsonNodeRoot.at(JSON_PATH);
 			txtLine = jsonNodeAt.asText();
 			// txtLine = jsonNodeRoot.at(JsonPointer.compile(jsonPath)).asText();
+		} catch (JsonProcessingException ex) {
+			LOGGER.severe(ex.getMessage());
 		}
-		catch (JsonProcessingException ex) { LOGGER.severe(ex.getMessage()); }
 		//
 		System.out.println("jsonNodeAt.asText(): " + txtLine);
 		Assert.isTrue(txtLine.equals("Gambardella , Matthew"), ASSERT_MSG);
@@ -131,8 +137,9 @@ public class JsonTasksTest {
 			ObjectMapper objectMapper = new ObjectMapper();
 			Object object = objectMapper.readValue(json, Object.class);
 			txtLines += objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object) + EOL;
+		} catch (Exception ex) {
+			LOGGER.info(ex.getMessage());
 		}
-		catch (Exception ex) { LOGGER.info(ex.getMessage()); }
 		//
 		// GSON
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -143,7 +150,9 @@ public class JsonTasksTest {
 		Assert.isTrue(txtLines.split("\n").length >= 5, ASSERT_MSG);
 	}
 
-	@Test void parseYaml2JsonNode() { }
+	@Test void parseYaml2JsonNode() {
+	}
 
-	@Test void parseJsonList2List() { }
+	@Test void parseJsonList2List() {
+	}
 }

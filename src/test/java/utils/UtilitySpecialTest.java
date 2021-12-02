@@ -16,6 +16,11 @@ import io.kubernetes.client.openapi.models.V1Node;
 import io.kubernetes.client.openapi.models.V1NodeList;
 import io.kubernetes.client.util.CallGeneratorParams;
 import io.opentracing.Tracer;
+import org.apache.commons.collections4.list.TreeList;
+import org.junit.jupiter.api.Test;
+import org.springframework.util.Assert;
+import samples.AnyHttpHandler;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -29,13 +34,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
-import org.apache.commons.collections4.list.TreeList;
-import org.junit.jupiter.api.Test;
-import org.springframework.util.Assert;
-import samples.AnyHttpHandler;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 import static org.springframework.http.HttpStatus.OK;
 import static utils.UtilityMain.EOL;
 
@@ -55,8 +55,11 @@ public class UtilitySpecialTest {
 		String txtLines = UtilityMain.transformXslt(xml, xsl);
 		//
 		System.out.println(txtLines);
-		try { Files.write(Paths.get(PATHFILE_LOCAL + "booksCatalog.html"), txtLines.getBytes(UTF_8)); }
-		catch (IOException ex) { ex.printStackTrace(); }
+		try {
+			Files.write(Paths.get(PATHFILE_LOCAL + "booksCatalog.html"), txtLines.getBytes(UTF_8));
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 		Assert.isTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
@@ -66,13 +69,14 @@ public class UtilitySpecialTest {
 		try {
 			InetAddress INA = InetAddress.getLocalHost();
 			txtLines += String.format(
-				"\tlocalhost: %s\n\t" + "hostName : %s\n\t" + "hostAddr : %s\n\t" + "canonical: %s\n\n",
-				INA.toString(),
-				INA.getHostName(),
-				INA.getHostAddress(),
-				INA.getCanonicalHostName());
+					"\tlocalhost: %s\n\t" + "hostName : %s\n\t" + "hostAddr : %s\n\t" + "canonical: %s\n\n",
+					INA.toString(),
+					INA.getHostName(),
+					INA.getHostAddress(),
+					INA.getCanonicalHostName());
+		} catch (Exception ex) {
+			LOGGER.info(ex.getMessage());
 		}
-		catch (Exception ex) { LOGGER.info(ex.getMessage()); }
 		//
 		txtLines += "NetworkInterface SSIDs" + EOL;
 		List<String> list = new TreeList<>();
@@ -93,7 +97,7 @@ public class UtilitySpecialTest {
 		//
 		DbProfile DPB = DbProfile.init(DbProfile.DATABASES.sqlite);
 		DPB.setSql("SELECT FirstName as FIRST, LastName as LAST, Email FROM  customers " +
-			"WHERE State = 'CA' ORDER BY LastName ASC");
+				"WHERE State = 'CA' ORDER BY LastName ASC");
 		//
 		String txtLines = DPB.dbRead();
 		//
@@ -118,20 +122,20 @@ public class UtilitySpecialTest {
 		SharedInformerFactory SIF = new SharedInformerFactory();
 		CoreV1Api coreV1Api = new CoreV1Api();
 		String pretty = "", continues = "", fieldSelector = "", labelSelector = "",
-			resourceVersionMatch =
-				"";
+				resourceVersionMatch =
+						"";
 		int limit = 0;
 		boolean allowWatchBookmarks = true, watch = true;
 		Integer timeoutSeconds = null;
 		ApiCallback<?> apiCallback = null;
 		//
 		SharedIndexInformer<V1Node> SII =
-			SIF.sharedIndexInformerFor(
-				(CallGeneratorParams params) -> coreV1Api.listNodeCall(
-					pretty, allowWatchBookmarks, continues, fieldSelector, labelSelector, limit,
-					params.resourceVersion, resourceVersionMatch,
-					timeoutSeconds, watch, apiCallback),
-				V1Node.class, V1NodeList.class);
+				SIF.sharedIndexInformerFor(
+						(CallGeneratorParams params) -> coreV1Api.listNodeCall(
+								pretty, allowWatchBookmarks, continues, fieldSelector, labelSelector, limit,
+								params.resourceVersion, resourceVersionMatch,
+								timeoutSeconds, watch, apiCallback),
+						V1Node.class, V1NodeList.class);
 		SIF.startAllRegisteredInformers();
 		//
 		class NodePrintingReconciler implements Reconciler {
@@ -154,15 +158,15 @@ public class UtilitySpecialTest {
 		NodePrintingReconciler NPR = new NodePrintingReconciler(SII);
 		//
 		Controller controller =
-			ControllerBuilder.defaultBuilder(SIF)
-				.watch(
-					(workQueue) -> ControllerBuilder.controllerWatchBuilder(V1Node.class, workQueue)
-						.build())
-				.withReconciler(NPR) // required, set the actual reconciler
-				.withName("node-printing-controller") // optional, set name for logging, thread-tracing
-				.withWorkerCount(4) // optional, set worker thread count
-				.withReadyFunc(SII::hasSynced) // optional, only starts when cache synced up
-				.build();
+				ControllerBuilder.defaultBuilder(SIF)
+						.watch(
+								(workQueue) -> ControllerBuilder.controllerWatchBuilder(V1Node.class, workQueue)
+										.build())
+						.withReconciler(NPR) // required, set the actual reconciler
+						.withName("node-printing-controller") // optional, set name for logging, thread-tracing
+						.withWorkerCount(4) // optional, set worker thread count
+						.withReadyFunc(SII::hasSynced) // optional, only starts when cache synced up
+						.build();
 
 		// controller.run();
 	}
@@ -178,24 +182,27 @@ public class UtilitySpecialTest {
 		String txtLines = "", address;
 		try {
 			byte[] bytes = netIface.getHardwareAddress();
-			if (bytes == null) {address = "[empty!]"; }
-			else { address = Base64.getEncoder().encodeToString(bytes);}
+			if (bytes == null) {
+				address = "[empty!]";
+			} else {
+				address = Base64.getEncoder().encodeToString(bytes);
+			}
 			// else{ address = bytes.length + " / " + new String(bytes, UTF_8);}
 			if (mode == 0) {
 				txtLines += String.format("\t%02d %s\n", netIface.getIndex(), netIface.getDisplayName());
-			}
-			else {
+			} else {
 				if (bytes != null) {
 					txtLines += String.format("\t%6s %2d %04d %s %s\n",
-						netIface.getName(),
-						netIface.getIndex(),
-						netIface.getMTU(), // Maximum Transmission Unit (MTU) of this interface
-						address,
-						netIface.getDisplayName());
+							netIface.getName(),
+							netIface.getIndex(),
+							netIface.getMTU(), // Maximum Transmission Unit (MTU) of this interface
+							address,
+							netIface.getDisplayName());
 				}
 			}
+		} catch (Exception ex) {
+			LOGGER.info(ex.getMessage());
 		}
-		catch (Exception ex) { LOGGER.info(ex.getMessage()); }
 		return txtLines;
 	}
 
@@ -213,7 +220,8 @@ public class UtilitySpecialTest {
 			httpServer.setExecutor(TPE);
 			httpServer.start();
 			LOGGER.info("Server started on port: " + PORT);
+		} catch (IOException ex) {
+			LOGGER.severe(ex.getMessage());
 		}
-		catch (IOException ex) { LOGGER.severe(ex.getMessage());}
 	}
 }

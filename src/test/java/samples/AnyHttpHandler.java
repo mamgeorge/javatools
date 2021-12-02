@@ -2,11 +2,12 @@ package samples;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.springframework.http.HttpMethod;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.logging.Logger;
-import org.springframework.http.HttpMethod;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -19,8 +20,12 @@ public class AnyHttpHandler implements HttpHandler {
 		//
 		String parm = "";
 		String method = httpExchange.getRequestMethod();
-		if (HttpMethod.GET.toString().equals(method)) { parm = handleGets(httpExchange); }
-		if (HttpMethod.POST.toString().equals(method)) { parm = handlePost(httpExchange); }
+		if (HttpMethod.GET.toString().equals(method)) {
+			parm = handleGets(httpExchange);
+		}
+		if (HttpMethod.POST.toString().equals(method)) {
+			parm = handlePost(httpExchange);
+		}
 		handleResponse(httpExchange, parm);
 	}
 
@@ -28,8 +33,12 @@ public class AnyHttpHandler implements HttpHandler {
 		//
 		String parm = "";
 		String uri = httpExchange.getRequestURI().toString();
-		if (uri.contains("?")) {parm = uri.split("\\?")[1];}
-		if (uri.contains("=")) {parm = uri.split("=")[1];}
+		if (uri.contains("?")) {
+			parm = uri.split("\\?")[1];
+		}
+		if (uri.contains("=")) {
+			parm = uri.split("=")[1];
+		}
 		return parm;
 	}
 
@@ -52,7 +61,8 @@ public class AnyHttpHandler implements HttpHandler {
 			outputStream.write(htmlResponse.getBytes());
 			outputStream.flush();
 			outputStream.close();
+		} catch (IOException ex) {
+			LOGGER.severe(ex.getMessage());
 		}
-		catch (IOException ex) { LOGGER.severe(ex.getMessage());}
 	}
 }

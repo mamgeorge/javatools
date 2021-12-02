@@ -2,14 +2,6 @@ package utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.logging.Logger;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -34,6 +26,15 @@ import org.springframework.web.multipart.MultipartFile;
 import samples.AppResponse;
 import samples.OauthToken;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -57,8 +58,8 @@ public class RestTemplateTest {
 	private static final String ASSERT_MSG = "ASSERT_MSG";
 	private static final String TESTSERVER_DOWNMSG = "I/O error on GET Connection refused; using Mock";
 	public static final String DEFAULT_OAUTH =
-		"{ \"access_token\": \"TOKEN_DEFAULT\", \"token_type\": \"TYPE_DEFAULT\", \"expires_in\": " +
-			"\"EXPIRES_DEFAULT\", \"id_token\": \"ID_DEFAULT\" }";
+			"{ \"access_token\": \"TOKEN_DEFAULT\", \"token_type\": \"TYPE_DEFAULT\", \"expires_in\": " +
+					"\"EXPIRES_DEFAULT\", \"id_token\": \"ID_DEFAULT\" }";
 	public static final String DEFAULT_APIRSP = "{ \"userid\": \"1234567890\", \"ttslength\": \"8000\" }";
 
 	//#### RestTemplate
@@ -67,8 +68,11 @@ public class RestTemplateTest {
 		StringBuilder sb = new StringBuilder();
 		RestTemplate restTemplate = new RestTemplate();
 		URI uri = null;
-		try { uri = new URI(TXT_URL);}
-		catch (URISyntaxException ex) { LOGGER.info(ex.getMessage()); }
+		try {
+			uri = new URI(TXT_URL);
+		} catch (URISyntaxException ex) {
+			LOGGER.info(ex.getMessage());
+		}
 		HttpEntity<String> httpEntity = new HttpEntity<>("http_text");
 		RequestEntity<String> requestEntity = RequestEntity.post(uri).body("request_text");
 		ResponseEntity<String> responseEntity = new ResponseEntity<>("response_text", OK);
@@ -119,7 +123,7 @@ public class RestTemplateTest {
 			httpEntity = new HttpEntity<>(map, httpHeaders);
 		}
 		ResponseEntity<String> responseEntity =
-			exchange_Entity(restTemplate, TXT_URL + "/post", POST, httpEntity);
+				exchange_Entity(restTemplate, TXT_URL + "/post", POST, httpEntity);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		String txtLines = String.format("httpStatus: %s\n", httpStatus);
@@ -132,7 +136,7 @@ public class RestTemplateTest {
 		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<String> httpEntity = new HttpEntity<>("bar");
 		ResponseEntity<String> responseEntity =
-			exchange_Entity(restTemplate, TXT_URL + "/post", POST, httpEntity);
+				exchange_Entity(restTemplate, TXT_URL + "/post", POST, httpEntity);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		String txtLines = String.format("httpStatus: %s\n", httpStatus);
@@ -183,18 +187,18 @@ public class RestTemplateTest {
 		String txtLines = "";
 		int timeout = 5000;
 		RequestConfig requestConfig = RequestConfig.custom()
-			.setConnectTimeout(timeout)
-			.setConnectionRequestTimeout(timeout)
-			.setSocketTimeout(timeout)
-			.build();
+				.setConnectTimeout(timeout)
+				.setConnectionRequestTimeout(timeout)
+				.setSocketTimeout(timeout)
+				.build();
 		//
 		CloseableHttpClient closeableHttpClient = HttpClientBuilder
-			.create()
-			.setDefaultRequestConfig(requestConfig)
-			.build();
+				.create()
+				.setDefaultRequestConfig(requestConfig)
+				.build();
 		//
 		HttpComponentsClientHttpRequestFactory HCCHRF =
-			new HttpComponentsClientHttpRequestFactory(closeableHttpClient);
+				new HttpComponentsClientHttpRequestFactory(closeableHttpClient);
 		//
 		RestTemplate restTemplate = new RestTemplate(HCCHRF);
 		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
@@ -265,8 +269,11 @@ public class RestTemplateTest {
 		//
 		String body = sendFiles2App(txtUrl, token, pathJson, pathWav);
 		AppResponse appResponse = null;
-		try { appResponse = new ObjectMapper().readValue(body, AppResponse.class);}
-		catch (JsonProcessingException | IllegalArgumentException ex) { LOGGER.info(ex.getMessage()); }
+		try {
+			appResponse = new ObjectMapper().readValue(body, AppResponse.class);
+		} catch (JsonProcessingException | IllegalArgumentException ex) {
+			LOGGER.info(ex.getMessage());
+		}
 		//
 		String txtLines = "body: " + body + EOL;
 		txtLines += "getUserid: " + appResponse.getUserid() + EOL;
@@ -282,8 +289,7 @@ public class RestTemplateTest {
 		ResponseEntity<String> responseEntity;
 		try {
 			responseEntity = restTemplate.getForEntity(txtUrl, String.class);
-		}
-		catch (ResourceAccessException ex) {
+		} catch (ResourceAccessException ex) {
 			LOGGER.info(TESTSERVER_DOWNMSG);
 			String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + FILENAME_BOOKS);
 			//
@@ -297,11 +303,12 @@ public class RestTemplateTest {
 	}
 
 	private ResponseEntity<String> exchange_Entity(RestTemplate RT, String txtUrl,
-		HttpMethod httpMethod, HttpEntity httpEntity) {
+	                                               HttpMethod httpMethod, HttpEntity httpEntity) {
 		//
 		ResponseEntity<String> responseEntity;
-		try { responseEntity = RT.exchange(txtUrl, httpMethod, httpEntity, String.class); }
-		catch (ResourceAccessException ex) {
+		try {
+			responseEntity = RT.exchange(txtUrl, httpMethod, httpEntity, String.class);
+		} catch (ResourceAccessException ex) {
 			LOGGER.info(TESTSERVER_DOWNMSG);
 			String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + FILENAME_BOOKS);
 			MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
@@ -315,8 +322,11 @@ public class RestTemplateTest {
 		//
 		// https://www.codejava.net/java-se/file-io/how-to-read-and-write-binary-files-in-java
 		byte[] bytes = null;
-		try { bytes = Files.readAllBytes(Paths.get(fileName)); }
-		catch (Exception ex) { LOGGER.info(ex.getMessage()); }
+		try {
+			bytes = Files.readAllBytes(Paths.get(fileName));
+		} catch (Exception ex) {
+			LOGGER.info(ex.getMessage());
+		}
 		System.out.println("bytes.length: " + bytes.length + " for " + fileName + EOL);
 		return bytes;
 	}
@@ -357,12 +367,18 @@ public class RestTemplateTest {
 		HttpEntity<?> httpEntity = new HttpEntity<>(MVM, httpHeaders);
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> responseEntity = new ResponseEntity<>(DEFAULT_OAUTH, getMvmSample(), OK);
-		try { responseEntity = restTemplate.postForEntity(txtUrl, httpEntity, String.class); }
-		catch (ResourceAccessException ex) { System.out.println("RAE ERROR: " + ex.getMessage()); }
+		try {
+			responseEntity = restTemplate.postForEntity(txtUrl, httpEntity, String.class);
+		} catch (ResourceAccessException ex) {
+			System.out.println("RAE ERROR: " + ex.getMessage());
+		}
 		//
 		String body = responseEntity.getBody();
-		try { oauthToken = new ObjectMapper().readValue(body, OauthToken.class);}
-		catch (JsonProcessingException | IllegalArgumentException ex) { LOGGER.info(ex.getMessage()); }
+		try {
+			oauthToken = new ObjectMapper().readValue(body, OauthToken.class);
+		} catch (JsonProcessingException | IllegalArgumentException ex) {
+			LOGGER.info(ex.getMessage());
+		}
 		//
 		access_token = oauthToken.getAccess_token();
 		System.out.println("oauthToken: " + access_token.substring(access_token.length() - 8));
@@ -374,8 +390,11 @@ public class RestTemplateTest {
 		String textFile = UtilityMain.getFileLocal(pathJson);
 		MultipartFile multipartFile = getMultipartFile(pathWav);
 		ByteArrayResource byteArrayResource_MPF = null;
-		try { byteArrayResource_MPF = new ByteArrayResource(multipartFile.getBytes()); }
-		catch (IOException ex) { LOGGER.info(ex.getMessage()); }
+		try {
+			byteArrayResource_MPF = new ByteArrayResource(multipartFile.getBytes());
+		} catch (IOException ex) {
+			LOGGER.info(ex.getMessage());
+		}
 		System.out.println("barmFile.contentLength(): " + byteArrayResource_MPF.contentLength());
 		//
 		HttpHeaders httpHeaders = new HttpHeaders();
@@ -394,8 +413,11 @@ public class RestTemplateTest {
 		HttpEntity<?> httpEntity = new HttpEntity<>(MVM, httpHeaders);
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> responseEntity = new ResponseEntity<>(DEFAULT_APIRSP, getMvmSample(), OK);
-		try { responseEntity = restTemplate.exchange(txtUrl, POST, httpEntity, String.class); }
-		catch (HttpClientErrorException | ResourceAccessException ex) { LOGGER.info(ex.getMessage()); }
+		try {
+			responseEntity = restTemplate.exchange(txtUrl, POST, httpEntity, String.class);
+		} catch (HttpClientErrorException | ResourceAccessException ex) {
+			LOGGER.info(ex.getMessage());
+		}
 		//
 		return responseEntity.getBody();
 	}
