@@ -1,5 +1,6 @@
 package samples;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -11,7 +12,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.Instant;
 import java.util.logging.Logger;
-import javax.swing.*;
+
 import static utils.UtilityMain.EOL;
 
 public class AdditionalServer extends JFrame {
@@ -44,7 +45,7 @@ public class AdditionalServer extends JFrame {
 				InetAddress INA = InetAddress.getLocalHost();
 				System.out.println("INA: " + INA.toString());
 				ServerSocket serverSocket = new ServerSocket(PORT, 0, INA);
-				jTextArea.append("INA: " + INA.toString() + ", port " + PORT + "\n");
+				jTextArea.append("INA: " + INA + ", port " + PORT + "\n");
 				jTextArea.append(Instant.now() + "\n");
 				Socket SocketConnection = serverSocket.accept();
 				connected = true;
@@ -69,8 +70,10 @@ public class AdditionalServer extends JFrame {
 					jTextArea.append("Sum returned: " + sum + "\n\n");
 					DOS.writeInt(sum); // DOS.writeUTF(txtSum);
 				}
+			} catch (IOException ex) {
+				connected = false;
+				LOGGER.info(ex.getMessage());
 			}
-			catch (IOException ex) { connected = false; LOGGER.info(ex.getMessage());}
 		}
 	}
 }

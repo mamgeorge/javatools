@@ -1,5 +1,9 @@
 package utils;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.util.Assert;
+import samples.AnyObject;
+
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Arrays;
@@ -16,9 +20,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.junit.jupiter.api.Test;
-import org.springframework.util.Assert;
-import samples.AnyObject;
 
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.TAB;
@@ -97,14 +98,17 @@ public class UtilityMainTest {
 		//
 		List<NetworkInterface> listMain = Collections.list(enums);
 		List<NetworkInterface> listFilt =
-			listMain.stream()
-				.filter(nifc -> {
-					int mtu = 0;
-					try { mtu = nifc.getMTU(); }
-					catch (Exception ex) { LOGGER.info(ex.getMessage()); }
-					return mtu > 1 && !nifc.getDisplayName().startsWith("VMware");
-				})
-				.collect(Collectors.toList());
+				listMain.stream()
+						.filter(nifc -> {
+							int mtu = 0;
+							try {
+								mtu = nifc.getMTU();
+							} catch (Exception ex) {
+								LOGGER.info(ex.getMessage());
+							}
+							return mtu > 1 && !nifc.getDisplayName().startsWith("VMware");
+						})
+						.collect(Collectors.toList());
 		//
 		listFilt.forEach(nifc -> set.add(TAB + nifc.getDisplayName()));
 		//
@@ -133,7 +137,7 @@ public class UtilityMainTest {
 		//
 		stringBuilder.append("Iterator Stream" + EOL);
 		Stream<NetworkInterface> stream = StreamSupport.stream(
-			Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
+				Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
 		stream.forEach(nifc -> stringBuilder.append(nifc.getDisplayName()).append(EOL));
 		//
 		System.out.println(stringBuilder);
@@ -161,14 +165,14 @@ public class UtilityMainTest {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		String[] fileNames =
-			{"booksCatalog.html", "booksCatalog.json", "booksCatalog.xml", "booksXml2Html.xslt"};
+				{"booksCatalog.html", "booksCatalog.json", "booksCatalog.xml", "booksXml2Html.xslt"};
 		//
 		AtomicInteger idx = new AtomicInteger();
 		Arrays.stream(fileNames).sequential().forEach(flnm -> {
 			String fileName = PATHFILE_LOCAL + flnm;
 			String txtLines = UtilityMain.getFileLocal(fileName);
 			stringBuilder.append(
-				String.format("\t%02d %s\tsize: %d \n", idx.incrementAndGet(), flnm, txtLines.length()));
+					String.format("\t%02d %s\tsize: %d \n", idx.incrementAndGet(), flnm, txtLines.length()));
 		});
 		//
 		int countFiles = stringBuilder.toString().split(EOL).length;
@@ -177,9 +181,11 @@ public class UtilityMainTest {
 		Assert.isTrue(countFiles == fileNames.length, ASSERT_MSG);
 	}
 
-	@Test void getZipFileList() { }
+	@Test void getZipFileList() {
+	}
 
-	@Test void putFilesIntoZip() { }
+	@Test void putFilesIntoZip() {
+	}
 
 	//#### url
 	@Test void urlGet() {
@@ -189,9 +195,11 @@ public class UtilityMainTest {
 		Assert.isTrue(html.contains("DOCTYPE"), ASSERT_MSG);
 	}
 
-	@Test void urlPost() { }
+	@Test void urlPost() {
+	}
 
-	@Test void urlPostFile() { }
+	@Test void urlPostFile() {
+	}
 
 	//#### reflection
 	@Test void test_getField() {

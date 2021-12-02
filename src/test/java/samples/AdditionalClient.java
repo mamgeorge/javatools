@@ -1,5 +1,6 @@
 package samples;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,7 +14,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.logging.Logger;
-import javax.swing.*;
 
 public class AdditionalClient extends JFrame implements ActionListener {
 
@@ -82,12 +82,10 @@ public class AdditionalClient extends JFrame implements ActionListener {
 			String txt_host = ina_local.getHostAddress();
 			System.out.println(txt_host);
 			DOS.writeUTF(txt_host);
-		}
-		catch (UnknownHostException ex) {
+		} catch (UnknownHostException ex) {
 			jTextField_msg.setText("host err");
 			LOGGER.info("startClient(host): " + ex.getMessage());
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			jTextField_msg.setText("io err");
 			LOGGER.info("startClient(ioex): " + ex.getMessage());
 		}
@@ -106,7 +104,8 @@ public class AdditionalClient extends JFrame implements ActionListener {
 			// String results= inDataStream.readUTF();
 			int results = DIS.readInt();
 			jLabel_sum.setText("" + results);
+		} catch (IOException ex) {
+			LOGGER.info("actionPerformed: " + ex.getMessage());
 		}
-		catch (IOException ex) { LOGGER.info("actionPerformed: " + ex.getMessage()); }
 	}
 }

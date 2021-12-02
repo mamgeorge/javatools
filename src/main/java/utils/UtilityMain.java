@@ -5,6 +5,27 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,28 +67,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
@@ -151,8 +150,12 @@ public class UtilityMain {
 			catch (IOException ex) { LOGGER.warning( ex.getMessage( ) ); }
 		 */
 		String txtLines = "";
-		if (pathFile == null || pathFile.equals("")) { pathFile = FLD_SAMPLE + TXT_SAMPLE; }
-		if (eol == null || eol.equals("")) { eol = EOL; }
+		if (pathFile == null || pathFile.equals("")) {
+			pathFile = FLD_SAMPLE + TXT_SAMPLE;
+		}
+		if (eol == null || eol.equals("")) {
+			eol = EOL;
+		}
 		//
 		List<String> list;
 		try (BufferedReader bReader = Files.newBufferedReader(Paths.get(pathFile))) {
@@ -160,8 +163,9 @@ public class UtilityMain {
 			list = bReader.lines().collect(Collectors.toList());
 			txtLines = String.join(EOL, list);
 			txtLines = txtLines.replaceAll(EOL, eol);
+		} catch (IOException ex) {
+			LOGGER.warning(ex.getMessage());
 		}
-		catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
 		//
 		return txtLines;
 	}
@@ -171,13 +175,16 @@ public class UtilityMain {
 		// https://howtodoinjava.com/java/io/read-file-from-resources-folder/
 		// File file = ResourceUtils.getFile("classpath:config/sample.txt")
 		String txtLines = "";
-		if (pathFile == null || pathFile.equals("")) { pathFile = FLD_SAMPLE + TXT_SAMPLE; }
+		if (pathFile == null || pathFile.equals("")) {
+			pathFile = FLD_SAMPLE + TXT_SAMPLE;
+		}
 		try {
 			File fileLocal = new File(pathFile);
 			File pathFileLocal = new File(fileLocal.getAbsolutePath());
 			txtLines = Files.readString(pathFileLocal.toPath());
+		} catch (IOException | NullPointerException ex) {
+			LOGGER.warning(ex.getMessage());
 		}
-		catch (IOException | NullPointerException ex) { LOGGER.warning(ex.getMessage()); }
 		return txtLines;
 	}
 
@@ -185,7 +192,9 @@ public class UtilityMain {
 		//
 		// https://www.baeldung.com/java-compress-and-uncompress
 		List<File> list = new ArrayList<>();
-		if (fileName == null || fileName.equals("")) { fileName = FLD_SAMPLE + ZIP_SAMPLE; }
+		if (fileName == null || fileName.equals("")) {
+			fileName = FLD_SAMPLE + ZIP_SAMPLE;
+		}
 		int BUFFER_SIZE = 4096;
 		String fileItem;
 		try {
@@ -214,8 +223,9 @@ public class UtilityMain {
 				zipEntry = zis.getNextEntry();
 				list.add(file);
 			}
+		} catch (IOException ex) {
+			LOGGER.warning(ex.getMessage());
 		}
-		catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
 		return list;
 	}
 
@@ -223,10 +233,14 @@ public class UtilityMain {
 		//
 		// https://www.baeldung.com/java-compress-and-uncompress
 		StringBuilder stringBuilder = new StringBuilder();
-		if (eol == null || eol.equals("")) { eol = EOL; }
+		if (eol == null || eol.equals("")) {
+			eol = EOL;
+		}
 		//
 		List<File> list = UtilityMain.getFilesFromZip(fileName);
-		for (File file : list) { stringBuilder.append(file.getName()).append(eol); }
+		for (File file : list) {
+			stringBuilder.append(file.getName()).append(eol);
+		}
 		return stringBuilder.toString();
 	}
 
@@ -264,8 +278,7 @@ public class UtilityMain {
 				stringBuilder.append(txtLine + EOL);
 			}
 			txtLines = stringBuilder.toString();
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			txtLines = ex.getMessage();
 			LOGGER.log(Level.SEVERE, "#### ERROR: {0} ", txtLines);
 		}
@@ -283,7 +296,7 @@ public class UtilityMain {
 			httpConn.setRequestMethod(HttpMethod.POST.toString());
 			httpConn.setRequestProperty(HttpHeaders.USER_AGENT, USER_AGENT);
 			httpConn
-				.setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+					.setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 			// httpConn.setRequestProperty( HttpHeaders.AUTHORIZATION, "JWT " + jwtSourceId );
 			//
 			OutputStream outputStream = httpConn.getOutputStream();
@@ -308,12 +321,10 @@ public class UtilityMain {
 				}
 				bufferedReader.close();
 				txtLines = stringBuilder.toString();
-			}
-			else {
+			} else {
 				LOGGER.info("POST failed to: " + link);
 			}
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			txtLines = ex.getMessage();
 			LOGGER.log(Level.SEVERE, "#### ERROR: {0} ", txtLines);
 		}
@@ -334,7 +345,7 @@ public class UtilityMain {
 			urlConn = url.openConnection();
 			urlConn.setDoOutput(true);
 			urlConn.setRequestProperty(HttpHeaders.CONTENT_TYPE,
-				MediaType.MULTIPART_FORM_DATA_VALUE + "; boundary=" + boundary);
+					MediaType.MULTIPART_FORM_DATA_VALUE + "; boundary=" + boundary);
 			//	urlConn.setRequestProperty( "Authorization", "JWT " + jwtSourceId );
 			//
 			System.out.println("0 urlConn.getOutputStream( )");
@@ -344,31 +355,31 @@ public class UtilityMain {
 			//
 			System.out.println("1 Send normal parms");
 			writer.append("--").append(boundary).append(CRLF)
-				.append("Content-Disposition: form-data; name=\"param\"").append(CRLF)
-				.append("Content-Type: text/plain; charset=").append(UTF_8.toString()).append(CRLF)
-				.append(CRLF).append(postParms).append(CRLF)
-				.flush();
+					.append("Content-Disposition: form-data; name=\"param\"").append(CRLF)
+					.append("Content-Type: text/plain; charset=").append(UTF_8.toString()).append(CRLF)
+					.append(CRLF).append(postParms).append(CRLF)
+					.flush();
 			//
 			System.out.println("2 Send text file in charset UTF_8");
 			writer.append("--").append(boundary).append(CRLF)
-				.append("Content-Disposition: form-data; name=\"textFile\"; filename=\"")
-				.append(fileTxt.getName()).append("\"").append(CRLF)
-				.append("Content-Type: text/plain; charset=").append(UTF_8.toString()).append(CRLF)
-				.append(CRLF)
-				.flush();
+					.append("Content-Disposition: form-data; name=\"textFile\"; filename=\"")
+					.append(fileTxt.getName()).append("\"").append(CRLF)
+					.append("Content-Type: text/plain; charset=").append(UTF_8.toString()).append(CRLF)
+					.append(CRLF)
+					.flush();
 			Files.copy(fileTxt.toPath(), outputStream);
 			outputStream.flush(); // Important before continuing with writer!
 			writer.append(CRLF).flush(); // CRLF indicates end of boundary
 			//
 			System.out.println("3 Send binary file");
 			writer.append("--").append(boundary).append(CRLF)
-				.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"")
-				.append(fileBin.getName()).append("\"").append(CRLF);
+					.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"")
+					.append(fileBin.getName()).append("\"").append(CRLF);
 			String fileBinContentType = URLConnection.guessContentTypeFromName(fileBin.getName());
 			writer.append("Content-Type: ").append(fileBinContentType).append(CRLF)
-				.append("Content-Transfer-Encoding: binary").append(CRLF)
-				.append(CRLF)
-				.flush();
+					.append("Content-Transfer-Encoding: binary").append(CRLF)
+					.append(CRLF)
+					.flush();
 			Files.copy(fileBin.toPath(), outputStream);
 			outputStream.flush(); // Important before continuing with writer!
 			writer.append(CRLF).flush(); // CRLF indicates end of boundary
@@ -379,8 +390,7 @@ public class UtilityMain {
 			System.out.println("5 request lazily fired to get response info");
 			int responseCode = ((HttpURLConnection) urlConn).getResponseCode();
 			txtLines = "responseCode: " + responseCode; // should be 200
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			txtLines = ex.getMessage();
 			LOGGER.log(Level.SEVERE, "#### ERROR: {0} ", txtLines);
 		}
@@ -398,8 +408,9 @@ public class UtilityMain {
 			field.setAccessible(true);
 			Object objectField = field.get(object);
 			txtLine = objectField.toString();
+		} catch (NoSuchFieldException | IllegalAccessException ex) {
+			LOGGER.severe(ex.getMessage());
 		}
-		catch (NoSuchFieldException | IllegalAccessException ex) { LOGGER.severe(ex.getMessage()); }
 		return txtLine;
 	}
 
@@ -409,17 +420,23 @@ public class UtilityMain {
 		try {
 			int parmsCount = 0;
 			Object objectItem = null;
-			if (objectParms == null || objectParms.length == 0) {}
-			else { parmsCount = objectParms.length;}
+			if (objectParms == null || objectParms.length == 0) {
+			} else {
+				parmsCount = objectParms.length;
+			}
 			Class<?>[] classArray = new Class<?>[parmsCount];
 			for (int ictr = 0; ictr < parmsCount; ictr++) {
-				try { objectItem = objectParms[ictr]; }
-				catch (NullPointerException ex) { LOGGER.info(ex.getMessage()); }
+				try {
+					objectItem = objectParms[ictr];
+				} catch (NullPointerException ex) {
+					LOGGER.info(ex.getMessage());
+				}
 				if (objectItem == null) {
 					classArray = new Class<?>[0];
 					objectParms = null;
+				} else {
+					classArray[ictr] = objectItem.getClass();
 				}
-				else { classArray[ictr] = objectItem.getClass(); }
 			}
 			//
 			// Class clazz = object.getClass();
@@ -427,9 +444,8 @@ public class UtilityMain {
 			Method method = clazz.getDeclaredMethod(nameMethod, classArray);
 			method.setAccessible(true);
 			objectReturn = method.invoke(objectInstance, objectParms);
-		}
-		catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException |
-			InvocationTargetException | InstantiationException ex) {
+		} catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException |
+				InvocationTargetException | InstantiationException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return objectReturn;
@@ -456,22 +472,25 @@ public class UtilityMain {
 			boolean boolClass = mthd.getReturnType().toString().startsWith("class");
 			boolean boolCount = mthd.getParameterCount() == 0;
 			if (boolClass & boolCount) {
-				try { objectVal = mthd.invoke(object, args); }
-				catch (IllegalAccessException | InvocationTargetException ex) {
+				try {
+					objectVal = mthd.invoke(object, args);
+				} catch (IllegalAccessException | InvocationTargetException ex) {
 					LOGGER.info(ex.getMessage());
 				}
-				if (objectVal == null) { objectVal = "NULL or EMPTY"; }
+				if (objectVal == null) {
+					objectVal = "NULL or EMPTY";
+				}
 			}
 			boolean boolAccess = mthd.getName().startsWith("access$");
 			if (!boolAccess) {
 				set.add(String.format(FRMT, atomicInteger.incrementAndGet(),
-					mthd.getName(), returnType, mthd.getParameterCount(), objectVal));
+						mthd.getName(), returnType, mthd.getParameterCount(), objectVal));
 			}
 		});
 		//
 
 		stringBuilder.append(object.getClass().getName()).append(" has: [").append(methods.length)
-			.append("] methods\n\n");
+				.append("] methods\n\n");
 		set.stream().sorted().forEach(val -> stringBuilder.append(val));
 		return stringBuilder + "\n";
 	}
@@ -483,8 +502,7 @@ public class UtilityMain {
 			Field field = clazz.getDeclaredField(objectName);
 			field.setAccessible(true);
 			field.set(object, objectValue);
-		}
-		catch (NoSuchFieldException | IllegalAccessException ex) {
+		} catch (NoSuchFieldException | IllegalAccessException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 	}
@@ -499,15 +517,18 @@ public class UtilityMain {
 			InputSource inputSource = new InputSource(stringReader);
 			XPath xPath = XPathFactory.newInstance().newXPath();
 			txtLines = xPath.evaluate(xpathTxt, inputSource);
+		} catch (XPathExpressionException ex) {
+			LOGGER.warning(ex.getMessage());
 		}
-		catch (XPathExpressionException ex) { LOGGER.warning(ex.getMessage()); }
 		return txtLines;
 	}
 
 	public static String formatXml(String xmlOld) {
 		//
 		String xml = "";
-		if (xmlOld == null || xmlOld.equals("")) { xmlOld = getFileLocal(FLD_SAMPLE + XML_SAMPLE); }
+		if (xmlOld == null || xmlOld.equals("")) {
+			xmlOld = getFileLocal(FLD_SAMPLE + XML_SAMPLE);
+		}
 		//
 		Document document = null;
 		try {
@@ -516,8 +537,7 @@ public class UtilityMain {
 			StringReader stringReader = new StringReader(xmlOld);
 			InputSource inputSource = new InputSource(stringReader);
 			document = documentBuilder.parse(inputSource);
-		}
-		catch (ParserConfigurationException | SAXException | IOException ex) {
+		} catch (ParserConfigurationException | SAXException | IOException ex) {
 			LOGGER.warning(ex.getMessage());
 		}
 		try {
@@ -534,8 +554,9 @@ public class UtilityMain {
 			DOMSource domSource = new DOMSource(document);
 			transformer.transform(domSource, streamResultXML);
 			xml = streamResultXML.getWriter().toString();
+		} catch (TransformerException ex) {
+			LOGGER.severe(ex.getMessage());
 		}
-		catch (TransformerException ex) { LOGGER.severe(ex.getMessage()); }
 		return xml;
 	}
 
@@ -559,8 +580,9 @@ public class UtilityMain {
 			// transform it
 			transformer.transform(streamSourceXML, result);
 			txtLines = baos.toString();
+		} catch (TransformerException ex) {
+			LOGGER.severe(ex.getMessage());
 		}
-		catch (TransformerException ex) { LOGGER.severe(ex.getMessage()); }
 		//
 		return txtLines;
 	}
@@ -587,8 +609,9 @@ public class UtilityMain {
 			ObjectMapper objectMapperNode = new ObjectMapper();
 			JsonNode jsonNode = objectMapperNode.readTree(json);
 			txtLine = (jsonNode.get(applicationNode)).asText();
+		} catch (IOException ex) {
+			LOGGER.warning(ex.getMessage());
 		}
-		catch (IOException ex) { LOGGER.warning(ex.getMessage()); }
 		//
 		return txtLine;
 	}
@@ -597,7 +620,8 @@ public class UtilityMain {
 		//
 		String txtLines = "";
 		ObjectMapper objectMapperHtml = new ObjectMapper();
-		TypeReference<ArrayList<LinkedHashMap<String, String>>> typeReference = new TypeReference<>() {};
+		TypeReference<ArrayList<LinkedHashMap<String, String>>> typeReference = new TypeReference<>() {
+		};
 		ArrayList<LinkedHashMap<String, String>> arrayList;
 		Set<?> set;
 		String txtKey, txtVal;
@@ -621,8 +645,9 @@ public class UtilityMain {
 				txtLines += PFX + txtKey + MID + txtVal + SFX;
 			}
 			System.out.println("txtLines: " + txtLines);
+		} catch (JsonProcessingException ex) {
+			LOGGER.warning(ex.getMessage());
 		}
-		catch (JsonProcessingException ex) { LOGGER.warning(ex.getMessage()); }
 		return txtLines;
 	}
 }

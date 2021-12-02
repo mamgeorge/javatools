@@ -1,8 +1,9 @@
 package samples;
 
+import utils.UtilityMainTest;
+
 import java.time.Instant;
 import java.util.logging.Logger;
-import utils.UtilityMainTest;
 
 public class AnyException extends IllegalStateException {
 
