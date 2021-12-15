@@ -66,7 +66,7 @@ public class UtilityMainTest {
 		//
 		System.out.println(txtLines);
 		System.out.println("envr: " + envr.length);
-		Assert.isTrue(envr.length > 60, ASSERT_MSG);
+		Assert.isTrue(envr.length > 40, ASSERT_MSG);
 	}
 
 	@Test void test_showTimes() {
@@ -204,18 +204,18 @@ public class UtilityMainTest {
 	//#### reflection
 	@Test void test_getField() {
 		//
-		String txtLine = UtilityMain.getField(new AnyObject(), "secretValue");
-		System.out.println(txtLine);
-		Assert.isTrue(txtLine.equals("SECRETSTR"), ASSERT_MSG);
+		String txtLine = UtilityMain.getField(new AnyObject(), "gamma");
+		System.out.println("txtLine: " + txtLine);
+		Assert.isTrue(txtLine.equals("GIMMEL"), ASSERT_MSG);
 	}
 
 	@Test void test_getMethod() {
 		//
 		Object objectParms = null;
-		Object object = UtilityMain.getMethod(AnyObject.class, "getSecretValue", objectParms);
+		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma", objectParms);
 		String txtLine = object.toString();
 		System.out.println(txtLine);
-		Assert.isTrue(txtLine.equals("SECRETSTR"), ASSERT_MSG);
+		Assert.isTrue(txtLine.equals("GIMMEL"), ASSERT_MSG);
 	}
 
 	@Test void test_exposeObject() {
@@ -229,8 +229,8 @@ public class UtilityMainTest {
 	@Test void test_putObject() {
 		//
 		AnyObject anyObject = new AnyObject();
-		UtilityMain.putObject(anyObject, "secretValue", "STUFF");
-		String txtLine = UtilityMain.getField(anyObject, "secretValue");
+		UtilityMain.putObject(anyObject, "gamma", "STUFF");
+		String txtLine = UtilityMain.getField(anyObject, "gamma");
 		System.out.println(txtLine);
 		Assert.isTrue(txtLine.equals("STUFF"), ASSERT_MSG);
 	}

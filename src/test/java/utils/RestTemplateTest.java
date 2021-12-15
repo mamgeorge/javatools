@@ -11,6 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -52,10 +53,13 @@ public class RestTemplateTest {
 
 	private static final Logger LOGGER = Logger.getLogger(RestTemplateTest.class.getName());
 	private static final String TXT_URL = "http://localhost:3000";
+	private static final String TXT_URLEXT = "http://httpbin.org";
 	private static final String PATHFILE_LOCAL = "src/test/resources/";
 	private static final String FILENAME_BOOKS = "booksCatalog.json";
 	private static final String FILENAME_WAVE = "hal9000.wav";
+	private static final String FRMT = "\t%-20s %s\n";
 	private static final String ASSERT_MSG = "ASSERT_MSG";
+	//
 	private static final String TESTSERVER_DOWNMSG = "I/O error on GET Connection refused; using Mock";
 	public static final String DEFAULT_OAUTH =
 			"{ \"access_token\": \"TOKEN_DEFAULT\", \"token_type\": \"TYPE_DEFAULT\", \"expires_in\": " +
@@ -87,6 +91,25 @@ public class RestTemplateTest {
 
 	@Test public void test_RT_getForEntity() {
 		//
+		String txtLines = "";
+		String url = TXT_URLEXT + "?sid=A123456";
+		//
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+		HttpStatus httpStatus = responseEntity.getStatusCode();
+		String html = responseEntity.getBody().substring(0,80).replaceAll("\n"," ");
+		String headers = responseEntity.getHeaders().toString().replaceAll(",",",\n\t\t");
+		//
+		txtLines += String.format(FRMT, "getStatusCode", httpStatus);
+		txtLines += String.format(FRMT, "getBody (html)",html );
+		txtLines += String.format(FRMT, "getHeaders", headers);
+		//
+		System.out.println(txtLines);
+		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
+	}
+
+	@Test public void test_RT_getForEntity_simplified() {
+		//
 		// ResponseEntity<String> responseEntity = restTemplate.getForEntity(txtURL, String.class);
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
@@ -110,7 +133,35 @@ public class RestTemplateTest {
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
 
-	@Test public void test_RT_postForEntity() {
+	@Test public void test_RT_postForEntity_body() {
+		//
+		String txtLines = "";
+		String url = TXT_URLEXT + "/post";
+		String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + "books.json");
+		//
+		// MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+		MultiValueMap<String, String> MVM =  new LinkedMultiValueMap<>();
+		MVM.add(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
+		MVM.add("AnyId", "G002875");
+		MVM.add("Phone", "614-377-7835");
+		//
+		HttpEntity<String> httpEntity = new HttpEntity<>(body, MVM);
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> responseEntity =
+				exchange_Entity(restTemplate, url, POST, httpEntity);
+		HttpStatus httpStatus = responseEntity.getStatusCode();
+		String html = responseEntity.getBody().substring(0,80).replaceAll("\n"," ");
+		String headers = responseEntity.getHeaders().toString().replaceAll(",",",\n\t\t");
+		//
+		txtLines += String.format(FRMT, "getStatusCode", httpStatus);
+		txtLines += String.format(FRMT, "getBody (html)",html );
+		txtLines += String.format(FRMT, "getHeaders", headers);
+		System.out.println(txtLines);
+		//
+		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
+	}
+
+	@Test public void test_RT_postForEntity_simplified() {
 		//
 		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<?> httpEntity = new HttpEntity<>("bar");
