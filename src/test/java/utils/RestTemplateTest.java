@@ -10,14 +10,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.mock.web.MockMultipartFile;
@@ -59,7 +56,7 @@ import static utils.UtilityMain.exposeObject;
 public class RestTemplateTest {
 
 	private static final Logger LOGGER = Logger.getLogger(RestTemplateTest.class.getName());
-	private static final String TXT_URL = "http://localhost:3000";
+	private static final String TXT_URLJS = "http://localhost:3000";
 	private static final String TXT_URLEXT = "http://httpbin.org";
 	private static final String PATHFILE_LOCAL = "src/test/resources/";
 	private static final String FILENAME_BOOKS = "booksCatalog.json";
@@ -80,7 +77,7 @@ public class RestTemplateTest {
 		RestTemplate restTemplate = new RestTemplate();
 		URI uri = null;
 		try {
-			uri = new URI(TXT_URL);
+			uri = new URI(TXT_URLEXT);
 		} catch (URISyntaxException ex) {
 			LOGGER.info(ex.getMessage());
 		}
@@ -120,52 +117,11 @@ public class RestTemplateTest {
 		//
 		// ResponseEntity<String> responseEntity = restTemplate.getForEntity(txtURL, String.class);
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
+		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URLEXT);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		// RT.getForEntity( ) > RE.getStatusCode( ) > HS
 		String txtLines = String.format("httpStatus: %s\n", httpStatus);
-		System.out.println(txtLines);
-		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
-	}
-
-	@Test public void test_RT_exchange_get() {
-		//
-		RestTemplate restTemplate = new RestTemplate();
-		HttpEntity<String> httpEntity = new HttpEntity<>("");
-		ResponseEntity<String> responseEntity = exchange_Entity(restTemplate, TXT_URL, GET, httpEntity);
-		HttpStatus httpStatus = responseEntity.getStatusCode();
-		//
-		String txtLines = String.format("httpStatus: %s\n", httpStatus);
-		System.out.println(txtLines);
-		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
-	}
-
-	@Test public void test_RT_postForEntity_body() {
-		//
-		String txtLines = "";
-		String url = TXT_URLEXT + "/post";
-		String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + "books.json");
-		//
-		// add headers: MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-		MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
-		MVM.add(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
-		MVM.add("AnyId", "G002875");
-		MVM.add("Phone", "614-377-7835");
-		HttpEntity<String> httpEntity = new HttpEntity<>(body, MVM);
-		//
-		// send request
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> responseEntity = restTemplate.exchange(url, POST, httpEntity, String.class);
-		HttpStatus httpStatus = responseEntity.getStatusCode();
-		String response = responseEntity.getBody().replaceAll("\n", "");
-		response = response.replaceAll("  ", " ").substring(0, 80);
-		String headers = responseEntity.getHeaders().toString().replaceAll(",", ",\n\t\t");
-		//
-		// show
-		txtLines += String.format(FRMT, "getStatusCode", httpStatus);
-		txtLines += String.format(FRMT, "getBody", response);
-		txtLines += String.format(FRMT, "getHeaders", headers);
 		System.out.println(txtLines);
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
@@ -220,7 +176,7 @@ public class RestTemplateTest {
 			httpEntity = new HttpEntity<>(map, httpHeaders);
 		}
 		ResponseEntity<String> responseEntity =
-				exchange_Entity(restTemplate, TXT_URL + "/post", POST, httpEntity);
+				exchange_Entity(restTemplate, TXT_URLEXT + "/post", POST, httpEntity);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		String txtLines = String.format("httpStatus: %s\n", httpStatus);
@@ -228,12 +184,65 @@ public class RestTemplateTest {
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
 
-	@Test public void test_RT_exchange_post() {
+	@Test public void test_RT_exchange_get() {
+		//
+		RestTemplate restTemplate = new RestTemplate();
+		HttpEntity<String> httpEntity = new HttpEntity<>("");
+		ResponseEntity<String> responseEntity = restTemplate.exchange(TXT_URLEXT, GET, httpEntity, String.class);
+		HttpStatus httpStatus = responseEntity.getStatusCode();
+		//
+		String txtLines = String.format("httpStatus: %s\n", httpStatus);
+		System.out.println(txtLines);
+		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
+	}
+
+	@Test public void test_RT_exchange_get_simplified() {
+		//
+		RestTemplate restTemplate = new RestTemplate();
+		HttpEntity<String> httpEntity = new HttpEntity<>("");
+		ResponseEntity<String> responseEntity = exchange_Entity(restTemplate, TXT_URLEXT, GET, httpEntity);
+		HttpStatus httpStatus = responseEntity.getStatusCode();
+		//
+		String txtLines = String.format("httpStatus: %s\n", httpStatus);
+		System.out.println(txtLines);
+		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
+	}
+
+	@Test public void test_RT_exchange_post_body() {
+		//
+		String txtLines = "";
+		String url = TXT_URLEXT + "/post";
+		String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + "books.json");
+		//
+		// add headers: MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+		MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
+		MVM.add(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
+		MVM.add("AnyId", "G002875");
+		MVM.add("Phone", "614-377-7835");
+		HttpEntity<String> httpEntity = new HttpEntity<>(body, MVM);
+		//
+		// send request
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> responseEntity = restTemplate.exchange(url, POST, httpEntity, String.class);
+		HttpStatus httpStatus = responseEntity.getStatusCode();
+		String response = responseEntity.getBody().replaceAll("\n", "");
+		response = response.replaceAll("  ", " ").substring(0, 80);
+		String headers = responseEntity.getHeaders().toString().replaceAll(",", ",\n\t\t");
+		//
+		// show
+		txtLines += String.format(FRMT, "getStatusCode", httpStatus);
+		txtLines += String.format(FRMT, "getBody", response);
+		txtLines += String.format(FRMT, "getHeaders", headers);
+		System.out.println(txtLines);
+		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
+	}
+
+	@Test public void test_RT_exchange_post_simplified() {
 		//
 		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<String> httpEntity = new HttpEntity<>("bar");
 		ResponseEntity<String> responseEntity =
-				exchange_Entity(restTemplate, TXT_URL + "/post", POST, httpEntity);
+				exchange_Entity(restTemplate, TXT_URLEXT + "/post", POST, httpEntity);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		String txtLines = String.format("httpStatus: %s\n", httpStatus);
@@ -253,7 +262,7 @@ public class RestTemplateTest {
 		// RestTemplate restTemplate = new RestTemplate(SCHRF);
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setRequestFactory(SCHRF);
-		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
+		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URLEXT);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		txtLines += String.format("SCHRF: %s\n", SCHRF);
@@ -270,7 +279,7 @@ public class RestTemplateTest {
 		HCCHRF.setConnectTimeout(timeout);
 		//
 		RestTemplate restTemplate = new RestTemplate(HCCHRF);
-		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
+		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URLEXT);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		txtLines += String.format("HCCHRF: %s\n", HCCHRF);
@@ -298,7 +307,7 @@ public class RestTemplateTest {
 				new HttpComponentsClientHttpRequestFactory(closeableHttpClient);
 		//
 		RestTemplate restTemplate = new RestTemplate(HCCHRF);
-		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
+		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URLEXT);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		txtLines += String.format("requestConfig: %s\n", requestConfig.toString());
@@ -313,7 +322,7 @@ public class RestTemplateTest {
 	@Test public void test_RE_getStatusCode() {
 		//
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
+		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URLEXT);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		System.out.println("responseEntity.getStatusCode(): " + httpStatus);
@@ -323,7 +332,7 @@ public class RestTemplateTest {
 	@Test public void test_RE_responseEntity() {
 		//
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
+		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URLEXT);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		String txtLines = "ResponseEntity" + EOL;
@@ -337,7 +346,7 @@ public class RestTemplateTest {
 	@Test public void test_httpStatus() {
 		//
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URL);
+		ResponseEntity<String> responseEntity = getForEntity_String(restTemplate, TXT_URLEXT);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		String txtLines = "HttpStatus" + EOL;
@@ -352,15 +361,15 @@ public class RestTemplateTest {
 	//#### implementations
 	@Test public void test_getOauthToken() {
 		//
-		String access_token = getOauthToken(TXT_URL + "/OAUTH", "ANY_PASSWORD");
+		String access_token = getOauthToken(TXT_URLJS + "/OAUTH", "ANY_PASSWORD");
 		System.out.println(access_token);
 		Assert.isTrue(access_token.length() >= 8, ASSERT_MSG);
 	}
 
 	@Test public void test_sendFiles2App() {
 		//
-		String txtUrl = TXT_URL + "/API";
-		String token = getOauthToken(TXT_URL + "/OAUTH", "ANY_PASSWORD");
+		String txtUrl = TXT_URLJS + "/API";
+		String token = getOauthToken(TXT_URLJS + "/OAUTH", "ANY_PASSWORD");
 		String pathJson = PATHFILE_LOCAL + FILENAME_BOOKS;
 		String pathWav = PATHFILE_LOCAL + FILENAME_WAVE;
 		//
