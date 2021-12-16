@@ -10,10 +10,14 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.mock.web.MockMultipartFile;
@@ -25,6 +29,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import samples.AppResponse;
+import samples.ClientHttpRequestInterceptorImpl;
 import samples.OauthToken;
 
 import java.io.IOException;
@@ -32,8 +37,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -92,16 +99,17 @@ public class RestTemplateTest {
 	@Test public void test_RT_getForEntity() {
 		//
 		String txtLines = "";
-		String url = TXT_URLEXT + "?sid=A123456";
+		String url = TXT_URLEXT + "/get?sid=A123456";
 		//
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
-		String html = responseEntity.getBody().substring(0,80).replaceAll("\n"," ");
-		String headers = responseEntity.getHeaders().toString().replaceAll(",",",\n\t\t");
+		String response = responseEntity.getBody().replaceAll("\n", "");
+		response = response.replaceAll("  ", " ").substring(0, 80);
+		String headers = responseEntity.getHeaders().toString().replaceAll(",", ",\n\t\t");
 		//
 		txtLines += String.format(FRMT, "getStatusCode", httpStatus);
-		txtLines += String.format(FRMT, "getBody (html)",html );
+		txtLines += String.format(FRMT, "getBody", response);
 		txtLines += String.format(FRMT, "getHeaders", headers);
 		//
 		System.out.println(txtLines);
@@ -139,25 +147,63 @@ public class RestTemplateTest {
 		String url = TXT_URLEXT + "/post";
 		String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + "books.json");
 		//
-		// MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-		MultiValueMap<String, String> MVM =  new LinkedMultiValueMap<>();
+		// add headers: MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+		MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
 		MVM.add(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
 		MVM.add("AnyId", "G002875");
 		MVM.add("Phone", "614-377-7835");
-		//
 		HttpEntity<String> httpEntity = new HttpEntity<>(body, MVM);
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> responseEntity =
-				exchange_Entity(restTemplate, url, POST, httpEntity);
-		HttpStatus httpStatus = responseEntity.getStatusCode();
-		String html = responseEntity.getBody().substring(0,80).replaceAll("\n"," ");
-		String headers = responseEntity.getHeaders().toString().replaceAll(",",",\n\t\t");
 		//
+		// send request
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> responseEntity = restTemplate.exchange(url, POST, httpEntity, String.class);
+		HttpStatus httpStatus = responseEntity.getStatusCode();
+		String response = responseEntity.getBody().replaceAll("\n", "");
+		response = response.replaceAll("  ", " ").substring(0, 80);
+		String headers = responseEntity.getHeaders().toString().replaceAll(",", ",\n\t\t");
+		//
+		// show
 		txtLines += String.format(FRMT, "getStatusCode", httpStatus);
-		txtLines += String.format(FRMT, "getBody (html)",html );
+		txtLines += String.format(FRMT, "getBody", response);
 		txtLines += String.format(FRMT, "getHeaders", headers);
 		System.out.println(txtLines);
+		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
+	}
+
+	@Test public void test_RT_postForEntity_logged() {
 		//
+		String txtLines = "";
+		String url = TXT_URLEXT + "/post";
+		String body = UtilityMain.getFileLocal(PATHFILE_LOCAL + "books.json");
+		//
+		// add headers: MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+		MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
+		MVM.add(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
+		MVM.add("AnyId", "G002875");
+		MVM.add("Phone", "614-377-7835");
+		HttpEntity<String> httpEntity = new HttpEntity<>(body, MVM);
+		//
+		// add logging
+		SimpleClientHttpRequestFactory SCHRF = new SimpleClientHttpRequestFactory();
+		BufferingClientHttpRequestFactory BCHRF = new BufferingClientHttpRequestFactory(SCHRF);
+		RestTemplate restTemplate = new RestTemplate(BCHRF);
+		List<ClientHttpRequestInterceptor> list = new ArrayList<>();
+		ClientHttpRequestInterceptorImpl CHRII = new ClientHttpRequestInterceptorImpl();
+		list.add(CHRII);
+		restTemplate.setInterceptors(list);
+		//
+		// send request
+		ResponseEntity<String> responseEntity = restTemplate.exchange(url, POST, httpEntity, String.class);
+		HttpStatus httpStatus = responseEntity.getStatusCode();
+		String response = responseEntity.getBody().replaceAll("\n", "");
+		response = response.replaceAll("  ", " ").substring(0, 80);
+		String headers = responseEntity.getHeaders().toString().replaceAll(",", ",\n\t\t");
+		//
+		// show
+		txtLines += String.format(FRMT, "getStatusCode", httpStatus);
+		txtLines += String.format(FRMT, "getBody", response);
+		txtLines += String.format(FRMT, "getHeaders", headers);
+		System.out.println(txtLines);
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
 
