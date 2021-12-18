@@ -1,7 +1,6 @@
 package utils;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.util.Assert;
 import samples.AnyObject;
 
 import java.net.NetworkInterface;
@@ -21,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.TAB;
 
@@ -39,7 +39,7 @@ public class UtilityMainTest {
 		//
 		String txtLines = stringBuilder.toString();
 		System.out.println("txtLines: " + txtLines);
-		Assert.isTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
+		assertTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
 	}
 
 	@SuppressWarnings({"all"})
@@ -56,7 +56,7 @@ public class UtilityMainTest {
 		txtLines += String.format("\t true && true && false\t %s \n", true && true && false);
 		//
 		System.out.println("txtLines: " + txtLines);
-		Assert.isTrue(txtLines.length() >= 1, ASSERT_MSG);
+		assertTrue(txtLines.length() >= 1, ASSERT_MSG);
 	}
 
 	@Test void test_showSys() {
@@ -66,7 +66,7 @@ public class UtilityMainTest {
 		//
 		System.out.println(txtLines);
 		System.out.println("envr: " + envr.length);
-		Assert.isTrue(envr.length > 40, ASSERT_MSG);
+		assertTrue(envr.length > 40, ASSERT_MSG);
 	}
 
 	@Test void test_showTimes() {
@@ -76,7 +76,7 @@ public class UtilityMainTest {
 		int showTimesLen = showTimes.split(EOL).length;
 		System.out.println("showTimes: " + showTimes);
 		System.out.println("showTimesLen: " + showTimesLen);
-		Assert.isTrue(showTimesLen > 4, ASSERT_MSG);
+		assertTrue(showTimesLen > 4, ASSERT_MSG);
 	}
 
 	@Test void test_Stream_sort() throws SocketException {
@@ -88,7 +88,7 @@ public class UtilityMainTest {
 		//
 		System.out.println("Stream & sort" + TAB + "size: " + set.size());
 		set.forEach(System.out::println);
-		Assert.isTrue(set.size() >= 7, ASSERT_MSG);
+		assertTrue(set.size() >= 7, ASSERT_MSG);
 	}
 
 	@Test void test_Stream_filter() throws SocketException {
@@ -114,7 +114,7 @@ public class UtilityMainTest {
 		//
 		System.out.println("Stream & filter" + TAB + "size: " + set.size());
 		set.forEach(System.out::println);
-		Assert.isTrue(set.size() >= 5, ASSERT_MSG);
+		assertTrue(set.size() >= 5, ASSERT_MSG);
 	}
 
 	@Test void test_Stream_Collections() throws SocketException {
@@ -127,7 +127,7 @@ public class UtilityMainTest {
 		Collections.list(enums).forEach(nifc -> stringBuilder.append(nifc.getDisplayName()).append(EOL));
 		//
 		System.out.println(stringBuilder);
-		Assert.isTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
+		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
 	@Test void test_Stream_Iterator() throws SocketException {
@@ -141,7 +141,7 @@ public class UtilityMainTest {
 		stream.forEach(nifc -> stringBuilder.append(nifc.getDisplayName()).append(EOL));
 		//
 		System.out.println(stringBuilder);
-		Assert.isTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
+		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
 	//#### files
@@ -150,7 +150,7 @@ public class UtilityMainTest {
 		String txtLines = UtilityMain.getFileLines("c:/workspace/greetings.txt", "");
 		//
 		LOGGER.info(txtLines); // System.out.println(txtLines);
-		Assert.isTrue(txtLines.length() > 12, ASSERT_MSG);
+		assertTrue(txtLines.length() > 12, ASSERT_MSG);
 	}
 
 	@Test void test_getFileLocal() {
@@ -158,7 +158,7 @@ public class UtilityMainTest {
 		String txtLines = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.json");
 		//
 		LOGGER.info(txtLines); // System.out.println(txtLines);
-		Assert.isTrue(txtLines.length() > 20, ASSERT_MSG);
+		assertTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
 	@Test void test_getFileLocals() {
@@ -178,7 +178,7 @@ public class UtilityMainTest {
 		int countFiles = stringBuilder.toString().split(EOL).length;
 		System.out.println("countFiles: " + countFiles);
 		System.out.println(stringBuilder);
-		Assert.isTrue(countFiles == fileNames.length, ASSERT_MSG);
+		assertTrue(countFiles == fileNames.length, ASSERT_MSG);
 	}
 
 	@Test void getZipFileList() {
@@ -192,7 +192,7 @@ public class UtilityMainTest {
 		//
 		String html = UtilityMain.urlGet("https://mamgeorge.altervista.org");
 		System.out.println("html: " + html);
-		Assert.isTrue(html.contains("DOCTYPE"), ASSERT_MSG);
+		assertTrue(html.contains("DOCTYPE"), ASSERT_MSG);
 	}
 
 	@Test void urlPost() {
@@ -206,7 +206,7 @@ public class UtilityMainTest {
 		//
 		String txtLine = UtilityMain.getField(new AnyObject(), "gamma");
 		System.out.println("txtLine: " + txtLine);
-		Assert.isTrue(txtLine.equals("GIMMEL"), ASSERT_MSG);
+		assertTrue(txtLine.equals("GIMMEL"), ASSERT_MSG);
 	}
 
 	@Test void test_getMethod() {
@@ -215,7 +215,7 @@ public class UtilityMainTest {
 		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma", objectParms);
 		String txtLine = object.toString();
 		System.out.println(txtLine);
-		Assert.isTrue(txtLine.equals("GIMMEL"), ASSERT_MSG);
+		assertTrue(txtLine.equals("GIMMEL"), ASSERT_MSG);
 	}
 
 	@Test void test_exposeObject() {
@@ -223,7 +223,7 @@ public class UtilityMainTest {
 		AnyObject anyObject = new AnyObject();
 		String txtLines = UtilityMain.exposeObject(anyObject);
 		System.out.println(txtLines);
-		Assert.isTrue(txtLines.split(EOL).length >= 6, ASSERT_MSG);
+		assertTrue(txtLines.split(EOL).length >= 6, ASSERT_MSG);
 	}
 
 	@Test void test_putObject() {
@@ -232,7 +232,7 @@ public class UtilityMainTest {
 		UtilityMain.putObject(anyObject, "gamma", "STUFF");
 		String txtLine = UtilityMain.getField(anyObject, "gamma");
 		System.out.println(txtLine);
-		Assert.isTrue(txtLine.equals("STUFF"), ASSERT_MSG);
+		assertTrue(txtLine.equals("STUFF"), ASSERT_MSG);
 	}
 }
 //----

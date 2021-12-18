@@ -1,16 +1,15 @@
 package utils;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.util.Assert;
 
 import javax.crypto.SecretKey;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.EncryptDecrypt.AES_KEY_BIT;
 import static utils.EncryptDecrypt.BLOCK_SIZE;
 import static utils.EncryptDecrypt.BYTES_IV_LEN;
@@ -48,7 +47,7 @@ public class EncryptDecrypt_Test {
 		//
 		byte[] bytesIV = getRandomIV(BYTES_IV_LEN);
 		System.out.println(bytesIV.toString() + " / " + bytesIV.length);
-		Assert.isTrue(bytesIV.length > 10, ASSERT_MSG);
+		assertTrue(bytesIV.length > 10, ASSERT_MSG);
 	}
 
 	@Test void test_getAESKey() {
@@ -57,7 +56,7 @@ public class EncryptDecrypt_Test {
 		String txtLines = showSecretKey(secretKey);
 		//
 		System.out.println("getAESKey " + txtLines);
-		Assert.isTrue(secretKey.toString().length() > 10, ASSERT_MSG);
+		assertTrue(secretKey.toString().length() > 10, ASSERT_MSG);
 	}
 
 	@Test void test_getAESKeyFromPassword() {
@@ -66,7 +65,7 @@ public class EncryptDecrypt_Test {
 		String txtLines = showSecretKey(secretKey);
 		//
 		System.out.println("getAESKeyFromPassword " + txtLines);
-		Assert.isTrue(secretKey.toString().length() > 10, ASSERT_MSG);
+		assertTrue(secretKey.toString().length() > 10, ASSERT_MSG);
 	}
 
 	@Test void test_encrypt() {
@@ -83,7 +82,7 @@ public class EncryptDecrypt_Test {
 		txtLines += "\tbytesEncrypted Hex: " + getHex(bytesEncrypted) + "\n";
 		txtLines += "\tbytesEncrypted Blk: " + getHexWithBlockSize(bytesEncrypted, BLOCK_SIZE);
 		System.out.println(txtLines);
-		Assert.isTrue(bytesEncrypted.length > 10, ASSERT_MSG);
+		assertTrue(bytesEncrypted.length > 10, ASSERT_MSG);
 	}
 
 	@Test void test_encryptPWD() {
@@ -94,14 +93,14 @@ public class EncryptDecrypt_Test {
 		try {
 			Path pathEncr = Paths.get(FILE_ENCR);
 			Files.write(pathEncr, contentEncryptedBase64.getBytes(UTF_8));
-		} catch (IOException ex) { System.out.println( "ERROR: " + ex.getMessage()); }
+		} catch (IOException ex) {System.out.println("ERROR: " + ex.getMessage());}
 		//
 		byte[] bytesEncryptedBase64 = contentEncryptedBase64.getBytes(UTF_8);
 		txtLines += "\tTXT_CONTENT.........: " + TXT_CONTENT + "\n";
 		txtLines += "\tcontentEncrypted txt: " + contentEncryptedBase64 + "\n";
 		txtLines += "\tcontentEncrypted Blk: " + getHexWithBlockSize(bytesEncryptedBase64, BLOCK_SIZE);
 		System.out.println(txtLines);
-		Assert.isTrue(contentEncryptedBase64.length() > 10, ASSERT_MSG);
+		assertTrue(contentEncryptedBase64.length() > 10, ASSERT_MSG);
 	}
 
 	@Test void test_encryptFile() {
@@ -111,7 +110,7 @@ public class EncryptDecrypt_Test {
 		String contentEncryptedBase64 = UtilityMain.getFileLocal(FILE_ENCR);
 		String txtLines = "contentEncryptedBase64:\n" + contentEncryptedBase64;
 		System.out.println(txtLines);
-		Assert.isTrue(contentEncryptedBase64.length() > 10, ASSERT_MSG);
+		assertTrue(contentEncryptedBase64.length() > 10, ASSERT_MSG);
 	}
 
 	@Test void test_decrypt() {
@@ -128,7 +127,7 @@ public class EncryptDecrypt_Test {
 		txtLines += "original!: " + TXT_CONTENT + "\n";
 		txtLines += "decrypted: " + contentDecrypted;
 		System.out.println(txtLines);
-		Assert.isTrue(contentDecrypted.equals(TXT_CONTENT), ASSERT_MSG);
+		assertTrue(contentDecrypted.equals(TXT_CONTENT), ASSERT_MSG);
 	}
 
 	@Test void test_decryptPWD() {
@@ -140,13 +139,13 @@ public class EncryptDecrypt_Test {
 		try {
 			Path pathOrig = Paths.get(FILE_ORIG);
 			Files.write(pathOrig, contentDecrypted.getBytes(UTF_8));
-		} catch (IOException ex) { System.out.println( "ERROR: " + ex.getMessage()); }
+		} catch (IOException ex) {System.out.println("ERROR: " + ex.getMessage());}
 		//
 		txtLines += "original!: " + TXT_CONTENT + "\n";
 		txtLines += "encrypted: " + contentEncrypted + "\n";
 		txtLines += "decrypted: " + contentDecrypted;
 		System.out.println(txtLines);
-		Assert.isTrue(contentDecrypted.equals(TXT_CONTENT), ASSERT_MSG);
+		assertTrue(contentDecrypted.equals(TXT_CONTENT), ASSERT_MSG);
 	}
 
 	@Test void test_decryptFile() {
@@ -155,7 +154,7 @@ public class EncryptDecrypt_Test {
 		//
 		String txtLines = "contentDecrypted:\n" + contentDecrypted;
 		System.out.println(txtLines);
-		Assert.isTrue(contentDecrypted.length() > 10, ASSERT_MSG);
+		assertTrue(contentDecrypted.length() > 10, ASSERT_MSG);
 	}
 
 	//############
@@ -168,7 +167,8 @@ public class EncryptDecrypt_Test {
 		txtLines += String.format(FRMT, "getFormat", secretKey.getFormat());
 		txtLines += String.format(FRMT, "getEncoded", secretKey.getEncoded());
 		txtLines += String.format(FRMT, "hexEncoded", getHex(secretKey.getEncoded()));
-		txtLines += String.format(FRMT, "hexBlocked", getHexWithBlockSize(secretKey.getEncoded(), BLOCK_SIZE));
+		txtLines +=
+				String.format(FRMT, "hexBlocked", getHexWithBlockSize(secretKey.getEncoded(), BLOCK_SIZE));
 		return txtLines;
 	}
 }

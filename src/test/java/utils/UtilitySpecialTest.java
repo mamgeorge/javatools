@@ -1,6 +1,5 @@
 package utils;
 
-import com.sun.net.httpserver.HttpServer;
 import io.jaegertracing.Configuration;
 import io.kubernetes.client.extended.controller.Controller;
 import io.kubernetes.client.extended.controller.builder.ControllerBuilder;
@@ -18,12 +17,9 @@ import io.kubernetes.client.util.CallGeneratorParams;
 import io.opentracing.Tracer;
 import org.apache.commons.collections4.list.TreeList;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.Assert;
-import samples.AnyHttpHandler;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.file.Files;
@@ -31,12 +27,10 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.springframework.http.HttpStatus.OK;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
 
 public class UtilitySpecialTest {
@@ -60,7 +54,7 @@ public class UtilitySpecialTest {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		Assert.isTrue(txtLines.length() > 20, ASSERT_MSG);
+		assertTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
 	@Test void test_NetworkAddress() throws SocketException { /**/
@@ -90,7 +84,7 @@ public class UtilitySpecialTest {
 		for (String txt : list) stringBuilder.append(txt);
 		txtLines += stringBuilder.toString();
 		System.out.println(txtLines);
-		Assert.isTrue(list.size() >= 7, ASSERT_MSG);
+		assertTrue(list.size() >= 7, ASSERT_MSG);
 	}
 
 	@Test void testDB_read() {
@@ -102,7 +96,7 @@ public class UtilitySpecialTest {
 		String txtLines = DPB.dbRead();
 		//
 		System.out.println("txtLines: " + txtLines);
-		Assert.isTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
+		assertTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
 	}
 
 	@Test void test_JaegerClient_tracing() {
@@ -112,7 +106,7 @@ public class UtilitySpecialTest {
 		Tracer tracer = configuration.getTracer();
 		String txtLines = UtilityMain.exposeObject(tracer);
 		System.out.println(txtLines);
-		Assert.isTrue(txtLines.split(EOL).length >= 20, ASSERT_MSG);
+		assertTrue(txtLines.split(EOL).length >= 20, ASSERT_MSG);
 	}
 
 	@Test void test_K8Controller() {
@@ -160,20 +154,17 @@ public class UtilitySpecialTest {
 		Controller controller =
 				ControllerBuilder.defaultBuilder(SIF)
 						.watch(
-								(workQueue) -> ControllerBuilder.controllerWatchBuilder(V1Node.class, workQueue)
+								(workQueue) -> ControllerBuilder.controllerWatchBuilder(V1Node.class,
+												workQueue)
 										.build())
 						.withReconciler(NPR) // required, set the actual reconciler
-						.withName("node-printing-controller") // optional, set name for logging, thread-tracing
+						.withName(
+								"node-printing-controller") // optional, set name for logging, thread-tracing
 						.withWorkerCount(4) // optional, set worker thread count
 						.withReadyFunc(SII::hasSynced) // optional, only starts when cache synced up
 						.build();
 
 		// controller.run();
-	}
-
-	@Test void test_sampleServer() {
-		//
-		System.out.println("HttpStatus.OK.value: " + OK.value() + " / " + OK.getReasonPhrase());
 	}
 
 	//#### statics
@@ -204,24 +195,5 @@ public class UtilitySpecialTest {
 			LOGGER.info(ex.getMessage());
 		}
 		return txtLines;
-	}
-
-	private static void sampleServer() {
-
-		String HOST = "localhost", CONTEXT = "/";
-		int PORT = 3000, backlog = 0, threads = 10;
-		try {
-			InetSocketAddress inetSocketAddress = new InetSocketAddress(HOST, PORT);
-			HttpServer httpServer = HttpServer.create(inetSocketAddress, backlog);
-			ThreadPoolExecutor TPE = (ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
-			AnyHttpHandler anyHttpHandler = new AnyHttpHandler();
-			//
-			httpServer.createContext(CONTEXT, anyHttpHandler);
-			httpServer.setExecutor(TPE);
-			httpServer.start();
-			LOGGER.info("Server started on port: " + PORT);
-		} catch (IOException ex) {
-			LOGGER.severe(ex.getMessage());
-		}
 	}
 }

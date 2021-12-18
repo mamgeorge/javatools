@@ -2,7 +2,7 @@ package utils;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.util.Assert;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import samples.AnyException;
 import samples.AnyObject;
 
@@ -30,7 +30,7 @@ public class UtilityMockTest {
 		txtLines += String.format("\t aob.getAlpha(): %s \n", anyObject.getAlpha());
 		txtLines += String.format("\t aom.getAlpha(): %s \n", anyObjectMock.getAlpha());
 		System.out.println(txtLines);
-		Assert.isTrue(anyObjectMock.getAlpha().equals(SAMPLE), ASSERT_MSG);
+		assertTrue(anyObjectMock.getAlpha().equals(SAMPLE), ASSERT_MSG);
 	}
 
 	@Test void testmock_doReturn_when() {
@@ -44,7 +44,7 @@ public class UtilityMockTest {
 		txtLines += String.format("\t aob.getAlpha(): %s \n", anyObject.getAlpha());
 		txtLines += String.format("\t aom.getAlpha(): %s \n", anyObjectMock.getAlpha());
 		System.out.println(txtLines);
-		Assert.isTrue(anyObjectMock.getAlpha().equals(SAMPLE), ASSERT_MSG);
+		assertTrue(anyObjectMock.getAlpha().equals(SAMPLE), ASSERT_MSG);
 	}
 
 	@Test void testmock_when_thenThrow() {
@@ -61,7 +61,7 @@ public class UtilityMockTest {
 			LOGGER.info("FORCED AnyException: " + ex.getMessage());
 		}
 		System.out.println(txtLines);
-		Assert.isTrue(anyObject.getAlpha().equals("ALEPH"), ASSERT_MSG);
+		assertTrue(anyObject.getAlpha().equals("ALEPH"), ASSERT_MSG);
 	}
 
 	@Test void testmock_doThrow_when() {
@@ -80,7 +80,7 @@ public class UtilityMockTest {
 		txtLines += String.format("\t aob.getClassName(): %s \n", anyObject.getAlpha());
 		txtLines += String.format("\t aom.getClassName(): %s \n", anyObjectMock.getAlpha());
 		System.out.println(txtLines);
-		Assert.isTrue(anyObjectMock.getAlpha() == null, ASSERT_MSG);
+		assertTrue(anyObjectMock.getAlpha() == null, ASSERT_MSG);
 	}
 
 	@Test void testmock_when_chained() {
@@ -98,7 +98,7 @@ public class UtilityMockTest {
 			LOGGER.info("FORCED AnyException: " + ex.getMessage());
 		}
 		System.out.println(txtLines);
-		Assert.isTrue(anyObjectMock.getBeta() == null, ASSERT_MSG);
+		assertTrue(anyObjectMock.getBeta() == null, ASSERT_MSG);
 	}
 
 	@Test void testspy_doReturn_when() {
@@ -113,7 +113,7 @@ public class UtilityMockTest {
 		txtLines += String.format("\t aos.getAlpha(): %s \n", anyObjectSpy.getAlpha());
 		txtLines += String.format("\t aos.getBeta(): %s \n", anyObjectSpy.getBeta());
 		System.out.println(txtLines);
-		Assert.isTrue(anyObjectSpy.getAlpha().equals(SAMPLE), ASSERT_MSG);
-		Assert.isTrue(anyObjectSpy.getBeta().equals("BETH"), ASSERT_MSG);
+		assertTrue(anyObjectSpy.getAlpha().equals(SAMPLE), ASSERT_MSG);
+		assertTrue(anyObjectSpy.getBeta().equals("BETH"), ASSERT_MSG);
 	}
 }

@@ -5,9 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.apache.http.HttpHeaders;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -293,10 +291,9 @@ public class UtilityMain {
 			URL url = new URL(link);
 			HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
 			httpConn.setDoOutput(true);
-			httpConn.setRequestMethod(HttpMethod.POST.toString());
-			httpConn.setRequestProperty(HttpHeaders.USER_AGENT, USER_AGENT);
-			httpConn
-					.setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+			httpConn.setRequestMethod("POST");
+			// httpConn.setRequestProperty(HttpHeaders.USER_AGENT, USER_AGENT);
+			// httpConn.setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 			// httpConn.setRequestProperty( HttpHeaders.AUTHORIZATION, "JWT " + jwtSourceId );
 			//
 			OutputStream outputStream = httpConn.getOutputStream();
@@ -344,8 +341,8 @@ public class UtilityMain {
 			URL url = new URL(link);
 			urlConn = url.openConnection();
 			urlConn.setDoOutput(true);
-			urlConn.setRequestProperty(HttpHeaders.CONTENT_TYPE,
-					MediaType.MULTIPART_FORM_DATA_VALUE + "; boundary=" + boundary);
+			urlConn.setRequestProperty("Content-Type",
+					"MediaType.MULTIPART_FORM_DATA_VALUE" + "; boundary=" + boundary);
 			//	urlConn.setRequestProperty( "Authorization", "JWT " + jwtSourceId );
 			//
 			System.out.println("0 urlConn.getOutputStream( )");
@@ -574,7 +571,7 @@ public class UtilityMain {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer(streamSourceXSL);
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.MEDIA_TYPE, MediaType.TEXT_XML_VALUE);
+			transformer.setOutputProperty(OutputKeys.MEDIA_TYPE, "MediaType.TEXT_XML_VALUE");
 			transformer.setOutputProperty(OutputKeys.ENCODING, UTF_8.toString());
 			//
 			// transform it

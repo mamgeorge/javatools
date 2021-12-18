@@ -11,7 +11,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.Assert;
 import samples.BooksCatalog;
 
 import java.util.logging.Logger;
@@ -94,7 +93,7 @@ public class JsonTasksTest {
 		}
 		//
 		System.out.println("jsonNodeAt.asText(): " + txtLine);
-		Assert.isTrue(txtLine.equals("Gambardella , Matthew"), ASSERT_MSG);
+		assertTrue(txtLine.equals("Gambardella , Matthew"), ASSERT_MSG);
 	}
 
 	@Test void test_getJsonValue_fromPath() {
@@ -108,7 +107,7 @@ public class JsonTasksTest {
 		String txtLine = object.toString();
 		//
 		LOGGER.info("jsonVal: " + txtLine); // System.out.println(txtLines);
-		Assert.isTrue(txtLine.equals("44.95"), ASSERT_MSG);
+		assertTrue(txtLine.equals("44.95"), ASSERT_MSG);
 	}
 
 	@Test void getXmlNode() {
@@ -117,7 +116,7 @@ public class JsonTasksTest {
 		String xmlPath = "/catalog/book[5]/price";
 		String txtLines = UtilityMain.getXmlNode(xml, xmlPath);
 		System.out.println(txtLines);
-		Assert.isTrue(txtLines.contains("5.95"), ASSERT_MSG);
+		assertTrue(txtLines.contains("5.95"), ASSERT_MSG);
 	}
 
 	@Test void formatXml() {
@@ -125,7 +124,7 @@ public class JsonTasksTest {
 		String xml = "<a><b><c>Boo</c></b></a>";
 		String txtLines = UtilityMain.formatXml(xml);
 		System.out.println(txtLines);
-		Assert.isTrue(txtLines.split("\n").length >= 5, ASSERT_MSG);
+		assertTrue(txtLines.split("\n").length >= 5, ASSERT_MSG);
 	}
 
 	@Test void formatJson() {
@@ -147,7 +146,7 @@ public class JsonTasksTest {
 		txtLines += gson.toJson(jsonElement);
 		//
 		System.out.println(txtLines);
-		Assert.isTrue(txtLines.split("\n").length >= 5, ASSERT_MSG);
+		assertTrue(txtLines.split("\n").length >= 5, ASSERT_MSG);
 	}
 
 	@Test void parseYaml2JsonNode() {
