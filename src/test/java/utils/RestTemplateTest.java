@@ -11,6 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
@@ -36,11 +37,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Base64;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static org.springframework.http.HttpHeaders.ACCEPT_CHARSET;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_ENCODING;
+import static org.springframework.http.HttpHeaders.CONTENT_LANGUAGE;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.USER_AGENT;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
@@ -101,8 +108,7 @@ public class RestTemplateTest {
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
-		String response = responseEntity.getBody().replaceAll("\n", "");
-		response = response.replaceAll("  ", " ").substring(0, 80);
+		String response = responseEntity.getBody().replaceAll("\\s+", " ").substring(0, 80);
 		String headers = responseEntity.getHeaders().toString().replaceAll(",", ",\n\t\t");
 		//
 		txtLines += String.format(FRMT, "getStatusCode", httpStatus);
@@ -151,8 +157,7 @@ public class RestTemplateTest {
 		// send request
 		ResponseEntity<String> responseEntity = restTemplate.exchange(url, POST, httpEntity, String.class);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
-		String response = responseEntity.getBody().replaceAll("\n", "");
-		response = response.replaceAll("  ", " ").substring(0, 80);
+		String response = responseEntity.getBody().replaceAll("\\s+", " ").substring(0, 80);
 		String headers = responseEntity.getHeaders().toString().replaceAll(",", ",\n\t\t");
 		//
 		// show
@@ -165,16 +170,14 @@ public class RestTemplateTest {
 
 	@Test public void test_RT_postForEntity_simplified() {
 		//
+		String body = "Here we go again!";
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+		httpHeaders.add("AgentId", "G002875");
+		httpHeaders.add("Phone", "614-377-7835");
+		//
+		HttpEntity<?> httpEntity = new HttpEntity<>(body, httpHeaders);
 		RestTemplate restTemplate = new RestTemplate();
-		HttpEntity<?> httpEntity = new HttpEntity<>("bar");
-		if (false) {
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.setContentType(APPLICATION_FORM_URLENCODED);
-			HashMap<String, Object> map = new HashMap<>();
-			map.put("AgentId", "G002875");
-			map.put("Phone", "614-377-7835");
-			httpEntity = new HttpEntity<>(map, httpHeaders);
-		}
 		ResponseEntity<String> responseEntity =
 				exchange_Entity(restTemplate, TXT_URLEXT + "/post", POST, httpEntity);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
@@ -188,11 +191,55 @@ public class RestTemplateTest {
 		//
 		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<String> httpEntity = new HttpEntity<>("");
-		ResponseEntity<String> responseEntity = restTemplate.exchange(TXT_URLEXT, GET, httpEntity, String.class);
+		ResponseEntity<String> responseEntity =
+				restTemplate.exchange(TXT_URLEXT, GET, httpEntity, String.class);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
 		//
 		String txtLines = String.format("httpStatus: %s\n", httpStatus);
 		System.out.println(txtLines);
+		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
+	}
+
+	@Test public void test_RT_exchange_get_HttpHeaders() {
+		//
+		StringBuilder stringBuilder = new StringBuilder();
+		String body = "{summary:{forename:Martin, surname:George, work: programmer, affiliation:Christian}}";
+		String auth_base64Creds = Base64.getEncoder().encodeToString("username:password".getBytes());
+		//
+		// request
+		HttpHeaders httpHeaders_REQ = new HttpHeaders();
+		httpHeaders_REQ.add(AUTHORIZATION, "Basic " + auth_base64Creds);
+		httpHeaders_REQ.add(ACCEPT_CHARSET, "utf-8, iso-8859-1");
+		httpHeaders_REQ.add(ACCEPT_ENCODING, "gzip");
+		httpHeaders_REQ.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
+		httpHeaders_REQ.add(CONTENT_ENCODING, "gzip");
+		httpHeaders_REQ.add(CONTENT_LANGUAGE, "en-US");
+		httpHeaders_REQ.add(USER_AGENT, "PostmanRuntime/7.26.5");
+		HttpEntity<String> httpEntity = new HttpEntity<>(body, httpHeaders_REQ);
+		//
+		HttpHeaders httpHeader_REQ = httpEntity.getHeaders();
+		stringBuilder.append("\n" + "httpHeader_REQ:\n");
+		httpHeader_REQ.keySet()
+				.forEach(key -> stringBuilder.append(String.format(FRMT, key, httpHeader_REQ.get(key))));
+		String body_REQ = httpEntity.getBody().replaceAll("\\s+", " ").substring(0, 80);
+		stringBuilder.append("\n" + "body_REQ:\n\t").append(body_REQ).append("\n");
+		//
+		// exchange
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> responseEntity =
+				restTemplate.exchange(TXT_URLEXT, GET, httpEntity, String.class);
+		//
+		// response
+		HttpStatus httpStatus = responseEntity.getStatusCode();
+		HttpHeaders httpHeader_RSP = responseEntity.getHeaders();
+		stringBuilder.append("\n" + "httpStatus:\n\t").append(httpStatus).append("\n");
+		stringBuilder.append("\n" + "httpHeader_RSP:\n");
+		httpHeader_RSP.keySet()
+				.forEach(key -> stringBuilder.append(String.format(FRMT, key, httpHeader_RSP.get(key))));
+		String body_RSP = responseEntity.getBody().replaceAll("\\s+", " ").substring(0, 80);
+		stringBuilder.append("\n" + "body_RSP:\n\t").append(body_RSP);
+		//
+		System.out.println(stringBuilder);
 		Assert.isTrue(httpStatus.equals(OK), ASSERT_MSG);
 	}
 
@@ -225,8 +272,7 @@ public class RestTemplateTest {
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<String> responseEntity = restTemplate.exchange(url, POST, httpEntity, String.class);
 		HttpStatus httpStatus = responseEntity.getStatusCode();
-		String response = responseEntity.getBody().replaceAll("\n", "");
-		response = response.replaceAll("  ", " ").substring(0, 80);
+		String response = responseEntity.getBody().replaceAll("\\s+", " ").substring(0, 80);
 		String headers = responseEntity.getHeaders().toString().replaceAll(",", ",\n\t\t");
 		//
 		// show
@@ -384,7 +430,7 @@ public class RestTemplateTest {
 		String txtLines = "body: " + body + EOL;
 		txtLines += "getUserid: " + appResponse.getUserid() + EOL;
 		txtLines += "getTtslength: " + appResponse.getTtslength() + EOL;
-		int ttsLength = Integer.valueOf(appResponse.getTtslength());
+		int ttsLength = Integer.parseInt(appResponse.getTtslength());
 		System.out.println(txtLines);
 		Assert.isTrue(ttsLength > 1000, ASSERT_MSG);
 	}
@@ -409,7 +455,7 @@ public class RestTemplateTest {
 	}
 
 	private ResponseEntity<String> exchange_Entity(RestTemplate RT, String txtUrl,
-	                                               HttpMethod httpMethod, HttpEntity httpEntity) {
+			HttpMethod httpMethod, HttpEntity<?> httpEntity) {
 		//
 		ResponseEntity<String> responseEntity;
 		try {
@@ -441,14 +487,14 @@ public class RestTemplateTest {
 		//
 		// https://www.codejava.net/java-se/file-io/how-to-read-and-write-binary-files-in-java
 		byte[] bytes = getFileBinary(fileName);
-		String MPF = MULTIPART_FORM_DATA_VALUE;
-		MultipartFile multipartFile = new MockMultipartFile("audioFile", fileName, MPF, bytes);
+		MultipartFile multipartFile =
+				new MockMultipartFile("audioFile", fileName, MULTIPART_FORM_DATA_VALUE, bytes);
 		System.out.println("multipartFile: " + multipartFile.getSize() + " for " + fileName + EOL);
 		//
 		return multipartFile;
 	}
 
-	public static MultiValueMap getMvmSample() {
+	public static MultiValueMap<String, String> getMvmSample() {
 		//
 		MultiValueMap<String, String> MVM = new LinkedMultiValueMap<>();
 		MVM.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
