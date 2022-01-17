@@ -1,3 +1,14 @@
+# Intent
+
+The purpose of this package is to allow various boilerplates and samples, including:
+* AWS access
+* MySQL & SQLite access
+* Encryption
+* Json Object transformations
+* Swing samples
+* Mock samples
+
+
 https://dzone.com/articles/build-a-java-app-with-gradle
 
 cd C:\workspace\training\javatools

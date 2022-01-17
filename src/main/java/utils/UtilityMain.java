@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.apache.http.HttpHeaders;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -68,12 +67,14 @@ import java.util.zip.ZipInputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
+import static org.apache.http.HttpHeaders.USER_AGENT;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
 public class UtilityMain {
 
 	public static final Logger LOGGER = Logger.getLogger(UtilityMain.class.getName());
 
-	public static final String USER_AGENT = "Mozilla/5.0";
+	public static final String USER_AGENT_VAL = "Mozilla/5.0";
 	public static final String GREEN = "\u001b[32,1m";
 	public static final String RESET = "\u001b[0m";
 	public static final String TAB = "\t";
@@ -257,7 +258,7 @@ public class UtilityMain {
 			URL url = new URL(link);
 			HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
 			httpConn.setRequestMethod("GET");
-			httpConn.setRequestProperty(HttpHeaders.USER_AGENT, USER_AGENT);
+			httpConn.setRequestProperty(USER_AGENT, USER_AGENT_VAL);
 			// httpConn.setRequestProperty( HttpHeaders.CONTENT_TYPE, CONTENTTYPE_JSON );
 			// httpConn.setRequestProperty( HttpHeaders.AUTHORIZATION, "JWT " + jwtSourceId );
 			httpConn.setConnectTimeout(5000);
@@ -292,9 +293,9 @@ public class UtilityMain {
 			HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
 			httpConn.setDoOutput(true);
 			httpConn.setRequestMethod("POST");
-			// httpConn.setRequestProperty(HttpHeaders.USER_AGENT, USER_AGENT);
-			// httpConn.setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-			// httpConn.setRequestProperty( HttpHeaders.AUTHORIZATION, "JWT " + jwtSourceId );
+			// httpConn.setRequestProperty(USER_AGENT, USER_AGENT);
+			// httpConn.setRequestProperty(CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+			// httpConn.setRequestProperty( AUTHORIZATION, "JWT " + jwtSourceId );
 			//
 			OutputStream outputStream = httpConn.getOutputStream();
 			outputStream.write(postParms.getBytes());
@@ -341,8 +342,7 @@ public class UtilityMain {
 			URL url = new URL(link);
 			urlConn = url.openConnection();
 			urlConn.setDoOutput(true);
-			urlConn.setRequestProperty("Content-Type",
-					"MediaType.MULTIPART_FORM_DATA_VALUE" + "; boundary=" + boundary);
+			urlConn.setRequestProperty(CONTENT_TYPE, "multipart/form-data; boundary=" + boundary);
 			//	urlConn.setRequestProperty( "Authorization", "JWT " + jwtSourceId );
 			//
 			System.out.println("0 urlConn.getOutputStream( )");

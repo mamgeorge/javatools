@@ -15,14 +15,14 @@ import java.util.logging.Logger;
 
 import static utils.UtilityMain.EOL;
 
-public class AdditionalServer extends JFrame {
+public class SwingServer extends JFrame {
 
-	static final Logger LOGGER = Logger.getLogger(AdditionalServer.class.getName());
+	static final Logger LOGGER = Logger.getLogger(SwingServer.class.getName());
 
 	private final JTextArea jTextArea = new JTextArea();
 	private final int PORT = 9000;
 
-	public AdditionalServer() {
+	public SwingServer() {
 		setTitle("Additional_Server");
 		jTextArea.setBackground(Color.BLACK);
 		jTextArea.setForeground(Color.GREEN);
@@ -34,7 +34,7 @@ public class AdditionalServer extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new AdditionalServer();
+		new SwingServer();
 	}
 
 	private void startServer() {

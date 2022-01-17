@@ -15,9 +15,9 @@ import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.logging.Logger;
 
-public class AdditionalClient extends JFrame implements ActionListener {
+public class SwingClient extends JFrame implements ActionListener {
 
-	static final Logger LOGGER = Logger.getLogger(AdditionalClient.class.getName());
+	static final Logger LOGGER = Logger.getLogger(SwingClient.class.getName());
 
 	private final JTextField jTextField_fst = new JTextField(3);
 	private final JTextField jTextField_sec = new JTextField(3);
@@ -39,7 +39,7 @@ public class AdditionalClient extends JFrame implements ActionListener {
 	private final String HOST_REMOTE = HOST_REMOTES[4];
 	private final int PORT = 9000;
 
-	public AdditionalClient() {
+	public SwingClient() {
 
 		//add the visual components
 		add(jTextField_fst);
@@ -65,7 +65,7 @@ public class AdditionalClient extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) {
-		new AdditionalClient();
+		new SwingClient();
 	}
 
 	private void startClient() {

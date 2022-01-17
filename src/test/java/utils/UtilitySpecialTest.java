@@ -87,18 +87,6 @@ public class UtilitySpecialTest {
 		assertTrue(list.size() >= 7, ASSERT_MSG);
 	}
 
-	@Test void testDB_read() {
-		//
-		DbProfile DPB = DbProfile.init(DbProfile.DATABASES.sqlite);
-		DPB.setSql("SELECT FirstName as FIRST, LastName as LAST, Email FROM  customers " +
-				"WHERE State = 'CA' ORDER BY LastName ASC");
-		//
-		String txtLines = DPB.dbRead();
-		//
-		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
-	}
-
 	@Test void test_JaegerClient_tracing() {
 		//
 		String[] ENVVAR = {"FOO", "USERNAME"};

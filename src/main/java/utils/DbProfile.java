@@ -24,98 +24,116 @@ import static utils.UtilityMain.TAB;
 @Getter @Setter @EqualsAndHashCode
 public class DbProfile {
 	//
-	public enum DATABASES {sqlite, derby, mysql, oracle, cassandra}
+	public enum DATABASES {sqlite, mysql, derby, oracle, cassandra}
 
 	private static final Logger LOGGER = Logger.getLogger(DbProfile.class.getName());
 	private String className;
-	private String connection;
-	public String sql;
+	private String connectionUrl;
+	private String sqlSelect;
+	private String username;
+	private String password;
 
 	private DbProfile dbProfile;
 
-	private DbProfile(String className, String connection, String sql) {
+	private DbProfile(String className, String connectionUrl, String sqlSelect) {
 		this.className = className;
-		this.connection = connection;
-		this.sql = sql;
+		this.connectionUrl = connectionUrl;
+		this.sqlSelect = sqlSelect;
 	}
 
-	public static DbProfile init(DATABASES dbtype) {
+	public static DbProfile init(DATABASES dbType) {
 		//
 		String className = "";
-		String connection = "";
-		String sql = "";
-		switch (dbtype) {
+		String connectionUrl = "";
+		String sqlSelect = "";
+		switch ( dbType ) {
 			case sqlite:
 				className = "org.sqlite.JDBC";
-				connection = "jdbc:sqlite:C:/dbase/sqlite/chinook.db";
-				sql = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
+				connectionUrl = "jdbc:sqlite:C:/workspace/dbase/sqlite/chinook.db";
+				sqlSelect = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
+				break;
+			case mysql:
+				className = "com.mysql.cj.jdbc.Driver"; // "com.mysql.jdbc.Driver";
+				connectionUrl = "jdbc:mysql://localhost:3306/mydb";
+				sqlSelect = "SELECT * FROM history WHERE id > 0 ORDER BY dateEnd";
 				break;
 			case derby:
 				className = "org.apache.derby.jdbc.ClientDriver";
-				connection = "jdbc:derby://localhost:1527/testDb";
-				sql = "";
-				break;
-			case mysql:
-				className = "com.mysql.jdbc.Driver";
-				connection = "jdbc:mysql://ohit014:3306/db";
-				sql = "";
+				connectionUrl = "jdbc:derby://localhost:1527/mydb";
+				sqlSelect = "";
 				break;
 			case oracle:
 				className = "oracle.jdbc.driver.OracleDriver";
-				connection = "jdbc:oracle:thin:@localhost:1521:db";
-				sql = "";
+				connectionUrl = "jdbc:oracle:thin:@localhost:1521:mydb";
+				sqlSelect = "";
 				break;
 			case cassandra:
 				className = "";
-				connection = "";
-				sql = "";
+				connectionUrl = "";
+				sqlSelect = "";
 				break;
 		}
-		DbProfile dbProfile = new DbProfile(className, connection, sql);
+		DbProfile dbProfile = new DbProfile(className, connectionUrl, sqlSelect);
 		return dbProfile;
 	}
 
-	public String dbRead() {
+	public String readDbLines( ) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		String DLM = ",\t";
 		try {
-			Class.forName(getClassName());
-			Connection connection = DriverManager.getConnection(getConnection());
+			Class.forName(className);
+			Connection connection;
+			if ( username == null || username.equals("") ) {
+				connection = DriverManager.getConnection(connectionUrl);
+			} else {
+				connection = DriverManager.getConnection(connectionUrl, username, password);
+			}
 			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(getSql());
+			ResultSet resultSet = statement.executeQuery(sqlSelect);
 			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 			int intColumnCount = resultSetMetaData.getColumnCount();
 			// get column titles
 			stringBuilder.append(EOL);
-			for (int ictr = 1; ictr < intColumnCount + 1; ictr++) {
-				stringBuilder.append(resultSetMetaData.getColumnName(ictr) + TAB);
+			for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
+				stringBuilder.append(resultSetMetaData.getColumnName(ictr)).append(TAB);
 			}
 			stringBuilder.append(EOL);
 			// get rows
-			Object object = null;
-			while (resultSet.next()) {
+			Object object;
+			while ( resultSet.next() ) {
 				//
 				stringBuilder.append(TAB);
-				for (int ictr = 1; ictr < intColumnCount + 1; ictr++) {
+				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
 					object = resultSet.getObject(ictr);
-					if (object instanceof Clob) {
+					if ( object instanceof Clob ) {
 						object = object.getClass().getName();
 					}
-					if (object == null) {
+					if ( object == null ) {
 						object = "NULL";
 					}
-					if (ictr < intColumnCount) {
-						stringBuilder.append(object + DLM);
+					if ( ictr < intColumnCount ) {
+						stringBuilder.append(object).append(DLM);
 					} else {
 						stringBuilder.append(object);
 					}
 				}
 				stringBuilder.append(EOL);
 			}
-		} catch (ClassNotFoundException | SQLException ex) {
-			LOGGER.info(ex.getMessage());
+		}
+		catch (ClassNotFoundException | SQLException ex) {
+			LOGGER.info("ERROR: " + ex.getMessage());
 		}
 		return stringBuilder.toString();
+	}
+
+	public static Class testClass(String className) {
+		//
+		Class clazz = null;
+		try { clazz = Class.forName(className); }
+		catch (ClassNotFoundException ex) {
+			LOGGER.info("ERROR: (" + className + ") " + ex.getMessage());
+		}
+		return clazz;
 	}
 }

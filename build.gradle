@@ -13,21 +13,25 @@ application { mainClass.set( 'utils.SwingSample' ) }
 
 dependencies {
 
+	// implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.11.1015'		// for AWS1 1.11.1005
 	implementation 'com.amazonaws:aws-java-sdk-sts:1.11.1015'		// for AWS1 services access
 	implementation 'software.amazon.awssdk:s3:2.16.48'				// for AWS2 2.16.48 > 2.16.59
+	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// SQLite
+	implementation 'mysql:mysql-connector-java:8.0.27'				// MySQL
+
+	implementation 'io.jaegertracing:jaeger-core:1.6.0'				// Jaeger tracing
+	implementation 'io.kubernetes:client-java-extended:13.0.0'		// Kubernetes
+
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'	// for json processing
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml' // 2.11.2'
 	implementation 'com.jayway.jsonpath:json-path:2.6.0'			// for json processing
-	//
-	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// SQLite
-	implementation 'io.jaegertracing:jaeger-core:1.6.0'				// Jaeger tracing
-	implementation 'io.kubernetes:client-java-extended:13.0.0'		// Kubernetes
     implementation 'org.projectlombok:lombok:1.18.18'
 	//
-	testImplementation 'org.mockito:mockito-core:4.0.0'				// mockito handle reflection
+	// testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+	testImplementation 'org.mockito:mockito-core:4.0.0'				// mockito handle reflection
 }
 
 // gradle clean build test --i | findstr /i INFO:
