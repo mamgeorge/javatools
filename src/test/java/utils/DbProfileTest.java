@@ -63,13 +63,22 @@ public class DbProfileTest {
 		assertNotNull(txtLines);
 	}
 
+	@Test void readDbLines_oracle( ) {
+		//
+		String schema = "XEPDB1";
+		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.oracle, "localhost", schema);
+		String txtLines = dbProfile.readDbLines(System.getenv("ORACLE_USER"), System.getenv("ORACLE_PASS"));
+		System.out.println("txtLines: " + txtLines);
+		assertNotNull(txtLines);
+	}
+
 	@Test void readDbLines_mssql( ) {
 		//
 		String HOST = "2021-MARTIN\\SQLEXPRESS";
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.mssql, HOST, "mydb");
 		String txtLines = dbProfile.readDbLines("","");
 		System.out.println("txtLines: " + txtLines);
-		// assertNotNull(txtLines);
+		assertNotNull(txtLines);
 	}
 
 	@Test void readDbLines_mssqlFull( ) {

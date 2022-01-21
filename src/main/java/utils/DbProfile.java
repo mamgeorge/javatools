@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import oracle.jdbc.datasource.impl.OracleDataSource;
 
 import java.sql.Clob;
 import java.sql.Connection;
@@ -59,8 +60,6 @@ public class DbProfile {
 	private String port;
 	private String dbUrl;
 	private String dbName;
-	private String username;
-	private String password;
 	private String sqlDefault;
 
 	public DbProfile(DBTYPE dbType, String host, String dbName) {
@@ -70,38 +69,38 @@ public class DbProfile {
 		this.server = host;
 		this.serverInstance = host;
 		this.dbName = dbName;
+		//
+		if ( host == null || host.equals("") ) { server = "localhost"; }
+		if ( dbName == null || dbName.equals("") ) { dbName = "mydb"; }
+		//
 		switch ( dbType ) {
 			case sqlite:
 				String DEFAULT_PATH = "C:/workspace/dbase/sqlite/";
-				if ( dbName == null || dbName.equals("") ) { dbName = "chinook.db"; }
 				if ( host == null || host.equals("") ) { server = DEFAULT_PATH ; }
+				if ( dbName == null || dbName.equals("") || dbName.equals("mydb") ) { dbName = "chinook.db"; }
 				dbUrl = "jdbc:sqlite:" + server + dbName;
 				sqlDefault = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
 				break;
 			case mysql:
-				server = "localhost";
 				port = "3306";
 				dbUrl = "jdbc:mysql://" + server + ":" + port + "/" + dbName;
 				sqlDefault = "SELECT * FROM history WHERE id > 0 ORDER BY dateEnd";
 				break;
 			case derby:
-				server = "localhost";
 				port = "1527";
 				dbUrl = "jdbc:derby://" + server + ":" + port + "/" + dbName;
 				sqlDefault = "";
 				break;
 			case oracle:
-				server = "localhost";
 				port = "1521";
-				dbUrl = "jdbc:oracle:thin:@" + server + ":" + port + ":" + dbName;
-				sqlDefault = "";
+				// dbUrl = "jdbc:oracle:thin@//localhost:1521/XE"
+				dbUrl = "jdbc:oracle:thin:@//" + server + ":" + port + "/" + dbName;
+				sqlDefault = "SELECT 'Hello World!' FROM dual";
 				break;
 			case mssql:
-				if ( host == null || host.equals("") ) { server = "localhost"; }
 				port = "1433";
 				// dbUrl = "jdbc:sqlserver://2021-MARTIN\SQLEXPRESS;databaseName=mydb;integratedSecurity=true"
 				dbUrl = "jdbc:sqlserver://" + server + ";databaseName=" + dbName + ";integratedSecurity=true";
-				System.out.println("dbUrl: " + dbUrl);
 				sqlDefault = "SELECT TOP (10) * FROM [mydb].[dbo].[Employee]";
 				break;
 			case cassandra:
@@ -110,16 +109,27 @@ public class DbProfile {
 				sqlDefault = "";
 				break;
 		}
+		System.out.println("dbUrl: " + dbUrl);
+		System.out.println("sqlDefault: " + sqlDefault);
 	}
-
+	
 	public String readDbLines(String username, String password) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		try {
 			Connection connection;
-			if ( username == null || username.equals("") ) {
+			if(dbType==DBTYPE.oracle) {
+				//
+				OracleDataSource ODS = new OracleDataSource();
+				ODS.setURL(dbUrl);
+				ODS.setUser(username);
+				ODS.setPassword(password);
+				connection = ODS.getConnection();
+			} 
+			else if ( username == null || username.equals("") ) {
 				connection = DriverManager.getConnection(dbUrl);
-			} else {
+			} 
+			else {
 				connection = DriverManager.getConnection(dbUrl, username, password);
 			}
 			Statement statement = connection.createStatement();

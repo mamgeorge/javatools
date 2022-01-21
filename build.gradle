@@ -24,6 +24,7 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3:2.16.48'				// for AWS2 2.16.48 > 2.16.59
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// SQLite
 	implementation 'mysql:mysql-connector-java:8.0.28'				// MySQL
+	implementation 'com.oracle.database.jdbc:ojdbc11:21.4.0.0.1'	// Oracle
 	// MSSQL
 	// implementation 'com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11'
 	// implementation 'com.microsoft.sqlserver:sqljdbc4:4.0'
