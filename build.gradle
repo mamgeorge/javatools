@@ -3,7 +3,12 @@
 
 plugins { id "application" }
 apply plugin: "java"
-repositories { mavenCentral() }
+repositories {
+
+	mavenCentral()
+	// maven { url "https://clojars.org/repo/" } // needed for sqljdbc4
+	// maven { url "https://nexus.onebusaway.org/nexus/content/repositories/public/" } // needed for sqljdbc6
+}
 
 println "#### build.gradle sample groovy print ####"
 task runany { println "[[[[ gradle Java tasks ]]]]" }
@@ -18,7 +23,11 @@ dependencies {
 	implementation 'com.amazonaws:aws-java-sdk-sts:1.11.1015'		// for AWS1 services access
 	implementation 'software.amazon.awssdk:s3:2.16.48'				// for AWS2 2.16.48 > 2.16.59
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// SQLite
-	implementation 'mysql:mysql-connector-java:8.0.27'				// MySQL
+	implementation 'mysql:mysql-connector-java:8.0.28'				// MySQL
+	// MSSQL
+	// implementation 'com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11'
+	// implementation 'com.microsoft.sqlserver:sqljdbc4:4.0'
+	implementation files('C:/workspace/dbase/mssql/sqljdbc6-4.2.jar')
 
 	implementation 'io.jaegertracing:jaeger-core:1.6.0'				// Jaeger tracing
 	implementation 'io.kubernetes:client-java-extended:13.0.0'		// Kubernetes

@@ -2,6 +2,7 @@ package utils;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Clob;
@@ -13,84 +14,116 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
 
-import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.TAB;
 
 /*
 	add 4 "lombok" refs & plugin to build?
 	add "lombok.config" with "lombok.addLombokGeneratedAnnotation=true"?
 	add @Getter @Setter @EqualsAndHashCode @NoArgsConstructor to POJO
+	//
+	DB GUIs: IntelliJ_DBBrowser; DBeaver, SQuirrelSQL, DbVisualizer; Adminer, Firebird
+	//
+	https://www.benchresources.net/jdbc-driver-list-and-url-for-all-databases/
+		DriverManager automatically selects driver className since JDBC4 (SDK6)
+		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+		//
+		Class.forName(className);
+		className = "org.sqlite.JDBC";
+		className = "com.mysql.cj.jdbc.Driver"; // "com.mysql.jdbc.Driver";
+		className = "org.apache.derby.jdbc.ClientDriver";
+		className = "oracle.jdbc.driver.OracleDriver";
+		className = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+	//
+	MSSQL required Microsoft JDBC Driver 6.0 for SQL Server Type 4
+		implementation files('C:/workspace/dbase/mssql/sqljdbc6-4.2.jar')
+		copies of sqljdbc_4.0/enu/auth/x64/sqljdbc_auth.dll to jdk bin, lib
+		For DBBrowser dll needed to be in IntelliJ bin & lib
+		Authentication	OS Credentials
+		Driver_Source	External Library
+		Driver_library	C:\workspace\dbase\mssql\sqljdbc6-4.2.jar
+		Driver 			com.microsoft.sqlserver.jdbc.SQLServerDriver
 */
-@Getter @Setter @EqualsAndHashCode
+@Getter @Setter @EqualsAndHashCode @NoArgsConstructor
 public class DbProfile {
 	//
-	public enum DATABASES {sqlite, mysql, derby, oracle, cassandra}
-
 	private static final Logger LOGGER = Logger.getLogger(DbProfile.class.getName());
-	private String className;
-	private String connectionUrl;
-	private String sqlSelect;
-	private String username;
-	private String password;
+
+	public enum DBTYPE {sqlite, mysql, derby, oracle, mssql, cassandra}
+	public static final String EOL = "\n";
+	public static final String DLM = " | ";
 
 	private DbProfile dbProfile;
+	private DBTYPE dbType;
+	private String server;
+	private String serverInstance;
+	private String port;
+	private String dbUrl;
+	private String dbName;
+	private String username;
+	private String password;
+	private String sqlDefault;
 
-	private DbProfile(String className, String connectionUrl, String sqlSelect) {
-		this.className = className;
-		this.connectionUrl = connectionUrl;
-		this.sqlSelect = sqlSelect;
-	}
-
-	public static DbProfile init(DATABASES dbType) {
+	public DbProfile(DBTYPE dbType, String host, String dbName) {
 		//
-		String className = "";
-		String connectionUrl = "";
-		String sqlSelect = "";
+		dbProfile = new DbProfile();
+		this.dbType = dbType;
+		this.server = host;
+		this.serverInstance = host;
+		this.dbName = dbName;
 		switch ( dbType ) {
 			case sqlite:
-				className = "org.sqlite.JDBC";
-				connectionUrl = "jdbc:sqlite:C:/workspace/dbase/sqlite/chinook.db";
-				sqlSelect = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
+				String DEFAULT_PATH = "C:/workspace/dbase/sqlite/";
+				if ( dbName == null || dbName.equals("") ) { dbName = "chinook.db"; }
+				if ( host == null || host.equals("") ) { server = DEFAULT_PATH ; }
+				dbUrl = "jdbc:sqlite:" + server + dbName;
+				sqlDefault = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
 				break;
 			case mysql:
-				className = "com.mysql.cj.jdbc.Driver"; // "com.mysql.jdbc.Driver";
-				connectionUrl = "jdbc:mysql://localhost:3306/mydb";
-				sqlSelect = "SELECT * FROM history WHERE id > 0 ORDER BY dateEnd";
+				server = "localhost";
+				port = "3306";
+				dbUrl = "jdbc:mysql://" + server + ":" + port + "/" + dbName;
+				sqlDefault = "SELECT * FROM history WHERE id > 0 ORDER BY dateEnd";
 				break;
 			case derby:
-				className = "org.apache.derby.jdbc.ClientDriver";
-				connectionUrl = "jdbc:derby://localhost:1527/mydb";
-				sqlSelect = "";
+				server = "localhost";
+				port = "1527";
+				dbUrl = "jdbc:derby://" + server + ":" + port + "/" + dbName;
+				sqlDefault = "";
 				break;
 			case oracle:
-				className = "oracle.jdbc.driver.OracleDriver";
-				connectionUrl = "jdbc:oracle:thin:@localhost:1521:mydb";
-				sqlSelect = "";
+				server = "localhost";
+				port = "1521";
+				dbUrl = "jdbc:oracle:thin:@" + server + ":" + port + ":" + dbName;
+				sqlDefault = "";
+				break;
+			case mssql:
+				if ( host == null || host.equals("") ) { server = "localhost"; }
+				port = "1433";
+				// dbUrl = "jdbc:sqlserver://2021-MARTIN\SQLEXPRESS;databaseName=mydb;integratedSecurity=true"
+				dbUrl = "jdbc:sqlserver://" + server + ";databaseName=" + dbName + ";integratedSecurity=true";
+				System.out.println("dbUrl: " + dbUrl);
+				sqlDefault = "SELECT TOP (10) * FROM [mydb].[dbo].[Employee]";
 				break;
 			case cassandra:
-				className = "";
-				connectionUrl = "";
-				sqlSelect = "";
+				// jdbc:cassandra:root/root@:/
+				dbUrl = "";
+				sqlDefault = "";
 				break;
 		}
-		DbProfile dbProfile = new DbProfile(className, connectionUrl, sqlSelect);
-		return dbProfile;
 	}
 
-	public String readDbLines( ) {
+	public String readDbLines(String username, String password) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
-		String DLM = ",\t";
 		try {
-			Class.forName(className);
 			Connection connection;
 			if ( username == null || username.equals("") ) {
-				connection = DriverManager.getConnection(connectionUrl);
+				connection = DriverManager.getConnection(dbUrl);
 			} else {
-				connection = DriverManager.getConnection(connectionUrl, username, password);
+				connection = DriverManager.getConnection(dbUrl, username, password);
 			}
 			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(sqlSelect);
+			ResultSet resultSet = statement.executeQuery(sqlDefault);
 			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 			int intColumnCount = resultSetMetaData.getColumnCount();
 			// get column titles
@@ -98,42 +131,24 @@ public class DbProfile {
 			for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
 				stringBuilder.append(resultSetMetaData.getColumnName(ictr)).append(TAB);
 			}
-			stringBuilder.append(EOL);
 			// get rows
+			stringBuilder.append(EOL);
 			Object object;
 			while ( resultSet.next() ) {
 				//
 				stringBuilder.append(TAB);
 				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
 					object = resultSet.getObject(ictr);
-					if ( object instanceof Clob ) {
-						object = object.getClass().getName();
-					}
-					if ( object == null ) {
-						object = "NULL";
-					}
-					if ( ictr < intColumnCount ) {
-						stringBuilder.append(object).append(DLM);
-					} else {
+					if ( object instanceof Clob ) { object = object.getClass().getName(); }
+					if ( object == null ) { object = "NULL"; }
+					if ( ictr < intColumnCount ) { stringBuilder.append(object).append(DLM); } else {
 						stringBuilder.append(object);
 					}
 				}
 				stringBuilder.append(EOL);
 			}
 		}
-		catch (ClassNotFoundException | SQLException ex) {
-			LOGGER.info("ERROR: " + ex.getMessage());
-		}
+		catch (SQLException ex) { LOGGER.info("ERROR: " + ex.getMessage()); }
 		return stringBuilder.toString();
-	}
-
-	public static Class testClass(String className) {
-		//
-		Class clazz = null;
-		try { clazz = Class.forName(className); }
-		catch (ClassNotFoundException ex) {
-			LOGGER.info("ERROR: (" + className + ") " + ex.getMessage());
-		}
-		return clazz;
 	}
 }
