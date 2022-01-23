@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import oracle.jdbc.datasource.impl.OracleDataSource;
 
 import java.sql.Clob;
 import java.sql.Connection;
@@ -22,27 +21,8 @@ import static utils.UtilityMain.TAB;
 	add "lombok.config" with "lombok.addLombokGeneratedAnnotation=true"?
 	add @Getter @Setter @EqualsAndHashCode @NoArgsConstructor to POJO
 	//
-	DB GUIs: IntelliJ_DBBrowser; DBeaver, SQuirrelSQL, DbVisualizer; Adminer, Firebird
-	//
-	https://www.benchresources.net/jdbc-driver-list-and-url-for-all-databases/
-		DriverManager automatically selects driver className since JDBC4 (SDK6)
-		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-		//
-		Class.forName(className);
-		className = "org.sqlite.JDBC";
-		className = "com.mysql.cj.jdbc.Driver"; // "com.mysql.jdbc.Driver";
-		className = "org.apache.derby.jdbc.ClientDriver";
-		className = "oracle.jdbc.driver.OracleDriver";
-		className = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-	//
-	MSSQL required Microsoft JDBC Driver 6.0 for SQL Server Type 4
-		implementation files('C:/workspace/dbase/mssql/sqljdbc6-4.2.jar')
-		copies of sqljdbc_4.0/enu/auth/x64/sqljdbc_auth.dll to jdk bin, lib
-		For DBBrowser dll needed to be in IntelliJ bin & lib
-		Authentication	OS Credentials
-		Driver_Source	External Library
-		Driver_library	C:\workspace\dbase\mssql\sqljdbc6-4.2.jar
-		Driver 			com.microsoft.sqlserver.jdbc.SQLServerDriver
+	many DB GUIs: IntelliJ_DBBrowser, DBeaver / SQuirrelSQL, DbVisualizer, Adminer, Firebird
+	default GUIs: for Oracle: SqlDeveloper, MSSQL: SSMS (SQL_Server_Management_Studio)
 */
 @Getter @Setter @EqualsAndHashCode @NoArgsConstructor
 public class DbProfile {
@@ -50,6 +30,7 @@ public class DbProfile {
 	private static final Logger LOGGER = Logger.getLogger(DbProfile.class.getName());
 
 	public enum DBTYPE {sqlite, mysql, derby, oracle, mssql, cassandra}
+
 	public static final String EOL = "\n";
 	public static final String DLM = " | ";
 
@@ -76,10 +57,10 @@ public class DbProfile {
 		switch ( dbType ) {
 			case sqlite:
 				String DEFAULT_PATH = "C:/workspace/dbase/sqlite/";
-				if ( host == null || host.equals("") ) { server = DEFAULT_PATH ; }
+				if ( host == null || host.equals("") ) { server = DEFAULT_PATH; }
 				if ( dbName == null || dbName.equals("") || dbName.equals("mydb") ) { dbName = "chinook.db"; }
 				dbUrl = "jdbc:sqlite:" + server + dbName;
-				sqlDefault = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
+				sqlDefault = "SELECT * FROM employees WHERE BirthDate > '1964-01-01' ORDER BY LastName ASC";
 				break;
 			case mysql:
 				port = "3306";
@@ -92,14 +73,31 @@ public class DbProfile {
 				sqlDefault = "";
 				break;
 			case oracle:
+				/*
+					use ":" for SID, "/" for servicename
+					dbUrl = "jdbc:oracle:thin@//localhost:1521/XE" ;
+					String driver = "oracle.jdbc.driver.OracleDriver";
+					OracleDataSource ODS = new OracleDataSource();
+					default GUI: SqlDeveloper
+				*/
 				port = "1521";
-				// dbUrl = "jdbc:oracle:thin@//localhost:1521/XE"
 				dbUrl = "jdbc:oracle:thin:@//" + server + ":" + port + "/" + dbName;
-				sqlDefault = "SELECT 'Hello World!' FROM dual";
+				sqlDefault = "SELECT * FROM (SELECT * FROM employees ORDER BY LAST_NAME) WHERE ROWNUM <= 10";
 				break;
 			case mssql:
+				/*
+					MSSQL required Microsoft JDBC Driver 6.0 for SQL Server Type 4
+					implementation files('C:/workspace/dbase/mssql/sqljdbc6-4.2.jar')
+					copies of sqljdbc_4.0/enu/auth/x64/sqljdbc_auth.dll to jdk bin, lib
+					For DBBrowser dll needed to be in IntelliJ bin & lib
+					Authentication	OS Credentials
+					Driver_Source	External Library
+					Driver_library	C:\workspace\dbase\mssql\sqljdbc6-4.2.jar
+					Driver 			com.microsoft.sqlserver.jdbc.SQLServerDriver
+					dbUrl = "jdbc:sqlserver://2021-MARTIN\SQLEXPRESS;databaseName=mydb;integratedSecurity=true"
+					default GUI: SSMS (SQL_Server_Management_Studio)
+				*/
 				port = "1433";
-				// dbUrl = "jdbc:sqlserver://2021-MARTIN\SQLEXPRESS;databaseName=mydb;integratedSecurity=true"
 				dbUrl = "jdbc:sqlserver://" + server + ";databaseName=" + dbName + ";integratedSecurity=true";
 				sqlDefault = "SELECT TOP (10) * FROM [mydb].[dbo].[Employee]";
 				break;
@@ -112,24 +110,15 @@ public class DbProfile {
 		System.out.println("dbUrl: " + dbUrl);
 		System.out.println("sqlDefault: " + sqlDefault);
 	}
-	
+
 	public String readDbLines(String username, String password) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		try {
 			Connection connection;
-			if(dbType==DBTYPE.oracle) {
-				//
-				OracleDataSource ODS = new OracleDataSource();
-				ODS.setURL(dbUrl);
-				ODS.setUser(username);
-				ODS.setPassword(password);
-				connection = ODS.getConnection();
-			} 
-			else if ( username == null || username.equals("") ) {
+			if ( username == null || username.equals("") ) {
 				connection = DriverManager.getConnection(dbUrl);
-			} 
-			else {
+			} else {
 				connection = DriverManager.getConnection(dbUrl, username, password);
 			}
 			Statement statement = connection.createStatement();
@@ -160,5 +149,23 @@ public class DbProfile {
 		}
 		catch (SQLException ex) { LOGGER.info("ERROR: " + ex.getMessage()); }
 		return stringBuilder.toString();
+	}
+
+	public static String testClassNames( ) {
+		//
+		// https://www.benchresources.net/jdbc-driver-list-and-url-for-all-databases/
+		// DriverManager automatically selects driver className since JDBC4 (SDK6)
+		// org.apache.derby.jdbc.ClientDriver()
+		//
+		String txtLines = "";
+		try {
+			DriverManager.registerDriver(new org.sqlite.JDBC());
+			DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver()); // "com.mysql.jdbc.Driver";
+			DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+			DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver());
+			txtLines = "ALL DRIVERS RECOGNIZED!";
+		}
+		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		return txtLines;
 	}
 }
