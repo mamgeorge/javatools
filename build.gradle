@@ -25,6 +25,7 @@ dependencies {
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// SQLite
 	implementation 'mysql:mysql-connector-java:8.0.28'				// MySQL
 	implementation 'com.oracle.database.jdbc:ojdbc11:21.4.0.0.1'	// Oracle
+	implementation 'org.mongodb:mongo-java-driver:3.12.10'          // MongoDB
 	implementation 'com.zaxxer:HikariCP:5.0.1'							// HikariCP
 	implementation files('C:/workspace/dbase/mssql/sqljdbc6-4.2.jar')   // MSSQL
 	// implementation 'com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11'	// MSSQL

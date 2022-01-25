@@ -29,7 +29,7 @@ public class DbProfile {
 	//
 	private static final Logger LOGGER = Logger.getLogger(DbProfile.class.getName());
 
-	public enum DBTYPE {sqlite, mysql, derby, h2, oracle, mssql, cassandra}
+	public enum DBTYPE {sqlite, mysql, derby, h2, oracle, mssql, mongodb}
 
 	public static final String EOL = "\n";
 	public static final String DLM = " | ";
@@ -107,7 +107,7 @@ public class DbProfile {
 				dbUrl = "jdbc:sqlserver://" + server + ";databaseName=" + dbName + ";integratedSecurity=true";
 				sqlDefault = "SELECT TOP (10) * FROM [mydb].[dbo].[Employee]";
 				break;
-			case cassandra:
+			case mongodb:
 				// jdbc:cassandra:root/root@:/
 				dbUrl = "";
 				sqlDefault = "";

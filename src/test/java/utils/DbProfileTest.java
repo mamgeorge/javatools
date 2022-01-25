@@ -1,10 +1,14 @@
 package utils;
 
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.bson.Document;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -114,10 +118,46 @@ public class DbProfileTest {
 		}
 		catch (SQLException ex) { System.out.println(ex.getMessage()); }
 		System.out.println("txtLines: " + txtLines);
-		// assertNotNull(txtLines);
+		assertNotNull(txtLines);
 	}
 
 	// ############
+	@Test void read_MongoDB( ) {
+		//
+		// https://docs.mongodb.com/drivers/java/sync/current/fundamentals/connection/connect/
+		// mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.1.9
+		String txtLines = "";
+		String host = "localhost";
+		String port = "27017";
+		String database = "admin";
+		String collection = "employees";
+		//
+		MongoClient mongoClient = new MongoClient(host, Integer.valueOf(port));
+		MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
+		MongoCollection<Document> mongoCollection =
+			mongoDatabase.getCollection(collection); // createCollection
+		long lngCount = mongoCollection.countDocuments();
+		MongoCursor<Document> mongoCursor = mongoCollection.find().iterator();
+		//
+		StringBuilder stringBuilder = new StringBuilder();
+		Document document = null;
+		String firstNames = "";
+		while ( mongoCursor.hasNext() ) {
+			document = mongoCursor.next(); // toJson()
+			firstNames += document.getString("FIRST_NAME") + DLM;
+			stringBuilder.append(document.get("LAST_NAME") + DLM);
+			//stringBuilder.append(document.toString()+ EOL);
+		}
+		//
+		txtLines += "lngCount     : " + lngCount + EOL;
+		txtLines += "firstNames   : " + firstNames + EOL;
+		txtLines += "sb.toString(): " + stringBuilder + EOL;
+		txtLines += "document.toString(): " + document.toString() + EOL;
+		txtLines += "document.toJson()  : " + document.toJson() + EOL;
+		System.out.println(txtLines);
+		assertNotNull(txtLines);
+	}
+
 	@Test void read_HikariCP( ) {
 		//
 		String txtLines = "\n";
@@ -151,10 +191,11 @@ public class DbProfileTest {
 				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
 					txtLines += resultSet.getString(ictr) + DLM;
 				}
-				txtLines+=EOL;
+				txtLines += EOL;
 			}
 		}
 		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		System.out.println("txtLines: " + txtLines);
+		assertNotNull(txtLines);
 	}
 }

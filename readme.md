@@ -2,12 +2,11 @@
 
 The purpose of this package is to allow various boilerplates and samples, including:
 * AWS access
-* MySQL & SQLite access
+* SQLite, MySQL, Oracle, MSSQL, MongoDB; Hikari access
 * Encryption
 * Json Object transformations
 * Swing samples
 * Mock samples
-
 
 https://dzone.com/articles/build-a-java-app-with-gradle
 
