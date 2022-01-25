@@ -29,7 +29,7 @@ public class DbProfile {
 	//
 	private static final Logger LOGGER = Logger.getLogger(DbProfile.class.getName());
 
-	public enum DBTYPE {sqlite, mysql, derby, oracle, mssql, cassandra}
+	public enum DBTYPE {sqlite, mysql, derby, h2, oracle, mssql, cassandra}
 
 	public static final String EOL = "\n";
 	public static final String DLM = " | ";
@@ -56,6 +56,7 @@ public class DbProfile {
 		//
 		switch ( dbType ) {
 			case sqlite:
+				// dbUrl = "jdbc:sqlite:C:/workspace/dbase/sqlite/chinook.db";
 				String DEFAULT_PATH = "C:/workspace/dbase/sqlite/";
 				if ( host == null || host.equals("") ) { server = DEFAULT_PATH; }
 				if ( dbName == null || dbName.equals("") || dbName.equals("mydb") ) { dbName = "chinook.db"; }
@@ -63,14 +64,19 @@ public class DbProfile {
 				sqlDefault = "SELECT * FROM employees WHERE BirthDate > '1964-01-01' ORDER BY LastName ASC";
 				break;
 			case mysql:
+				// dbUrl = "jdbc:mysql://localhost:3306/mydb";
 				port = "3306";
 				dbUrl = "jdbc:mysql://" + server + ":" + port + "/" + dbName;
 				sqlDefault = "SELECT * FROM history WHERE id > 0 ORDER BY dateEnd";
 				break;
 			case derby:
+				// dbUrl = "jdbc:derby://localhost:1527/mydb";
 				port = "1527";
 				dbUrl = "jdbc:derby://" + server + ":" + port + "/" + dbName;
 				sqlDefault = "";
+				break;
+			case h2:
+				// jdbc:h2:mem:mydb;DB_CLOSE_DELAY=-1;INIT='classpath:/db.sql' // runscript
 				break;
 			case oracle:
 				/*

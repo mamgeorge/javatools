@@ -25,10 +25,10 @@ dependencies {
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// SQLite
 	implementation 'mysql:mysql-connector-java:8.0.28'				// MySQL
 	implementation 'com.oracle.database.jdbc:ojdbc11:21.4.0.0.1'	// Oracle
-	// MSSQL
-	// implementation 'com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11'
-	// implementation 'com.microsoft.sqlserver:sqljdbc4:4.0'
-	implementation files('C:/workspace/dbase/mssql/sqljdbc6-4.2.jar')
+	implementation 'com.zaxxer:HikariCP:5.0.1'							// HikariCP
+	implementation files('C:/workspace/dbase/mssql/sqljdbc6-4.2.jar')   // MSSQL
+	// implementation 'com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11'	// MSSQL
+	// implementation 'com.microsoft.sqlserver:sqljdbc4:4.0'			// MSSQL
 
 	implementation 'io.jaegertracing:jaeger-core:1.6.0'				// Jaeger tracing
 	implementation 'io.kubernetes:client-java-extended:13.0.0'		// Kubernetes
