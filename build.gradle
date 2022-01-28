@@ -23,21 +23,14 @@ dependencies {
 	implementation 'com.amazonaws:aws-java-sdk-sts:1.11.1015'		// for AWS1 services access
 	implementation 'software.amazon.awssdk:s3:2.16.48'				// for AWS2 2.16.48 > 2.16.59
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// SQLite
-	implementation 'mysql:mysql-connector-java:8.0.28'				// MySQL
-	implementation 'com.oracle.database.jdbc:ojdbc11:21.4.0.0.1'	// Oracle
-	implementation 'org.mongodb:mongo-java-driver:3.12.10'          // MongoDB
-	implementation 'com.zaxxer:HikariCP:5.0.1'							// HikariCP
-	implementation files('C:/workspace/dbase/mssql/sqljdbc6-4.2.jar')   // MSSQL
-	// implementation 'com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11'	// MSSQL
-	// implementation 'com.microsoft.sqlserver:sqljdbc4:4.0'			// MSSQL
+	implementation 'org.mongodb:mongo-java-driver:3.12.10'			// MongoDB
 
-	implementation 'io.jaegertracing:jaeger-core:1.6.0'				// Jaeger tracing
-	implementation 'io.kubernetes:client-java-extended:13.0.0'		// Kubernetes
-
-	implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'	// for json processing
-	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml' // 2.11.2'
-	implementation 'com.jayway.jsonpath:json-path:2.6.0'			// for json processing
-    implementation 'org.projectlombok:lombok:1.18.18'
+	implementation 'io.jaegertracing:jaeger-core:1.6.0'							// Jaeger tracing
+	implementation 'io.kubernetes:client-java-extended:13.0.0'					// Kubernetes
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'				// for json processing
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'   // 2.11.2'
+	implementation 'com.jayway.jsonpath:json-path:2.6.0'						// for json processing
+	implementation 'org.projectlombok:lombok:1.18.18'
 	//
 	// testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'

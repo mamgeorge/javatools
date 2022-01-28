@@ -2,7 +2,7 @@
 
 The purpose of this package is to allow various boilerplates and samples, including:
 * AWS access
-* SQLite, MySQL, Oracle, MSSQL, MongoDB; Hikari access
+* SQLite, MongoDB
 * Encryption
 * Json Object transformations
 * Swing samples
