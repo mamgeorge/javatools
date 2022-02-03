@@ -6,11 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import samples.AnyException;
 import samples.AnyObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class UtilityMockTest {
@@ -45,6 +51,20 @@ public class UtilityMockTest {
 		txtLines += String.format("\t aom.getAlpha(): %s \n", anyObjectMock.getAlpha());
 		System.out.println(txtLines);
 		assertTrue(anyObjectMock.getAlpha().equals(SAMPLE), ASSERT_MSG);
+	}
+
+	@Test void testmock_doNothing_whenn() {
+		//
+		List listReal = new ArrayList();
+		listReal.add(0, "alpha");
+		//
+		List listMock = Mockito.mock(ArrayList.class);
+		doNothing().when(listMock).add(isA(Integer.class), isA(String.class));
+		listMock.add(0, "beta");
+		//
+		System.out.println(listReal);
+		System.out.println(listMock);
+		verify(listMock,times(1)).add(0, "beta");
 	}
 
 	@Test void testmock_when_thenThrow() {

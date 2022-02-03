@@ -1,8 +1,7 @@
 # Intent
 
 The purpose of this package is to allow various boilerplates and samples, including:
-* AWS access
-* SQLite, MongoDB
+* SQLite, AWS, MongoDB access
 * Encryption
 * Json Object transformations
 * Swing samples
