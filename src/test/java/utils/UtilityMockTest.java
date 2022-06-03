@@ -2,7 +2,9 @@ package utils;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import samples.AnyException;
 import samples.AnyObject;
 
@@ -36,7 +38,7 @@ public class UtilityMockTest {
 		txtLines += String.format("\t aob.getAlpha(): %s \n", anyObject.getAlpha());
 		txtLines += String.format("\t aom.getAlpha(): %s \n", anyObjectMock.getAlpha());
 		System.out.println(txtLines);
-		assertTrue(anyObjectMock.getAlpha().equals(SAMPLE), ASSERT_MSG);
+		assertEquals(anyObjectMock.getAlpha(),SAMPLE, ASSERT_MSG);
 	}
 
 	@Test void testmock_doReturn_when() {
@@ -50,10 +52,10 @@ public class UtilityMockTest {
 		txtLines += String.format("\t aob.getAlpha(): %s \n", anyObject.getAlpha());
 		txtLines += String.format("\t aom.getAlpha(): %s \n", anyObjectMock.getAlpha());
 		System.out.println(txtLines);
-		assertTrue(anyObjectMock.getAlpha().equals(SAMPLE), ASSERT_MSG);
+		assertEquals(anyObjectMock.getAlpha(), SAMPLE, ASSERT_MSG);
 	}
 
-	@Test void testmock_doNothing_whenn() {
+	@Test void testmock_doNothing_when() {
 		//
 		List listReal = new ArrayList();
 		listReal.add(0, "alpha");
@@ -81,7 +83,7 @@ public class UtilityMockTest {
 			LOGGER.info("FORCED AnyException: " + ex.getMessage());
 		}
 		System.out.println(txtLines);
-		assertTrue(anyObject.getAlpha().equals("ALEPH"), ASSERT_MSG);
+		assertEquals(anyObject.getAlpha(),"ALEPH", ASSERT_MSG);
 	}
 
 	@Test void testmock_doThrow_when() {
@@ -100,7 +102,7 @@ public class UtilityMockTest {
 		txtLines += String.format("\t aob.getClassName(): %s \n", anyObject.getAlpha());
 		txtLines += String.format("\t aom.getClassName(): %s \n", anyObjectMock.getAlpha());
 		System.out.println(txtLines);
-		assertTrue(anyObjectMock.getAlpha() == null, ASSERT_MSG);
+		assertNull(anyObjectMock.getAlpha(), ASSERT_MSG);
 	}
 
 	@Test void testmock_when_chained() {
@@ -118,7 +120,7 @@ public class UtilityMockTest {
 			LOGGER.info("FORCED AnyException: " + ex.getMessage());
 		}
 		System.out.println(txtLines);
-		assertTrue(anyObjectMock.getBeta() == null, ASSERT_MSG);
+		assertNull(anyObjectMock.getBeta(), ASSERT_MSG);
 	}
 
 	@Test void testspy_doReturn_when() {
@@ -133,7 +135,7 @@ public class UtilityMockTest {
 		txtLines += String.format("\t aos.getAlpha(): %s \n", anyObjectSpy.getAlpha());
 		txtLines += String.format("\t aos.getBeta(): %s \n", anyObjectSpy.getBeta());
 		System.out.println(txtLines);
-		assertTrue(anyObjectSpy.getAlpha().equals(SAMPLE), ASSERT_MSG);
-		assertTrue(anyObjectSpy.getBeta().equals("BETH"), ASSERT_MSG);
+		assertEquals(anyObjectSpy.getAlpha(),SAMPLE, ASSERT_MSG);
+		assertEquals(anyObjectSpy.getBeta(), "BETH", ASSERT_MSG);
 	}
 }

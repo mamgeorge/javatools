@@ -6,6 +6,8 @@ apply plugin: "java"
 repositories {
 
 	mavenCentral()
+	//mavenLocal()
+	maven { url "https://oss.sonatype.org/content/repositories/snapshots" } // sphinx4
 	// maven { url "https://clojars.org/repo/" } // needed for sqljdbc4
 	// maven { url "https://nexus.onebusaway.org/nexus/content/repositories/public/" } // needed for sqljdbc6
 }
@@ -19,23 +21,34 @@ application { mainClass.set( 'utils.SwingSample' ) }
 dependencies {
 
 	// implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'com.amazonaws:aws-java-sdk-s3:1.11.1015'		// for AWS1 1.11.1005
-	implementation 'com.amazonaws:aws-java-sdk-sts:1.11.1015'		// for AWS1 services access
-	implementation 'software.amazon.awssdk:s3:2.16.48'				// for AWS2 2.16.48 > 2.16.59
-	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// SQLite
-	implementation 'org.mongodb:mongo-java-driver:3.12.10'			// MongoDB
+	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.220'			// 1.11.1015 for AWS1 1.11.1005
+	implementation 'com.amazonaws:aws-java-sdk-sts:1.12.220'		// 1.11.1015 for AWS1 services access
+	implementation 'software.amazon.awssdk:s3:2.17.191'				// 2.16.48 for AWS2 2.16.48 > 2.16.59
+	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// 3.36.0.3 SQLite
+	implementation 'org.mongodb:mongo-java-driver:3.12.11'			// 3.12.10 MongoDB
 
-	implementation 'io.jaegertracing:jaeger-core:1.6.0'							// Jaeger tracing
-	implementation 'io.kubernetes:client-java-extended:13.0.0'					// Kubernetes
-	implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'				// for json processing
+	implementation 'io.jaegertracing:jaeger-core:1.8.0'							// 1.6.0 Jaeger tracing
+	implementation 'io.kubernetes:client-java-extended:15.0.1'					// 13.0.0 Kubernetes
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'				// 2.12.3 for json processing
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'   // 2.11.2'
-	implementation 'com.jayway.jsonpath:json-path:2.6.0'						// for json processing
-	implementation 'org.projectlombok:lombok:1.18.18'
-	//
+	implementation 'com.jayway.jsonpath:json-path:2.7.0'						// 2.6.0 for json processing
+	implementation 'org.projectlombok:lombok:1.18.24'							// 1.18.18
+
+	// sphinx4
+	implementation 'edu.cmu.sphinx:sphinx4-core:5prealpha-SNAPSHOT'
+	implementation 'edu.cmu.sphinx:sphinx4-data:5prealpha-SNAPSHOT'
+
+	// kafka
+	implementation 'org.apache.kafka:kafka-clients:3.2.0'
+	implementation 'org.apache.kafka:kafka_2.13:3.2.0'
+	implementation 'org.apache.kafka:kafka-streams:3.2.0'
+	implementation 'org.slf4j:slf4j-api:1.7.36'
+	implementation 'org.slf4j:slf4j-simple:1.7.36'
+
 	// testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-	testImplementation 'org.mockito:mockito-core:4.0.0'				// mockito handle reflection
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'	// 5.8.1
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'	// 5.8.1
+	testImplementation 'org.mockito:mockito-core:4.5.1'				// 4.0.0 mockito handle reflection
 }
 
 // gradle clean build test --i | findstr /i INFO:
