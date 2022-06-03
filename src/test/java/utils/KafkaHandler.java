@@ -103,12 +103,23 @@ public class KafkaHandler {
 		KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
 		kafkaConsumer.subscribe(Arrays.asList(topicName));
 		int ictr = 0;
-		String FRMT = "%d: offset = %d, key = %s, value = %s\n";
+		String FRMT = "%d: topic: %s, partition: %s, offset: %d, key: %s, value: %s\n";
+		String txtRecord;
 		while ( true ) {
-			ConsumerRecords<String, String> records = kafkaConsumer.poll(100);
-			for ( ConsumerRecord<String, String> record : records ) {
-				System.out.printf(FRMT, ictr, record.offset(), record.key(), record.value());
+			ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(100);
+			for ( ConsumerRecord<String, String> consumerRecord : consumerRecords ) {
+				//
+				txtRecord = String.format("Topic: %s, Partition: %s, Value: %s",
+					ictr++,
+					consumerRecord.topic(),
+					consumerRecord.partition(),
+					consumerRecord.offset(),
+					consumerRecord.key(),
+					consumerRecord.value()
+				);
+				System.out.println(txtRecord);
 			}
+			kafkaConsumer.close();
 		}
 	}
 
