@@ -21,8 +21,8 @@ application { mainClass.set( 'utils.SwingSample' ) }
 dependencies {
 
 	// implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.220'			// 1.11.1015 for AWS1 1.11.1005
-	implementation 'com.amazonaws:aws-java-sdk-sts:1.12.220'		// 1.11.1015 for AWS1 services access
+	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.221'			// 1.12.221 for AWS1 1.11.1005
+	implementation 'com.amazonaws:aws-java-sdk-sts:1.12.221'		// 1.12.221 for AWS1 services access
 	implementation 'software.amazon.awssdk:s3:2.17.191'				// 2.16.48 for AWS2 2.16.48 > 2.16.59
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'				// 3.36.0.3 SQLite
 	implementation 'org.mongodb:mongo-java-driver:3.12.11'			// 3.12.10 MongoDB
@@ -38,12 +38,14 @@ dependencies {
 	implementation 'edu.cmu.sphinx:sphinx4-core:5prealpha-SNAPSHOT'
 	implementation 'edu.cmu.sphinx:sphinx4-data:5prealpha-SNAPSHOT'
 
-	// kafka
+	// kafka, rabbitMQ
 	implementation 'org.apache.kafka:kafka-clients:3.2.0'
 	implementation 'org.apache.kafka:kafka_2.13:3.2.0'
 	implementation 'org.apache.kafka:kafka-streams:3.2.0'
 	implementation 'org.slf4j:slf4j-api:1.7.36'
 	implementation 'org.slf4j:slf4j-simple:1.7.36'
+	implementation 'com.rabbitmq:amqp-client:5.14.2'
+
 
 	// testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'	// 5.8.1
