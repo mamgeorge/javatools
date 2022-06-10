@@ -1,5 +1,6 @@
 package utils;
 
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -11,7 +12,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
-import com.sun.istack.NotNull; // import org.jetbrains.annotations.NotNull;
+import lombok.NonNull; // import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -71,7 +72,7 @@ public class KafkaHandler {
 		kafkaProducer.close();
 	}
 
-	@NotNull private static String createValue( ) {
+	@NonNull private static String createValue( ) {
 		//
 		StringBuilder txtLine = new StringBuilder();
 		StringBuilder txtRandom = new StringBuilder();
