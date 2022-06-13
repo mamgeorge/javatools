@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MediaTests {
 
 	static final String PATHFILE_LOCAL = "src/test/resources/";
-	static final String PATHFILE_AUDIO = "hal9000.wav";
+	static final String[] PATHFILE_AUDIOS = { "hal9000.wav", "ping.wav" };
 
 	@Test void ansi_chars_test( ) {
 		//
@@ -99,13 +99,21 @@ public class MediaTests {
 	@Test void audio_file_test( ) {
 		//
 		System.out.println("AudioInputStream file");
-		String filePath = PATHFILE_LOCAL + PATHFILE_AUDIO;
-		System.out.println("filePath: " + filePath);
+		int fileNum = 0;
+		for (int ictr = 0; ictr < 100; ictr++){
+			//
+			fileNum = (int) (Math.random() * PATHFILE_AUDIOS.length);
+			System.out.print(fileNum + " | ");
+		}
+		String fileName = PATHFILE_AUDIOS[fileNum];
+		String filePath = PATHFILE_LOCAL + fileName;
+		System.out.println("filePath[" + fileNum + "]: " + filePath);
 		File file = new File(filePath).getAbsoluteFile();
-		AudioInputStream AIS;
+		AudioInputStream AIS = null;
+		Clip clip = null;
 		try {
 			AIS = AudioSystem.getAudioInputStream(file);
-			Clip clip = AudioSystem.getClip();
+			clip = AudioSystem.getClip();
 			clip.open(AIS);
 			float len = clip.getMicrosecondLength() / 1000f;
 			clip.setMicrosecondPosition(0);
@@ -114,11 +122,14 @@ public class MediaTests {
 			//
 			clip.start();
 			Thread.sleep(( (int) len ) + 1000);
-			clip.close();
 		}
 		catch (UnsupportedAudioFileException | IOException | LineUnavailableException |
 		       InterruptedException ex) {
 			System.out.println("ERROR file: " + ex.getMessage());
+		}
+		finally{
+			try{ clip.close(); AIS.close(); }
+			catch(IOException | NullPointerException ex) { System.out.println("ERROR file: " + ex.getMessage()); }
 		}
 	}
 }
