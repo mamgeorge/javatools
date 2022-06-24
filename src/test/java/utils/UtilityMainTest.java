@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.TAB;
@@ -42,8 +43,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
 	}
 
-	@SuppressWarnings({"all"})
-	@Test void test_booleans() {
+	@SuppressWarnings({"all"}) @Test void test_booleans() {
 		//
 		String txtLines = EOL;
 		//
@@ -178,7 +178,7 @@ public class UtilityMainTest {
 		int countFiles = stringBuilder.toString().split(EOL).length;
 		System.out.println("countFiles: " + countFiles);
 		System.out.println(stringBuilder);
-		assertTrue(countFiles == fileNames.length, ASSERT_MSG);
+		assertEquals(countFiles, fileNames.length, ASSERT_MSG);
 	}
 
 	@Test void getZipFileList() {
@@ -206,7 +206,7 @@ public class UtilityMainTest {
 		//
 		String txtLine = UtilityMain.getField(new AnyObject(), "gamma");
 		System.out.println("txtLine: " + txtLine);
-		assertTrue(txtLine.equals("GIMMEL"), ASSERT_MSG);
+		assertEquals(txtLine,"GIMMEL", ASSERT_MSG);
 	}
 
 	@Test void test_getMethod() {
@@ -215,7 +215,7 @@ public class UtilityMainTest {
 		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma", objectParms);
 		String txtLine = object.toString();
 		System.out.println(txtLine);
-		assertTrue(txtLine.equals("GIMMEL"), ASSERT_MSG);
+		assertEquals(txtLine,"GIMMEL", ASSERT_MSG);
 	}
 
 	@Test void test_exposeObject() {
@@ -232,7 +232,7 @@ public class UtilityMainTest {
 		UtilityMain.putObject(anyObject, "gamma", "STUFF");
 		String txtLine = UtilityMain.getField(anyObject, "gamma");
 		System.out.println(txtLine);
-		assertTrue(txtLine.equals("STUFF"), ASSERT_MSG);
+		assertEquals(txtLine, "STUFF", ASSERT_MSG);
 	}
 }
 //----

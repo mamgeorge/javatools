@@ -6,6 +6,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
+import samples.DbProfile;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,6 +21,15 @@ public class DBaseTest {
 
 	private static final String EOL = "\n";
 	private static final String DLM = " | ";
+
+	@Test void test_readDbLines_sqlite( ) {
+		//
+		String txtLines = "", dbName = "", host = "", username = "", password = "";
+		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.sqlite, host, dbName);
+		txtLines = dbProfile.readDbLines(username, password);
+		System.out.println("txtLines: " + txtLines);
+		assertNotNull(txtLines);
+	}
 
 	@Test void test_sqlite_full( ) {
 		//
