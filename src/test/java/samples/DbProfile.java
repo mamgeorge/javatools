@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import oracle.jdbc.datasource.impl.OracleDataSource;
 import utils.UtilityMain;
 
 import java.sql.Clob;
@@ -20,10 +19,11 @@ import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTI
 import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_SERVICES;
 import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 
-@Getter @Setter @EqualsAndHashCode @NoArgsConstructor
-public class DbProfile {
+@Getter @Setter @EqualsAndHashCode @NoArgsConstructor public class DbProfile {
 	//
 	public enum DBTYPE {sqlite, mysql, oracle, oracle2, mssql, mongodb}
+
+	public Properties properties = null;
 
 	public static final String PATH_TNSURL = "C:/workspace/dbase/oracle/tnsnames.ora";
 	public static final String PATH_KRB5_CONF = "C:/Users/mamge/Kerberos/config/krb5.conf";
@@ -55,10 +55,46 @@ public class DbProfile {
 			if ( host == null || host.equals("") ) { server = PATH_DEFAULT_SQLITE; }
 			dbUrl = "jdbc:sqlite:" + server + dbName;
 			sqlDefault = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
+			//
+			// not needed
+			try { Class.forName(java.sql.DriverManager.class.getName()); }
+			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		}
-		if ( dbType.equals(DBTYPE.mysql) ) { }
-		if ( dbType.equals(DBTYPE.oracle) ) { }
-		if ( dbType.equals(DBTYPE.mssql) ) { }
+		if ( dbType.equals(DBTYPE.mysql) ) {
+			port = "3306";
+			dbUrl = "jdbc:mysql://" + server + ":" + port + "/" + dbName;
+			sqlDefault = "SELECT * FROM mydb.history;";
+			//
+			try { DriverManager.registerDriver(new oracle.jdbc.OracleDriver()); }
+			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+			try { Class.forName(com.mysql.cj.jdbc.Driver.class.getName()); }
+			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		}
+		if ( dbType.equals(DBTYPE.oracle) ) {
+			port = "1521";
+			dbUrl = "jdbc:oracle:thin:@localhost:" + port + ":" + dbName;
+			sqlDefault = "SELECT * FROM (SELECT * FROM sys.employees ORDER BY LAST_NAME) WHERE ROWNUM <= 10";
+			//
+			try { Class.forName(oracle.jdbc.OracleDriver.class.getName()); }
+			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		}
+		if ( dbType.equals(DBTYPE.oracle2) ) {
+			properties = getOCI_KerberosProps(PATH_KRB5_CONF);
+			//
+			try { DriverManager.registerDriver(new oracle.jdbc.OracleDriver()); }
+			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		}
+		if ( dbType.equals(DBTYPE.mssql) ) {
+			// jdbc:sqlserver://2021-MARTIN\SQLEXPRESS;databaseName=mydb;integratedSecurity=true
+			// ensure "sqljdbc_auth.dll" is on library path for Java app
+			port = "1433";
+			dbUrl = "jdbc:sqlserver://" + host + ";databaseName=" + dbName
+				+ ";integratedSecurity=true;" + "trustServerCertificate=true;";
+			sqlDefault = "SELECT TOP (10) * FROM [" + dbName + "].[Person].[Address];";
+			//
+			try { DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver()); }
+			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		}
 		if ( dbType.equals(DBTYPE.mongodb) ) { }
 	}
 
@@ -68,16 +104,8 @@ public class DbProfile {
 		Connection connection = null;
 		Statement statement = null;
 		try {
-			if ( dbType == DBTYPE.oracle ) {
-				OracleDataSource ODS = new OracleDataSource();
-				ODS.setURL(dbUrl);
-				ODS.setUser(username);
-				ODS.setPassword(password);
-			} else if ( dbType == DBTYPE.oracle2 ) {
-				Properties propsKerberos = getOCI_KerberosProps(PATH_KRB5_CONF);
-				try { Class.forName(oracle.jdbc.OracleDriver.class.getName()); }
-				catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-				connection = DriverManager.getConnection(dbUrl, propsKerberos);
+			if ( properties != null ) {
+				connection = DriverManager.getConnection(dbUrl, properties);
 			} else if ( username == null || username.equals("") ) {
 				txtLines += "NO PASSWORD!";
 				connection = DriverManager.getConnection(dbUrl);
