@@ -65,8 +65,6 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 			dbUrl = "jdbc:mysql://" + server + ":" + port + "/" + dbName;
 			sqlDefault = "SELECT * FROM mydb.history;";
 			//
-			try { DriverManager.registerDriver(new oracle.jdbc.OracleDriver()); }
-			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 			try { Class.forName(com.mysql.cj.jdbc.Driver.class.getName()); }
 			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		}
@@ -88,10 +86,13 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 			// jdbc:sqlserver://2021-MARTIN\SQLEXPRESS;databaseName=mydb;integratedSecurity=true
 			// ensure "sqljdbc_auth.dll" is on library path for Java app
 			port = "1433";
-			dbUrl = "jdbc:sqlserver://" + host + ";databaseName=" + dbName
-				+ ";integratedSecurity=true;" + "trustServerCertificate=true;";
+			dbUrl = "jdbc:sqlserver://" + host + ";databaseName=" + dbName + ";"
+				+ "integratedSecurity=true;" + "trustServerCertificate=true;";
 			sqlDefault = "SELECT TOP (10) * FROM [" + dbName + "].[Person].[Address];";
 			//
+			System.out.println("dbUrl: "+ dbUrl);
+			properties = new Properties();
+			properties.setProperty("integratedSecurity", "true");
 			try { DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver()); }
 			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		}
@@ -105,11 +106,13 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 		Statement statement = null;
 		try {
 			if ( properties != null ) {
+				System.out.println("USING PROPERTIES!");
 				connection = DriverManager.getConnection(dbUrl, properties);
 			} else if ( username == null || username.equals("") ) {
-				txtLines += "NO PASSWORD!";
+				System.out.println("NO PASSWORD!");
 				connection = DriverManager.getConnection(dbUrl);
 			} else {
+				System.out.println("USING PASSWORD!");
 				connection = DriverManager.getConnection(dbUrl, username, password);
 			}
 			statement = connection.createStatement();

@@ -5,6 +5,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import samples.DbProfile;
 
@@ -15,7 +16,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DBaseTest {
 	//
@@ -28,7 +29,7 @@ public class DBaseTest {
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.sqlite, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertNotNull(txtLines);
+		assertTrue(txtLines.split("\n").length > 1);
 	}
 
 	@Test void test_readDbLines_mySql( ) {
@@ -40,29 +41,29 @@ public class DBaseTest {
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.mysql, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertNotNull(txtLines);
+		assertTrue(txtLines.split("\n").length > 1);
 	}
 
 	@Test void test_readDbLines_oracle( ) {
 		//
 		String dbName = "XE", host = "localhost";
-		String username = System.getProperty("ORACLE_USER") + " as sysdba";
-		String password = System.getProperty("ORACLE_PASS");
+		String username = System.getenv("ORACLE_USER") + " as sysdba";
+		String password = System.getenv("ORACLE_PASS");
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.oracle, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertNotNull(txtLines);
+		assertTrue(txtLines.split("\n").length > 1);
 	}
 
 	@Test void test_readDbLines_oracle2( ) { }
 
-	@Test void test_readDbLines_mssql( ) {
+	@Test @Disabled void test_readDbLines_mssql( ) {
 		//
 		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS", username = "", password = "";
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.mssql, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertNotNull(txtLines);
+		assertTrue(txtLines.split("\n").length > 1);
 	}
 
 	@Test void test_sqlite_full( ) {
@@ -86,7 +87,7 @@ public class DBaseTest {
 		}
 		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		System.out.println("txtLines: " + txtLines);
-		assertNotNull(txtLines);
+		assertTrue(txtLines.split("\n").length > 1);
 	}
 
 	@Test void read_MongoDB_full( ) {
@@ -122,6 +123,6 @@ public class DBaseTest {
 		txtLines += "document.toString(): " + document.toString() + EOL;
 		txtLines += "document.toJson()  : " + document.toJson() + EOL;
 		System.out.println(txtLines);
-		assertNotNull(txtLines);
+		assertTrue(txtLines.split("\n").length > 1);
 	}
 }
