@@ -5,7 +5,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import samples.DbProfile;
 
@@ -15,8 +14,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static samples.DbProfile.ERROR_NOT_INTEGRATED;
+import static samples.DbProfile.ERROR_NO_CREDENTIALS;
+import static samples.DbProfile.ERROR_PKIX_CERT_PATH;
+import static samples.DbProfile.ERROR_SSL_ENCRYPT;
 
 public class DBaseTest {
 	//
@@ -29,7 +33,7 @@ public class DBaseTest {
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.sqlite, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split("\n").length > 1);
+		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
 	@Test void test_readDbLines_mySql( ) {
@@ -41,34 +45,44 @@ public class DBaseTest {
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.mysql, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split("\n").length > 1);
+		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
 	@Test void test_readDbLines_oracle( ) {
 		//
 		String dbName = "XE", host = "localhost";
-		String username = System.getenv("ORACLE_USER") + " as sysdba";
+		String username = System.getenv("ORACLE_USER");
 		String password = System.getenv("ORACLE_PASS");
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.oracle, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split("\n").length > 1);
+		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
-	@Test void test_readDbLines_oracle2( ) { }
-
-	@Test @Disabled void test_readDbLines_mssql( ) {
+	@Test void test_readDbLines_oracleTns( ) {
 		//
-		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS", username = "", password = "";
+		String username = System.getenv("ORACLE_USER");
+		String password = System.getenv("ORACLE_PASS");
+		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.oracleTns, "", "");
+		String txtLines = dbProfile.readDbLines(username, password);
+		System.out.println("txtLines: " + txtLines);
+		assertTrue(txtLines.split(EOL).length > 1);
+	}
+
+	@Test void test_readDbLines_mssql( ) {
+		//
+		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS";
+		String username = "", password = "";
+		DbProfile.setupLibraryPath();
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.mssql, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split("\n").length > 1);
+		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
 	@Test void test_sqlite_full( ) {
 		//
-		String txtLines = "\n";
+		String txtLines = EOL;
 		String dbName = "chinook.db";
 		String dbUrl = "jdbc:sqlite:C:/workspace/dbase/sqlite/" + dbName;
 		String sqlDefault = "SELECT * FROM employees WHERE BirthDate > '1964-01-01' ORDER BY LastName ASC";
@@ -87,7 +101,47 @@ public class DBaseTest {
 		}
 		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split("\n").length > 1);
+		assertTrue(txtLines.split(EOL).length > 1);
+	}
+
+	@Test void test_mssql_full( ) {
+		//
+		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS" + ";";
+		String username = "", password = "";
+		String dbUrl = "jdbc:sqlserver://" + host
+			+ "databaseName=mydb;"
+			+ "trustServerCertificate=true;"
+			+ "integratedSecurity=true;";
+		String sqlDefault = "SELECT TOP (10) * FROM [" + dbName + "].[Person].[Address];";
+		System.out.println("dbUrl: " + dbUrl);
+		String txtLines = "";
+		DbProfile.setupLibraryPath();
+		try {
+			Connection connection = DriverManager.getConnection(dbUrl);
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(sqlDefault);
+			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+			int intColumnCount = resultSetMetaData.getColumnCount();
+			while ( resultSet.next() ) {
+				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
+					txtLines += resultSet.getString(ictr) + DLM;
+				}
+				txtLines += EOL;
+			}
+			System.out.println(txtLines);
+		}
+		catch (SQLException ex) {
+			String err = ex.getMessage();
+			if ( err.startsWith(ERROR_SSL_ENCRYPT) || err.contains(ERROR_PKIX_CERT_PATH) ) {
+				System.out.println("ERROR missing trustServerCertificate: " + err);
+			} else if ( err.startsWith(ERROR_NOT_INTEGRATED) ) {
+				System.out.println("ERROR missing valid sqljdbc_auth.dll: " + err);
+			} else if ( err.startsWith(ERROR_NO_CREDENTIALS) ) {
+				System.out.println("ERROR missing credentials (user/pass): " + err);
+			} else {
+				System.out.println("ERROR: " + err);
+			}
+		}
 	}
 
 	@Test void read_MongoDB_full( ) {
@@ -123,6 +177,6 @@ public class DBaseTest {
 		txtLines += "document.toString(): " + document.toString() + EOL;
 		txtLines += "document.toJson()  : " + document.toJson() + EOL;
 		System.out.println(txtLines);
-		assertTrue(txtLines.split("\n").length > 1);
+		assertTrue(txtLines.split(EOL).length > 1);
 	}
 }
