@@ -1,6 +1,5 @@
 package samples;
 
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 
 import javax.sound.sampled.AudioFormat;
@@ -82,13 +81,13 @@ public class MediaTests {
 			System.out.println("ERROR tone: " + ex.getMessage());
 		}
 		sourceDataLine.start();
-		double angle ;
-		double val ;
+		double angle;
+		double val;
 		for ( double ictr = 0; ictr < msecs * 4; ictr = ictr + .02 ) {
 			angle = ictr / ( SAMPLE_RATE / hertz ) * ( ictr / 80 ) * Math.PI;
 			val = Math.sin(angle) * 127.0 * volume;
 			bytes[0] = (byte) val;
-			System.out.print("\t" + Math.round(val));
+			System.out.print(" " + Math.round(val));
 			sourceDataLine.write(bytes, 0, 1);
 		}
 		sourceDataLine.drain();
@@ -100,9 +99,9 @@ public class MediaTests {
 		//
 		System.out.println("AudioInputStream file");
 		int fileNum = 0;
-		for (int ictr = 0; ictr < 100; ictr++){
+		for ( int ictr = 0; ictr < 100; ictr++ ) {
 			//
-			fileNum = (int) (Math.random() * PATHFILE_AUDIOS.length);
+			fileNum = (int) ( Math.random() * PATHFILE_AUDIOS.length );
 			System.out.print(fileNum + " | ");
 		}
 		String fileName = PATHFILE_AUDIOS[fileNum];
@@ -126,10 +125,14 @@ public class MediaTests {
 		catch (UnsupportedAudioFileException | IOException | LineUnavailableException |
 		       InterruptedException ex) {
 			System.out.println("ERROR file: " + ex.getMessage());
-		}
-		finally{
-			try{ clip.close(); AIS.close(); }
-			catch(IOException | NullPointerException ex) { System.out.println("ERROR file: " + ex.getMessage()); }
+		} finally {
+			try {
+				clip.close();
+				AIS.close();
+			}
+			catch (IOException | NullPointerException ex) {
+				System.out.println("ERROR file: " + ex.getMessage());
+			}
 		}
 	}
 }

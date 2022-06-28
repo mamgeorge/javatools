@@ -3,10 +3,16 @@
 
 plugins { id "application" }
 apply plugin: "java"
+
+// sourceCompatibility uses the java version to compile java files
+// targetCompatibility tells generate class supports minimum java version that has support
+sourceCompatibility = '1.11'
+targetCompatibility = '1.11'
+
 repositories {
 
 	mavenCentral()
-	//mavenLocal()
+	// mavenLocal()
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots" } // sphinx4
 	// maven { url "https://clojars.org/repo/" } // needed for sqljdbc4
 	// maven { url "https://nexus.onebusaway.org/nexus/content/repositories/public/" } // needed for sqljdbc6
