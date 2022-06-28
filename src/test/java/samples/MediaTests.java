@@ -1,5 +1,6 @@
 package samples;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.sound.sampled.AudioFormat;
@@ -95,7 +96,7 @@ public class MediaTests {
 		sourceDataLine.close();
 	}
 
-	@Test void audio_file_test( ) {
+	@Test @Disabled void audio_file_test( ) {
 		//
 		System.out.println("AudioInputStream file");
 		int fileNum = 0;

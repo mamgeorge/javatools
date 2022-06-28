@@ -20,6 +20,7 @@ import io.kubernetes.client.openapi.models.V1NodeList;
 import io.kubernetes.client.util.CallGeneratorParams;
 import io.opentracing.Tracer;
 import org.apache.commons.collections4.list.TreeList;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -91,7 +92,7 @@ public class UtilitySpecialTest {
 		assertTrue(list.size() >= 7, ASSERT_MSG);
 	}
 
-	@Test void test_sphinx4_STT( ) {
+	@Test @Disabled void test_sphinx4_STT( ) {
 		//
 		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
 		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
@@ -113,7 +114,7 @@ public class UtilitySpecialTest {
 		assertNotNull(speechResult, ASSERT_MSG);
 	}
 
-	@Test void test_sphinx4_TTS_SS( ) {
+	@Test @Disabled void test_sphinx4_TTS_SS( ) {
 		//
 		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
 		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
@@ -137,7 +138,7 @@ public class UtilitySpecialTest {
 		assertNotNull(speechResultSS, ASSERT_MSG);
 	}
 
-	@Test void test_sphinx4_TTS_LS( ) {
+	@Test @Disabled void test_sphinx4_TTS_LS( ) {
 		//
 		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
 		// String pathFile = PATHFILE_LOCAL + "hal9000.wav";
