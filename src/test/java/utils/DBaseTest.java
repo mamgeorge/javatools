@@ -1,13 +1,27 @@
 package utils;
 
+import com.hazelcast.client.HazelcastClient;
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.cluster.Cluster;
+import com.hazelcast.cluster.Member;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.flakeidgen.FlakeIdGenerator;
+import com.hazelcast.map.IMap;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
 import samples.DbProfile;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,7 +29,14 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static samples.DbProfile.ERROR_NOT_INTEGRATED;
 import static samples.DbProfile.ERROR_NO_CREDENTIALS;
@@ -33,19 +54,19 @@ public class DBaseTest {
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.sqlite, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split(EOL).length > 1);
+		assertNotNull(txtLines);
 	}
 
 	@Test void test_readDbLines_mySql( ) {
 		//
 		// see: "C:\Program Files\MySQL\MySQL Server 8.0\mysql_options.txt" ; ren2shen1
-		String dbName = "mysql", host = "localhost";
+		String dbName = "mydb", host = "localhost";
 		String username = System.getenv("MYSQL_USER");
 		String password = System.getenv("MYSQL_PASS");
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.mysql, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split(EOL).length > 1);
+		assertNotNull(txtLines);
 	}
 
 	@Test void test_readDbLines_oracle( ) {
@@ -53,20 +74,22 @@ public class DBaseTest {
 		String dbName = "XE", host = "localhost";
 		String username = System.getenv("ORACLE_USER");
 		String password = System.getenv("ORACLE_PASS");
+		System.out.println("credentials: " + username + " / " + password);
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.oracle, host, dbName);
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split(EOL).length > 1);
+		assertNotNull(txtLines);
 	}
 
 	@Test void test_readDbLines_oracleTns( ) {
 		//
 		String username = System.getenv("ORACLE_USER");
 		String password = System.getenv("ORACLE_PASS");
+		System.out.println("credentials: " + username + " / " + password);
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.oracleTns, "", "");
 		String txtLines = dbProfile.readDbLines(username, password);
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split(EOL).length > 1);
+		assertNotNull(txtLines);
 	}
 
 	@Test void test_readDbLines_mssql( ) {
@@ -80,6 +103,7 @@ public class DBaseTest {
 		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
+	//#### FULL SAMLPLES ####
 	@Test void test_sqlite_full( ) {
 		//
 		String txtLines = EOL;
@@ -128,7 +152,6 @@ public class DBaseTest {
 				}
 				txtLines += EOL;
 			}
-			System.out.println(txtLines);
 		}
 		catch (SQLException ex) {
 			String err = ex.getMessage();
@@ -142,6 +165,8 @@ public class DBaseTest {
 				System.out.println("ERROR: " + err);
 			}
 		}
+		System.out.println(txtLines);
+		assertNotNull(txtLines);
 	}
 
 	@Test void read_MongoDB_full( ) {
@@ -179,4 +204,114 @@ public class DBaseTest {
 		System.out.println(txtLines);
 		assertTrue(txtLines.split(EOL).length > 1);
 	}
+
+	@Test void read_HikariCP( ) {
+		//
+		String txtLines = EOL;
+		String dbURL = "jdbc:mysql://localhost:3306/mydb";
+		String sqlDefault = "SELECT * FROM mydb.history WHERE id > 0 ORDER BY dateend;";
+		String username = System.getenv("MYSQL_USER");
+		String password = System.getenv("MYSQL_PASS");
+		/*
+			HikariConfig hikariConfig = new  HikariConfig( properties );
+			HikariConfig hikariConfig = new  HikariConfig( "datasource.properties" );
+			dataSourceClassName = com.mysql.cj.jdbc.Driver;
+			dataSource.user = anyuser;
+			datasource.cachePrepStmts = true;
+		*/
+		HikariConfig hikariConfig = new HikariConfig();
+		hikariConfig.setJdbcUrl(dbURL);
+		hikariConfig.setUsername(username);
+		hikariConfig.setPassword(password);
+		hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+		hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+		hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+		//
+		HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
+		try {
+			Connection connection = hikariDataSource.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(sqlDefault);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+			int intColumnCount = resultSetMetaData.getColumnCount();
+			while ( resultSet.next() ) {
+				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
+					txtLines += resultSet.getString(ictr) + DLM;
+				}
+				txtLines += EOL;
+			}
+		}
+		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		System.out.println(txtLines);
+		assertNotNull(txtLines);
+	}
+
+	@Test void read_Hazelcast( ) {
+		//
+		String txtLines = "";
+		Config config = new Config();
+		HazelcastInstance HCI = Hazelcast.newHazelcastInstance(config); // create new node in cluster
+		Cluster cluster = HCI.getCluster(); // gets cluster in node
+		Set<Member> setMembers = cluster.getMembers(); // get all devices
+		ExecutorService executorService = HCI.getExecutorService("exec"); // get ExecutorService for cluster
+		System.out.println("setMembers: " + setMembers);
+		//
+		for ( int ictr = 0; ictr < setMembers.size(); ictr++ ) {
+			// send a task for each member on service of HazelcastInstance
+			ClusterWorkingTask CWT = new ClusterWorkingTask();
+			Future<String> future = executorService.submit(CWT);
+			txtLines = "";
+			try {
+				txtLines += future.get() + EOL;
+			}
+			catch (InterruptedException | ExecutionException ex) {
+				System.out.println("ERROR: " + ex.getMessage());
+			}
+		}
+		// hazelcastInstance.shutDown();
+		System.out.println(txtLines);
+		assertNotNull(txtLines);
+	}
+
+	@Test void read_HazelcastNW( ) {
+		//
+		String txtLines = "";
+		String HOST_NAME = "localhost";
+		String clusterName = "anyMap";
+		int PORT = 5071;
+		//
+		// config
+		Config config = new Config();
+		NetworkConfig networkConfig = config.getNetworkConfig();
+		networkConfig.setPort(PORT).setPortCount(5);
+		networkConfig.setPortAutoIncrement(true);
+		JoinConfig joinConfig = networkConfig.getJoin();
+		joinConfig.getMulticastConfig().setEnabled(true);
+		joinConfig.getTcpIpConfig().addMember(HOST_NAME).setEnabled(true);
+		//
+		HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance();
+		IMap<Long, String> iMap = hazelcastInstance.getMap(clusterName);
+		FlakeIdGenerator FIG = hazelcastInstance.getFlakeIdGenerator("newid");
+		for ( int ictr = 0; ictr < 10; ictr++ ) {
+			iMap.put(FIG.newId(), "message" + ictr);
+		}
+		// client
+		ClientConfig clientConfig = new ClientConfig();
+		clientConfig.setClusterName("dev");
+		HazelcastInstance hazelcastInstanceClient = HazelcastClient.newHazelcastClient(clientConfig);
+		Map<Long, String> map = hazelcastInstanceClient.getMap("data");
+		for ( Map.Entry<Long, String> entry : map.entrySet() ) {
+			//
+			txtLines += "\t" + entry.toString() + EOL;
+		}
+		//
+		// hazelcastInstance.shutDown();
+		System.out.println(txtLines);
+		assertNotNull(txtLines);
+	}
+}
+
+class ClusterWorkingTask implements Callable<String>, Serializable {
+	@Override
+	public String call( ) throws Exception { return "Hello World!"; }
 }

@@ -35,6 +35,8 @@ dependencies {
 	implementation 'com.oracle.database.jdbc:ojdbc11:21.6.0.0.1'	// 21.6.0.1 Oracle
 	implementation 'com.microsoft.sqlserver:mssql-jdbc:10.2.1.jre11'    // MSSQL sqlserver
 	implementation 'org.mongodb:mongo-java-driver:3.12.11'			// 3.12.10 MongoDB
+	implementation 'com.zaxxer:HikariCP:5.0.1'						// 5.5.6 org.hibernate:hibernate-hikaricp:
+	implementation 'com.hazelcast:hazelcast:5.1.2'					// 5.1.2 Hazelcast
 
 	// extras
 	implementation 'io.jaegertracing:jaeger-core:1.8.0'							// 1.6.0 Jaeger tracing

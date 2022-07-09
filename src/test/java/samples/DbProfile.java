@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.checkerframework.checker.units.qual.C;
 import utils.UtilityMain;
 
 import java.lang.reflect.Field;
@@ -24,11 +25,9 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 	//
 	public enum DBTYPE {sqlite, mysql, oracle, oracleTns, mssql, mongodb}
 
-	public Properties properties = null;
-
-	static final String PATHFILE_LOCAL = "src/test/resources/";
+	static final String PATHFILE_LOCAL = "src/test/resources/"; // "C:/Users/mamge/Kerberos/config/"
 	public static final String PATH_TNS_DEFAULT = PATHFILE_LOCAL + "local_tnsnames.ora";
-	public static final String PATH_KRB5_CONF = "C:/Users/mamge/Kerberos/config/krb5.conf";
+	public static final String PATH_KRB5_CONF = PATHFILE_LOCAL + "krb5.conf";
 	public static final String EOL = "\n";
 	public static final String DLM = " | ";
 
@@ -48,6 +47,7 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 	private String dbName;
 	private String dbUrl;
 	private String sqlDefault;
+	private Properties properties = null;
 
 	public DbProfile(DBTYPE dbType, String host, String dbName) {
 		//
@@ -73,23 +73,25 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 		if ( dbType.equals(DBTYPE.mysql) ) {
 			port = "3306";
 			dbUrl = "jdbc:mysql://" + server + ":" + port + "/" + dbName;
-			sqlDefault = "SELECT * FROM mydb.history;";
+			sqlDefault = "SELECT * FROM mydb.history WHERE id > 0 ORDER BY dateend;";
 			//
 			try { Class.forName(com.mysql.cj.jdbc.Driver.class.getName()); }
 			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.oracle) ) {
 			port = "1521";
-			dbUrl = "jdbc:oracle:thin:@localhost:" + port + ":" + dbName;
 			sqlDefault = "SELECT * FROM (SELECT * FROM sys.employees ORDER BY LAST_NAME) WHERE ROWNUM <= 10";
+			dbUrl = "jdbc:oracle:thin:@localhost:" + port + ":" + dbName;
 			//
 			try { Class.forName(oracle.jdbc.OracleDriver.class.getName()); }
 			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.oracleTns) ) {
 			//
-			dbUrl = getOCI_TnsUrl(PATH_TNS_DEFAULT);
 			sqlDefault = "SELECT * FROM (SELECT * FROM sys.employees ORDER BY LAST_NAME) WHERE ROWNUM <= 10";
+			dbUrl = getOCI_TnsUrl(PATH_TNS_DEFAULT);
+			properties = getOCI_KerberosProps(PATH_KRB5_CONF);
+			properties=null;
 			//
 			try { DriverManager.registerDriver(new oracle.jdbc.OracleDriver()); }
 			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
@@ -187,11 +189,15 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 
 	public static Properties getOCI_KerberosProps(String pathKrb5) {
 		//
+		// oracle.net.authentication_services			KERBEROS5
+		// oracle.net.kerberos5_mutual_authentication	true
+		// java.security.krb5.conf						pathKrb5
 		Properties properties = new Properties();
-		String CPTNAKM_AK = "( " + AUTHENTICATION_KERBEROS5 + " )";
+		String CPTNAKM_AK = "(" + AUTHENTICATION_KERBEROS5 + ")";
 		properties.setProperty(CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_SERVICES, CPTNAKM_AK);
 		properties.setProperty(CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_KRB5_MUTUAL, "true");
 		System.setProperty("java.security.krb5.conf", pathKrb5);
+		System.out.println("properties: " + properties);
 		return properties;
 	}
 
