@@ -205,7 +205,7 @@ public class DBaseTest {
 		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
-	@Test void read_HikariCP( ) {
+	@Test void read_HikariCP( ) { // CP: Connection Pooling
 		//
 		String txtLines = EOL;
 		String dbURL = "jdbc:mysql://localhost:3306/mydb";
