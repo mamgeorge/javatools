@@ -1,11 +1,9 @@
-package samples;
+package utils;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.checkerframework.checker.units.qual.C;
-import utils.UtilityMain;
 
 import java.lang.reflect.Field;
 import java.sql.Clob;
@@ -24,6 +22,38 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 @Getter @Setter @EqualsAndHashCode @NoArgsConstructor public class DbProfile {
 	//
 	public enum DBTYPE {sqlite, mysql, oracle, oracleTns, mssql, mongodb}
+
+	public enum DBASES {
+
+		// access, dbname, host, port, serviceName, sqlDefault, user, pass
+		SQLITE_CHINOOK("NONE", "chinook", "C:/workspace/dbase/sqlite/", "", "",
+			"SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC", "", ""),
+		MYSQL_MYDB("NONE", "mydb", "localhost", "3306", "",
+			"SELECT * FROM mydb.history WHERE id > 0 ORDER BY dateend;", "", ""),
+		ORACLE_XE("NONE", "XE", "localhost", "1521", "", "SELECT * FROM sys.employees ORDER BY LAST_NAME", "",
+			"");
+
+		public final String access;
+		public final String dbname;
+		public final String host;
+		public final String port;
+		public final String serviceName;
+		public final String sqlDefault;
+		public final String user;
+		public final String pass;
+
+		DBASES(String access, String dbname, String host, String port, String serviceName, String sqlDefault,
+			String user, String pass) {
+			this.access = access;
+			this.dbname = dbname;
+			this.host = host;
+			this.port = port;
+			this.serviceName = serviceName;
+			this.sqlDefault = sqlDefault;
+			this.user = user;
+			this.pass = pass;
+		}
+	}
 
 	static final String PATHFILE_LOCAL = "src/test/resources/"; // "C:/Users/mamge/Kerberos/config/"
 	public static final String PATH_TNS_DEFAULT = PATHFILE_LOCAL + "local_tnsnames.ora";
@@ -60,11 +90,10 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 		//
 		if ( dbType.equals(DBTYPE.sqlite) ) {
 			//
-			String PATH_DEFAULT_SQLITE = "C:/workspace/dbase/sqlite/";
-			if ( dbName == null || dbName.equals("") ) { dbName = "chinook.db"; }
-			if ( host == null || host.equals("") ) { server = PATH_DEFAULT_SQLITE; }
+			if ( dbName == null || dbName.equals("") ) { dbName = DBASES.SQLITE_CHINOOK.dbname + ".db"; }
+			if ( host == null || host.equals("") ) { server = DBASES.SQLITE_CHINOOK.host; }
 			dbUrl = "jdbc:sqlite:" + server + dbName;
-			sqlDefault = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
+			sqlDefault = DBASES.SQLITE_CHINOOK.sqlDefault;
 			//
 			// not needed
 			try { Class.forName(java.sql.DriverManager.class.getName()); }
@@ -73,25 +102,25 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 		if ( dbType.equals(DBTYPE.mysql) ) {
 			port = "3306";
 			dbUrl = "jdbc:mysql://" + server + ":" + port + "/" + dbName;
-			sqlDefault = "SELECT * FROM mydb.history WHERE id > 0 ORDER BY dateend;";
+			sqlDefault = DBASES.MYSQL_MYDB.sqlDefault;
 			//
 			try { Class.forName(com.mysql.cj.jdbc.Driver.class.getName()); }
 			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.oracle) ) {
-			port = "1521";
-			sqlDefault = "SELECT * FROM (SELECT * FROM sys.employees ORDER BY LAST_NAME) WHERE ROWNUM <= 10";
-			dbUrl = "jdbc:oracle:thin:@localhost:" + port + ":" + dbName;
+			port = DBASES.ORACLE_XE.port;
+			sqlDefault = "SELECT * FROM (" + DBASES.ORACLE_XE.sqlDefault + ") WHERE ROWNUM <= 10";
+			dbUrl = "jdbc:oracle:thin:@" + server + ":" + port + ":" + dbName;
 			//
 			try { Class.forName(oracle.jdbc.OracleDriver.class.getName()); }
 			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.oracleTns) ) {
 			//
-			sqlDefault = "SELECT * FROM (SELECT * FROM sys.employees ORDER BY LAST_NAME) WHERE ROWNUM <= 10";
+			sqlDefault = "SELECT * FROM (" + DBASES.ORACLE_XE.sqlDefault + ") WHERE ROWNUM <= 10";
 			dbUrl = getOCI_TnsUrl(PATH_TNS_DEFAULT);
 			properties = getOCI_KerberosProps(PATH_KRB5_CONF);
-			properties=null;
+			properties = null;
 			//
 			try { DriverManager.registerDriver(new oracle.jdbc.OracleDriver()); }
 			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
@@ -121,7 +150,9 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 			try { DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver()); }
 			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		}
-		if ( dbType.equals(DBTYPE.mongodb) ) { }
+		if ( dbType.equals(DBTYPE.mongodb) ) {
+			//
+		}
 	}
 
 	public String readDbLines(String username, String password) {

@@ -1,5 +1,6 @@
 package utils;
 
+import lombok.NonNull;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -12,97 +13,79 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
-import lombok.NonNull; // import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+/*
+	see "kafka_info.md"
+	For this java implementation, zookeeper & kafkaServer must be running.
+	Note consumer props set "auto.offset.reset" to "earliest", "enable.auto.commit" to "false", and randomizes "group.id".
+*/
 public class KafkaHandler {
 
-	final static String TOPIC_NAME = "quickstart-events";
-	final static String BOOTSTRAP_SERVERS = "localhost:9092"; // "BROKER-1:9092, BROKER-2:9093"
-	final static String APACHE_PRFX = "org.apache.kafka.common.serialization.";
+	private final static String[] CLUSTER_NAMES = { "" };
+	private final static String[] TOPIC_NAMES = { "quickstart-events" };
+	private final static String[] HOSTS = { "localhost" }; // BROKER_1, BROKER_2
+	private final static String[] PORTS = { "9092" }; // 9092, 9093
+	//
+	private final static String GROUP_ID = "test";
+	private final static String APACHE_PRFX = "org.apache.kafka.common.serialization.";
+	private final static String EOL = "\n";
 
-	enum Kafkas {PRODUCER, CONSUMER, STREAMS}
-
-	final static Kafkas kafkas = Kafkas.PRODUCER;
+	private final static boolean testingProducer = false;
+	private final static boolean testingConsumer = true;
 
 	public static void main(String[] args) {
 		//
-		System.out.println("Subscribed to topic " + TOPIC_NAME);
-		switch ( kafkas ) {
-			case PRODUCER:
-				producer(TOPIC_NAME);
-				break;
-			case CONSUMER:
-				consumer(TOPIC_NAME);
-				break;
-			case STREAMS:
-				streams(TOPIC_NAME);
-				break;
-		}
+		String topicName = TOPIC_NAMES[0];
+		//
+		System.out.println("Subscribed to topic " + topicName);
+		if ( testingProducer ) { producer(topicName); }
+		if ( testingConsumer ) { consumer(topicName); }
+		//
 		System.out.println("DONE");
 	}
 
 	public static void producer(String topicName) {
 		//
-		Properties props = new Properties();
-		props.put("bootstrap.servers", BOOTSTRAP_SERVERS);
-		props.put("key.serializer", APACHE_PRFX + "StringSerializer");
-		props.put("value.serializer", APACHE_PRFX + "StringSerializer");
-		props.put("acks", "all");
-		props.put("retries", 0);
-		props.put("batch.size", 16384);
-		props.put("linger.ms", 1);
-		props.put("buffer.memory", 33554432);
+		String host = HOSTS[0];
+		String port = PORTS[0];
+		String BOOTSTRAP_SERVERS = host + ":" + port;
+		Properties properties = getPropertiesProducer(BOOTSTRAP_SERVERS);
 		//
-		Producer<String, String> kafkaProducer = new KafkaProducer<>(props); // KafkaProducer
+		Producer<String, String> kafkaProducer = new KafkaProducer<>(properties);
 		ProducerRecord<String, String> producerRecord;
 		//
-		String key; String val;
+		String txtKey;
+		String txtVal;
 		for ( int ictr = 0; ictr < 20; ictr++ ) {
-			key = Integer.toString(ictr);
-			val = createValue();
-			producerRecord = new ProducerRecord<>(topicName, key, val);
+			txtKey = Integer.toString(ictr);
+			txtVal = getRandomLine();
+			producerRecord = new ProducerRecord<>(topicName, txtKey, txtVal);
 			kafkaProducer.send(producerRecord);
 		}
 		System.out.println("Messages Sent!");
 		kafkaProducer.close();
 	}
 
-	@NonNull private static String createValue( ) {
-		//
-		StringBuilder txtLine = new StringBuilder();
-		StringBuilder txtRandom = new StringBuilder();
-		Random random = new Random();
-		char[] chars = ("1234567890abcdefghijklmnopqrstuvwxyz"+"ABCDEFGHIJKLMNOPQRSTUVWZYZ").toCharArray();
-		double dbl = Math.round(Math.random() * 10000D * 10000D);
-		for ( int ictr = 0; ictr < 16; ictr++ ) {
-			txtRandom.append(chars[random.nextInt(chars.length)]);
-		}
-		//
-		txtLine.append(Instant.now().toString()).append(" / ");
-		txtLine.append((int) dbl);
-		txtLine.append(txtRandom);
-		return txtLine.toString();
-	}
-
 	public static void consumer(String topicName) {
 		//
-		Properties props = new Properties();
-		props.put("bootstrap.servers", BOOTSTRAP_SERVERS);
-		props.put("key.deserializer", APACHE_PRFX + "StringDeserializer");
-		props.put("value.deserializer", APACHE_PRFX + "StringDeserializer");
-		props.put("group.id", "test");
-		props.put("enable.auto.commit", "true");
-		props.put("auto.commit.interval.ms", "1000");
-		props.put("session.timeout.ms", "30000");
+		String host = HOSTS[0];
+		String port = PORTS[0];
+		String BOOTSTRAP_SERVERS = host + ":" + port;
+		Properties properties = getPropertiesConsumer(BOOTSTRAP_SERVERS);
 		//
-		Consumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
+		Consumer<String, String> kafkaConsumer = new KafkaConsumer<>(properties);
 		kafkaConsumer.subscribe(Arrays.asList(topicName));
 		//
+		// kafkaConsumer.seekToBeginning(kafkaConsumer.assignment());
 		int ictr = 0;
 		String FRMT = "%d: topic: %s, partition: %s, offset: %d, key: %s, value: %s\n";
 		String txtRecord;
@@ -110,7 +93,7 @@ public class KafkaHandler {
 			ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(100);
 			for ( ConsumerRecord<String, String> consumerRecord : consumerRecords ) {
 				//
-				txtRecord = String.format("Topic: %s, Partition: %s, Value: %s",
+				txtRecord = String.format(FRMT,
 					ictr++,
 					consumerRecord.topic(),
 					consumerRecord.partition(),
@@ -118,10 +101,81 @@ public class KafkaHandler {
 					consumerRecord.key(),
 					consumerRecord.value()
 				);
-				System.out.println(txtRecord);
+				System.out.print(txtRecord);
 			}
-			kafkaConsumer.close();
+			// kafkaConsumer.close();
 		}
+	}
+
+	@NotNull private static Properties getPropertiesProducer(String bootstrapServers) {
+		//
+		Properties properties = new Properties();
+		properties.put("bootstrap.servers", bootstrapServers);
+		properties.put("key.serializer", APACHE_PRFX + "StringSerializer");
+		properties.put("value.serializer", APACHE_PRFX + "StringSerializer");
+		//
+		properties.put("acks", "all");
+		properties.put("retries", 0);
+		properties.put("batch.size", 16384);
+		properties.put("linger.ms", 1);
+		properties.put("buffer.memory", 33554432);
+		//
+		return properties;
+	}
+
+	@NotNull private static Properties getPropertiesConsumer(String bootstrapServers) {
+		//
+		Properties properties = new Properties();
+		properties.put("bootstrap.servers", bootstrapServers);
+		properties.put("key.deserializer", APACHE_PRFX + "StringDeserializer");
+		properties.put("value.deserializer", APACHE_PRFX + "StringDeserializer");
+		//
+		// https://stackoverflow.com/questions/51510250/kafka-from-begining-cli-vs-kafka-java-api
+		properties.put("group.id", GROUP_ID + "_" + getRandomString(4));
+		properties.put("enable.auto.commit", "false"); // true
+		properties.put("auto.offset.reset", "earliest");
+		//
+		properties.put("auto.commit.interval.ms", "1000");
+		properties.put("session.timeout.ms", "30000");
+		return properties;
+	}
+
+	@NonNull private static String getRandomLine( ) {
+		//
+		StringBuilder txtLine = new StringBuilder();
+		String txtRandom = getRandomString(16);
+		//
+		txtLine.append(Instant.now().toString()).append(" / ");
+		txtLine.append(txtRandom);
+		return txtLine.toString();
+	}
+
+	@NonNull private static String getRandomString(int num){
+		//
+		StringBuilder txtRandom = new StringBuilder();
+		Random random = new Random();
+		char[] chars =
+			( "1234567890abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWZYZ" ).toCharArray();
+		double dbl = Math.round(Math.random() * 10000D * 10000D);
+		for ( int ictr = 0; ictr < num; ictr++ ) {
+			txtRandom.append(chars[random.nextInt(chars.length)]);
+		}
+		return txtRandom.toString();
+	}
+
+	@Test void test_getRandomLine( ) {
+		//
+		String txtLines = "";
+		for ( int ictr = 0; ictr < 20; ictr++ ) {
+			txtLines += String.format("\t %02d %s \n", ictr + 1, getRandomLine());
+		}
+		txtLines+=EOL;
+		//
+		for ( int ictr = 0; ictr < 20; ictr++ ) {
+			txtLines += String.format("\t %02d %s \n", ictr + 1, getRandomString(ictr));
+		}
+		System.out.println(txtLines);
+		assertNotNull(txtLines);
 	}
 
 	public static void streams(String topicName) {

@@ -19,7 +19,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
-import samples.DbProfile;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -38,10 +37,10 @@ import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static samples.DbProfile.ERROR_NOT_INTEGRATED;
-import static samples.DbProfile.ERROR_NO_CREDENTIALS;
-import static samples.DbProfile.ERROR_PKIX_CERT_PATH;
-import static samples.DbProfile.ERROR_SSL_ENCRYPT;
+import static utils.DbProfile.ERROR_NOT_INTEGRATED;
+import static utils.DbProfile.ERROR_NO_CREDENTIALS;
+import static utils.DbProfile.ERROR_PKIX_CERT_PATH;
+import static utils.DbProfile.ERROR_SSL_ENCRYPT;
 
 public class DBaseTest {
 	//
@@ -60,7 +59,8 @@ public class DBaseTest {
 	@Test void test_readDbLines_mySql( ) {
 		//
 		// see: "C:\Program Files\MySQL\MySQL Server 8.0\mysql_options.txt" ; ren2shen1
-		String dbName = "mydb", host = "localhost";
+		String dbName = DbProfile.DBASES.MYSQL_MYDB.dbname;
+		String host = DbProfile.DBASES.MYSQL_MYDB.host;
 		String username = System.getenv("MYSQL_USER");
 		String password = System.getenv("MYSQL_PASS");
 		DbProfile dbProfile = new DbProfile(DbProfile.DBTYPE.mysql, host, dbName);
@@ -71,7 +71,8 @@ public class DBaseTest {
 
 	@Test void test_readDbLines_oracle( ) {
 		//
-		String dbName = "XE", host = "localhost";
+		String dbName = "XE";
+		String host = DbProfile.DBASES.ORACLE_XE.host;
 		String username = System.getenv("ORACLE_USER");
 		String password = System.getenv("ORACLE_PASS");
 		System.out.println("credentials: " + username + " / " + password);
@@ -107,9 +108,9 @@ public class DBaseTest {
 	@Test void test_sqlite_full( ) {
 		//
 		String txtLines = EOL;
-		String dbName = "chinook.db";
-		String dbUrl = "jdbc:sqlite:C:/workspace/dbase/sqlite/" + dbName;
-		String sqlDefault = "SELECT * FROM employees WHERE BirthDate > '1964-01-01' ORDER BY LastName ASC";
+		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
+		String dbUrl = "jdbc:sqlite:" + DbProfile.DBASES.SQLITE_CHINOOK.host + dbName;
+		String sqlDefault = DbProfile.DBASES.SQLITE_CHINOOK.sqlDefault;
 		try {
 			Connection connection = DriverManager.getConnection(dbUrl);
 			PreparedStatement preparedStatement = connection.prepareStatement(sqlDefault);
@@ -126,6 +127,31 @@ public class DBaseTest {
 		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		System.out.println("txtLines: " + txtLines);
 		assertTrue(txtLines.split(EOL).length > 1);
+	}
+
+	@Test void read_oracle_full( ) {
+		//
+		String txtLines = EOL;
+		String dbName = DbProfile.DBASES.ORACLE_XE.dbname;
+		String host = DbProfile.DBASES.ORACLE_XE.host;
+		String port = DbProfile.DBASES.ORACLE_XE.port;
+		String sqlDefault =
+			"SELECT * FROM (" + DbProfile.DBASES.ORACLE_XE.sqlDefault + ") WHERE ROWNUM <= 10";
+		String dbUrl = "jdbc:oracle:thin:@" + host + ":" + port + ":" + dbName;
+		String username = System.getenv("ORACLE_USER");
+		String password = System.getenv("ORACLE_PASS");
+		System.out.println("credentials: " + username + " / " + password);
+		//
+		try {
+			Class.forName(oracle.jdbc.OracleDriver.class.getName());
+			Connection connection = DriverManager.getConnection(dbUrl, username, password);
+			Statement statement = connection.createStatement();
+			txtLines += DbProfile.getResults(statement, sqlDefault);
+		}
+		catch (ClassNotFoundException | SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		//
+		System.out.println("txtLines: " + txtLines);
+		assertNotNull(txtLines);
 	}
 
 	@Test void test_mssql_full( ) {
@@ -205,7 +231,8 @@ public class DBaseTest {
 		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
-	@Test void read_HikariCP( ) { // CP: Connection Pooling
+	@Test void read_HikariCP( ) {
+		// CP: Connection Pooling
 		//
 		String txtLines = EOL;
 		String dbURL = "jdbc:mysql://localhost:3306/mydb";
