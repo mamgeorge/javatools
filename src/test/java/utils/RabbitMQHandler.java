@@ -116,7 +116,7 @@ public class RabbitMQHandler {
 			while ( ictr < qty ) {
 				//
 				String txtMessage = String.format(FRMT, ( ++ictr ), Instant.now());
-				channel.basicPublish(ROUTING_KEY,EXCHANGE_QUEUE, AMQP_BP, txtMessage.getBytes());
+				channel.basicPublish(ROUTING_KEY, EXCHANGE_QUEUE, AMQP_BP, txtMessage.getBytes());
 			}
 		}
 		catch (IOException ex) { System.out.println("ERROR send: " + ex.getMessage()); }

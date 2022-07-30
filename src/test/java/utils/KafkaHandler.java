@@ -150,7 +150,7 @@ public class KafkaHandler {
 		return txtLine.toString();
 	}
 
-	@NonNull private static String getRandomString(int num){
+	@NonNull private static String getRandomString(int num) {
 		//
 		StringBuilder txtRandom = new StringBuilder();
 		Random random = new Random();
@@ -169,7 +169,7 @@ public class KafkaHandler {
 		for ( int ictr = 0; ictr < 20; ictr++ ) {
 			txtLines += String.format("\t %02d %s \n", ictr + 1, getRandomLine());
 		}
-		txtLines+=EOL;
+		txtLines += EOL;
 		//
 		for ( int ictr = 0; ictr < 20; ictr++ ) {
 			txtLines += String.format("\t %02d %s \n", ictr + 1, getRandomString(ictr));

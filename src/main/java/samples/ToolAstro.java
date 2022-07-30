@@ -4,7 +4,8 @@ import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,8 @@ public class ToolAstro {
 	private static final String IMG_JPG = "jpg";
 	private static final String IMG_PNG = "png";
 
-	private static final String TXT_CONS = "AND ANT APS AQL AQR ARA ARI AUR BOO CAE CAM CAP CAR CAS CEN CEP CET CHA CIR CMA CMI CNC COL COM CRA CRB CRT CRU CRV CVN CYG DEL DOR DRA EQU ERI FOR GEM GRU HER HOR HYA HYI IND LAC LEO LEP LIB LMI LUP LYN LYR MEN MIC MON MUS NOR OCT OPH ORI PAV PEG PER PHE PIC PSA PSC PUP PYX RET SCL SCO SCT "
+	private static final String TXT_CONS =
+		"AND ANT APS AQL AQR ARA ARI AUR BOO CAE CAM CAP CAR CAS CEN CEP CET CHA CIR CMA CMI CNC COL COM CRA CRB CRT CRU CRV CVN CYG DEL DOR DRA EQU ERI FOR GEM GRU HER HOR HYA HYI IND LAC LEO LEP LIB LMI LUP LYN LYR MEN MIC MON MUS NOR OCT OPH ORI PAV PEG PER PHE PIC PSA PSC PUP PYX RET SCL SCO SCT "
 			+ "SERCD SERCP SEX SGE SGR TAU TEL TRA TRI TUC UMA UMI VEL VIR VOL VUL";
 	private static final String[] STR_CONS = TXT_CONS.split(" ");
 	private static final String TXT_PATH_ASTRO = "C:/Martin/5Personal/Astronomy/icons/";
@@ -52,7 +54,7 @@ public class ToolAstro {
 		BufferedImage bufferedImage = null;
 		String txtURLPrefix = TXT_URL + "/" + IMG_GIF + "/";
 		try {
-			for (String string : strings) {
+			for ( String string : strings ) {
 				//
 				txtIMG = txtURLPrefix + string.toUpperCase() + "." + IMG_GIF;
 				url = new URL(txtIMG);
@@ -61,7 +63,8 @@ public class ToolAstro {
 				ImageIO.write(bufferedImage, IMG_GIF, file);
 			}
 			//
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 	}
@@ -86,7 +89,7 @@ public class ToolAstro {
 		FileImageOutputStream fos = null;
 		IIOImage iioImage = null;
 		try {
-			for (String string : strings) {
+			for ( String string : strings ) {
 				//
 				txtIMG = txtURLPrefix + string.toUpperCase() + "." + IMG_GIF;
 				url = new URL(txtIMG);
@@ -102,7 +105,8 @@ public class ToolAstro {
 				imageWriter.dispose();
 			}
 			//
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 	}
@@ -131,7 +135,7 @@ public class ToolAstro {
 		int intH = 0;
 		IIOImage iioImage = null;
 		try {
-			for (String string : strings) {
+			for ( String string : strings ) {
 				//
 				txtIMG = txtDIRPrefix + string.toUpperCase() + "." + IMG_GIF;
 				fileIn = new File(txtIMG);
@@ -157,7 +161,8 @@ public class ToolAstro {
 				imageWriter.dispose();
 			}
 			//
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 	}

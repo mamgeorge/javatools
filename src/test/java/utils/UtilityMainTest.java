@@ -32,7 +32,7 @@ public class UtilityMainTest {
 	static final String ASSERT_MSG = "ASSERT_MSG";
 
 	//#### basics
-	@Test void test_template() {
+	@Test void test_template( ) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		//
@@ -43,7 +43,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
 	}
 
-	@SuppressWarnings({"all"}) @Test void test_booleans() {
+	@SuppressWarnings( { "all" } ) @Test void test_booleans( ) {
 		//
 		String txtLines = EOL;
 		//
@@ -59,7 +59,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() >= 1, ASSERT_MSG);
 	}
 
-	@Test void test_showSys() {
+	@Test void test_showSys( ) {
 
 		String txtLines = UtilityMain.showSys();
 		String[] envr = txtLines.split(EOL);
@@ -69,7 +69,7 @@ public class UtilityMainTest {
 		assertTrue(envr.length > 40, ASSERT_MSG);
 	}
 
-	@Test void test_showTimes() {
+	@Test void test_showTimes( ) {
 
 		String showTimes = UtilityMain.showTimes();
 		//
@@ -79,7 +79,7 @@ public class UtilityMainTest {
 		assertTrue(showTimesLen > 4, ASSERT_MSG);
 	}
 
-	@Test void test_Stream_sort() throws SocketException {
+	@Test void test_Stream_sort( ) throws SocketException {
 		//
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -91,24 +91,25 @@ public class UtilityMainTest {
 		assertTrue(set.size() >= 7, ASSERT_MSG);
 	}
 
-	@Test void test_Stream_filter() throws SocketException {
+	@Test void test_Stream_filter( ) throws SocketException {
 		//
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
 		//
 		List<NetworkInterface> listMain = Collections.list(enums);
 		List<NetworkInterface> listFilt =
-				listMain.stream()
-						.filter(nifc -> {
-							int mtu = 0;
-							try {
-								mtu = nifc.getMTU();
-							} catch (Exception ex) {
-								LOGGER.info(ex.getMessage());
-							}
-							return mtu > 1 && !nifc.getDisplayName().startsWith("VMware");
-						})
-						.collect(Collectors.toList());
+			listMain.stream()
+				.filter(nifc -> {
+					int mtu = 0;
+					try {
+						mtu = nifc.getMTU();
+					}
+					catch (Exception ex) {
+						LOGGER.info(ex.getMessage());
+					}
+					return mtu > 1 && !nifc.getDisplayName().startsWith("VMware");
+				})
+				.collect(Collectors.toList());
 		//
 		listFilt.forEach(nifc -> set.add(TAB + nifc.getDisplayName()));
 		//
@@ -117,7 +118,7 @@ public class UtilityMainTest {
 		assertTrue(set.size() >= 5, ASSERT_MSG);
 	}
 
-	@Test void test_Stream_Collections() throws SocketException {
+	@Test void test_Stream_Collections( ) throws SocketException {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -130,14 +131,14 @@ public class UtilityMainTest {
 		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
-	@Test void test_Stream_Iterator() throws SocketException {
+	@Test void test_Stream_Iterator( ) throws SocketException {
 		// better for larger numbers
 		StringBuilder stringBuilder = new StringBuilder();
 		Iterator<NetworkInterface> iterator = NetworkInterface.getNetworkInterfaces().asIterator();
 		//
 		stringBuilder.append("Iterator Stream" + EOL);
 		Stream<NetworkInterface> stream = StreamSupport.stream(
-				Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
+			Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
 		stream.forEach(nifc -> stringBuilder.append(nifc.getDisplayName()).append(EOL));
 		//
 		System.out.println(stringBuilder);
@@ -145,7 +146,7 @@ public class UtilityMainTest {
 	}
 
 	//#### files
-	@Test void test_getFileLines() {
+	@Test void test_getFileLines( ) {
 
 		String txtLines = UtilityMain.getFileLines("c:/workspace/greetings.txt", "");
 		//
@@ -153,7 +154,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() > 12, ASSERT_MSG);
 	}
 
-	@Test void test_getFileLocal() {
+	@Test void test_getFileLocal( ) {
 
 		String txtLines = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.json");
 		//
@@ -161,18 +162,18 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
-	@Test void test_getFileLocals() {
+	@Test void test_getFileLocals( ) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		String[] fileNames =
-				{"booksCatalog.html", "booksCatalog.json", "booksCatalog.xml", "booksXml2Html.xslt"};
+			{ "booksCatalog.html", "booksCatalog.json", "booksCatalog.xml", "booksXml2Html.xslt" };
 		//
 		AtomicInteger idx = new AtomicInteger();
 		Arrays.stream(fileNames).sequential().forEach(flnm -> {
 			String fileName = PATHFILE_LOCAL + flnm;
 			String txtLines = UtilityMain.getFileLocal(fileName);
 			stringBuilder.append(
-					String.format("\t%02d %s\tsize: %d \n", idx.incrementAndGet(), flnm, txtLines.length()));
+				String.format("\t%02d %s\tsize: %d \n", idx.incrementAndGet(), flnm, txtLines.length()));
 		});
 		//
 		int countFiles = stringBuilder.toString().split(EOL).length;
@@ -181,44 +182,44 @@ public class UtilityMainTest {
 		assertEquals(countFiles, fileNames.length, ASSERT_MSG);
 	}
 
-	@Test void getZipFileList() {
+	@Test void getZipFileList( ) {
 	}
 
-	@Test void putFilesIntoZip() {
+	@Test void putFilesIntoZip( ) {
 	}
 
 	//#### url
-	@Test void urlGet() {
+	@Test void urlGet( ) {
 		//
 		String html = UtilityMain.urlGet("https://mamgeorge.altervista.org");
 		System.out.println("html: " + html);
 		assertTrue(html.contains("DOCTYPE"), ASSERT_MSG);
 	}
 
-	@Test void urlPost() {
+	@Test void urlPost( ) {
 	}
 
-	@Test void urlPostFile() {
+	@Test void urlPostFile( ) {
 	}
 
 	//#### reflection
-	@Test void test_getField() {
+	@Test void test_getField( ) {
 		//
 		String txtLine = UtilityMain.getField(new AnyObject(), "gamma");
 		System.out.println("txtLine: " + txtLine);
-		assertEquals(txtLine,"GIMMEL", ASSERT_MSG);
+		assertEquals(txtLine, "GIMMEL", ASSERT_MSG);
 	}
 
-	@Test void test_getMethod() {
+	@Test void test_getMethod( ) {
 		//
 		Object objectParms = null;
 		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma", objectParms);
 		String txtLine = object.toString();
 		System.out.println(txtLine);
-		assertEquals(txtLine,"GIMMEL", ASSERT_MSG);
+		assertEquals(txtLine, "GIMMEL", ASSERT_MSG);
 	}
 
-	@Test void test_exposeObject() {
+	@Test void test_exposeObject( ) {
 		//
 		AnyObject anyObject = new AnyObject();
 		String txtLines = UtilityMain.exposeObject(anyObject);
@@ -226,7 +227,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.split(EOL).length >= 6, ASSERT_MSG);
 	}
 
-	@Test void test_putObject() {
+	@Test void test_putObject( ) {
 		//
 		AnyObject anyObject = new AnyObject();
 		UtilityMain.putObject(anyObject, "gamma", "STUFF");

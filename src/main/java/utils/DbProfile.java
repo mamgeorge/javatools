@@ -174,7 +174,8 @@ import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 			statement = connection.createStatement();
 			txtLines += getResults(statement, sqlDefault);
 		}
-		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); } finally {
+		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		finally {
 			if ( statement != null ) try { statement.close(); }
 			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 			if ( connection != null ) try { connection.close(); }

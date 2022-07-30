@@ -1,7 +1,11 @@
 package samples;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -35,11 +39,12 @@ public class SwingClient extends JFrame implements ActionListener {
 
 	// declare attribute to tell details of remote machine and port
 	// ipconfig /all | findstr "192\.168\.1 Wireless"
-	private final String[] HOST_REMOTES = {"127.0.0.1", "192.168.1.4", "192.168.58.1", "192.168.238.1", "172.27.16.1"};
+	private final String[] HOST_REMOTES =
+		{ "127.0.0.1", "192.168.1.4", "192.168.58.1", "192.168.238.1", "172.27.16.1" };
 	private final String HOST_REMOTE = HOST_REMOTES[4];
 	private final int PORT = 9000;
 
-	public SwingClient() {
+	public SwingClient( ) {
 
 		//add the visual components
 		add(jTextField_fst);
@@ -68,7 +73,7 @@ public class SwingClient extends JFrame implements ActionListener {
 		new SwingClient();
 	}
 
-	private void startClient() {
+	private void startClient( ) {
 		//
 		try {
 			socketConnection = new Socket(HOST_REMOTE, PORT);
@@ -82,10 +87,12 @@ public class SwingClient extends JFrame implements ActionListener {
 			String txt_host = ina_local.getHostAddress();
 			System.out.println(txt_host);
 			DOS.writeUTF(txt_host);
-		} catch (UnknownHostException ex) {
+		}
+		catch (UnknownHostException ex) {
 			jTextField_msg.setText("host err");
 			LOGGER.info("startClient(host): " + ex.getMessage());
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			jTextField_msg.setText("io err");
 			LOGGER.info("startClient(ioex): " + ex.getMessage());
 		}
@@ -104,7 +111,8 @@ public class SwingClient extends JFrame implements ActionListener {
 			// String results= inDataStream.readUTF();
 			int results = DIS.readInt();
 			jLabel_sum.setText("" + results);
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			LOGGER.info("actionPerformed: " + ex.getMessage());
 		}
 	}

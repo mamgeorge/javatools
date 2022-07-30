@@ -25,7 +25,7 @@ public class Aws2Class {
 	private S3Client s3Client = null;
 	private static final Region REGION = Region.US_EAST_2;
 
-	public Aws2Class() {
+	public Aws2Class( ) {
 		//
 		String txtLines = "#### Aws2Class ####" + EOL;
 		s3Client = S3Client.builder().region(REGION).build();
@@ -43,7 +43,7 @@ public class Aws2Class {
 		System.out.println("DONE");
 	}
 
-	public String listBuckets() {
+	public String listBuckets( ) {
 		//
 		StringBuffer stringBuffer = new StringBuffer();
 		ListBucketsRequest LB_REQ = ListBucketsRequest.builder().build();
@@ -58,13 +58,13 @@ public class Aws2Class {
 		boolean done = false;
 		ListObjectsV2Request LO2_REQ = ListObjectsV2Request.builder().bucket(bucket_name).maxKeys(1).build();
 		ListObjectsV2Response LO2_RES = null;
-		while (!done) {
+		while ( !done ) {
 			//
 			LO2_RES = s3Client.listObjectsV2(LO2_REQ);
-			for (S3Object s3Object : LO2_RES.contents()) {
+			for ( S3Object s3Object : LO2_RES.contents() ) {
 				txtLines += s3Object.key() + EOL;
 			}
-			if (LO2_RES.nextContinuationToken() == null) {
+			if ( LO2_RES.nextContinuationToken() == null ) {
 				done = true;
 			}
 			LO2_REQ = LO2_REQ.toBuilder().continuationToken(LO2_RES.nextContinuationToken()).build();
@@ -79,10 +79,11 @@ public class Aws2Class {
 		ResponseInputStream<GetObjectResponse> RIS = s3Client.getObject(GOR);
 		try {
 			txtLines = IoUtils.toUtf8String(RIS);
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			System.err.println(ex.getMessage());
 		}
-		if (txtLines.length() > MAX_DISPLAY) {
+		if ( txtLines.length() > MAX_DISPLAY ) {
 			txtLines = txtLines.substring(0, txtLines.indexOf(EOL));
 		}
 		return txtLines;

@@ -60,7 +60,8 @@ public class EncryptDecrypt {
 			KeyGenerator keyGen = KeyGenerator.getInstance(DIGITALENCRYPTKEY_AES);
 			keyGen.init(keysize, SecureRandom.getInstanceStrong());
 			secretKey = keyGen.generateKey();
-		} catch (NoSuchAlgorithmException ex) {
+		}
+		catch (NoSuchAlgorithmException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return secretKey;
@@ -75,7 +76,8 @@ public class EncryptDecrypt {
 			SecretKeyFactory SKF = SecretKeyFactory.getInstance(ALGORITHM_SKF);
 			KeySpec keySpec = new PBEKeySpec(password.toCharArray(), bytesSalt, iterationCount, keyLength);
 			secretKey = new SecretKeySpec(SKF.generateSecret(keySpec).getEncoded(), DIGITALENCRYPTKEY_AES);
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+		}
+		catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return secretKey;
@@ -84,7 +86,7 @@ public class EncryptDecrypt {
 	public static String getHex(byte[] bytes) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
-		for (byte bytee : bytes) {
+		for ( byte bytee : bytes ) {
 			stringBuilder.append(String.format("%02x", bytee));
 		}
 		return stringBuilder.toString();
@@ -96,7 +98,7 @@ public class EncryptDecrypt {
 		blockSize = blockSize * 2;
 		List<String> list = new ArrayList<>();
 		int idx = 0;
-		while (idx < txtHex.length()) {
+		while ( idx < txtHex.length() ) {
 			list.add(txtHex.substring(idx, Math.min(idx + blockSize, txtHex.length())));
 			idx += blockSize;
 		}
@@ -110,8 +112,9 @@ public class EncryptDecrypt {
 			Cipher cipher = Cipher.getInstance(ALGORITHM_ENCRYPTION);
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(TAG_LENGTH_BIT, bytesIV));
 			bytesEncrypted = cipher.doFinal(bytesContent);
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-				InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+		}
+		catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+		       InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return bytesEncrypted;
@@ -128,14 +131,16 @@ public class EncryptDecrypt {
 			Cipher cipher = Cipher.getInstance(ALGORITHM_ENCRYPTION);
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(TAG_LENGTH_BIT, bytesIV));
 			byte[] bytesEncrypted = cipher.doFinal(content.getBytes(UTF_8));
-			byte[] bytesEncryptedWithIvSalt = ByteBuffer.allocate(bytesIV.length + bytesSalt.length + bytesEncrypted.length)
+			byte[] bytesEncryptedWithIvSalt =
+				ByteBuffer.allocate(bytesIV.length + bytesSalt.length + bytesEncrypted.length)
 					.put(bytesIV)
 					.put(bytesSalt)
 					.put(bytesEncrypted)
 					.array();
 			contentEncryptedBase64 = Base64.getEncoder().encodeToString(bytesEncryptedWithIvSalt);
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-				InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+		}
+		catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+		       InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return contentEncryptedBase64;
@@ -152,7 +157,8 @@ public class EncryptDecrypt {
 			String contentEncryptedBase64 = encryptPWD(content, password);
 			Path pathEncr = Paths.get(fileEncr);
 			Files.write(pathEncr, contentEncryptedBase64.getBytes(UTF_8));
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 	}
@@ -165,8 +171,9 @@ public class EncryptDecrypt {
 			cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(TAG_LENGTH_BIT, bytesIV));
 			byte[] bytesDecrypted = cipher.doFinal(bytesContent);
 			txtLines = new String(bytesDecrypted, UTF_8);
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-				InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+		}
+		catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+		       InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return txtLines;
@@ -191,8 +198,9 @@ public class EncryptDecrypt {
 			cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(TAG_LENGTH_BIT, bytesIV));
 			byte[] bytesDecrypted = cipher.doFinal(bytesCipher);
 			content = new String(bytesDecrypted, UTF_8);
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
-				InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+		}
+		catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+		       InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return content;
@@ -205,7 +213,8 @@ public class EncryptDecrypt {
 			byte[] bytesContent = Files.readAllBytes(Paths.get(fileEncr));
 			String contentEncryptedBase64 = new String(bytesContent, UTF_8);
 			content = decryptPWD(contentEncryptedBase64, password);
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return content;

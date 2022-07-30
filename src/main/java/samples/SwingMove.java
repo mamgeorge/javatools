@@ -2,8 +2,14 @@
 
 package samples;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -45,7 +51,7 @@ public class SwingMove {
 		new SwingMove().startup();
 	}
 
-	private void startup() {
+	private void startup( ) {
 		//
 		jFrame = new JFrame("SwingMove");
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -103,26 +109,26 @@ public class SwingMove {
 		public void actionPerformed(ActionEvent actionEvent) {
 			//
 			// System.out.print( actionEvent.getSource( ).toString() );
-			if (actionEvent.getSource() == jButton_L) {
-				if (oneX > minWdt) {
+			if ( actionEvent.getSource() == jButton_L ) {
+				if ( oneX > minWdt ) {
 					oneX = oneX - inc;
 				}
 				ANYJCOMPONENT.repaint();
 			}
-			if (actionEvent.getSource() == jButton_D) {
-				if (oneY < maxHth) {
+			if ( actionEvent.getSource() == jButton_D ) {
+				if ( oneY < maxHth ) {
 					oneY = oneY + inc;
 				}
 				ANYJCOMPONENT.repaint();
 			}
-			if (actionEvent.getSource() == jButton_U) {
-				if (oneY > minHth) {
+			if ( actionEvent.getSource() == jButton_U ) {
+				if ( oneY > minHth ) {
 					oneY = oneY - inc;
 				}
 				ANYJCOMPONENT.repaint();
 			}
-			if (actionEvent.getSource() == jButton_R) {
-				if (oneX < maxWdt) {
+			if ( actionEvent.getSource() == jButton_R ) {
+				if ( oneX < maxWdt ) {
 					oneX = oneX + inc;
 				}
 				ANYJCOMPONENT.repaint();
@@ -130,11 +136,12 @@ public class SwingMove {
 			// if ( actionEvent.getSource( ) instanceof JComponent ) { ANYJCOMPONENT.repaint(); }
 		}
 
-		private void lesser() {
+		private void lesser( ) {
 			oneX = oneX - 1;
 			try {
 				Thread.sleep(50);
-			} catch (InterruptedException ex) {
+			}
+			catch (InterruptedException ex) {
 				System.out.println(ex.getMessage());
 			}
 			// System.out.println( ictr );

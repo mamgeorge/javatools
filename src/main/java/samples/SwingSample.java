@@ -1,7 +1,19 @@
 package samples;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
@@ -54,7 +66,7 @@ public class SwingSample extends JPanel {
 		System.out.println("DONE");
 	}
 
-	public void showFrame() {
+	public void showFrame( ) {
 		//
 		JFrame jFrame = new JFrame();
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,7 +84,7 @@ public class SwingSample extends JPanel {
 		jFrame.setVisible(true);
 	}
 
-	public void showField() {
+	public void showField( ) {
 		// create the frame & container
 		JFrame jFrame = new JFrame();
 		jFrame.setTitle(TITLE);
@@ -101,7 +113,7 @@ public class SwingSample extends JPanel {
 	public static JButton getJButton(String name, Color color, Dimension dimension, Action action) {
 		//
 		JButton jButton = new JButton(name);
-		if (action == null) {
+		if ( action == null ) {
 		} else {
 			jButton.setAction(action);
 		}
@@ -121,7 +133,7 @@ public class SwingSample extends JPanel {
 			//
 			Graphics2D graphics2D = (Graphics2D) graphics;
 			setGrid(graphics, graphics2D);
-			for (int ictr = 0; ictr < 10; ++ictr)
+			for ( int ictr = 0; ictr < 10; ++ictr )
 				setPoints(graphics, graphics2D);
 		}
 
@@ -145,7 +157,7 @@ public class SwingSample extends JPanel {
 			Random random = null;
 			graphics.setColor(Color.white);
 			int xval, yval, trad;
-			for (int ictr = 0; ictr < 20; ++ictr) {
+			for ( int ictr = 0; ictr < 20; ++ictr ) {
 				random = new Random();
 				xval = random.nextInt(MXH - BFR);
 				yval = random.nextInt(MXV - BFR);
@@ -161,7 +173,7 @@ public class SwingSample extends JPanel {
 			//
 			System.out.print(actionEvent.getSource().toString());
 			// if ( actionEvent.getSource( ) == b1 ) { System.out.print( "GOOD" ) ; }
-			if (actionEvent.getSource() instanceof JComponent) {
+			if ( actionEvent.getSource() instanceof JComponent ) {
 				ANYJCOMPONENT.repaint();
 			}
 		}

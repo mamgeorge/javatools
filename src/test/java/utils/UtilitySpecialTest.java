@@ -120,7 +120,7 @@ public class UtilitySpecialTest {
 		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
 		//
 		Configuration configuration = getSphinxConfig();
-		StreamSpeechRecognizer ssRecognizer ;
+		StreamSpeechRecognizer ssRecognizer;
 		SpeechResult speechResultSS = null;
 		try {
 			FileInputStream FIS = new FileInputStream(pathFile);
@@ -130,7 +130,7 @@ public class UtilitySpecialTest {
 			speechResultSS = ssRecognizer.getResult();
 			ssRecognizer.stopRecognition();
 			System.out.println(speechResultSS.getHypothesis());
-			for ( WordResult wordResult : speechResultSS.getWords()) {
+			for ( WordResult wordResult : speechResultSS.getWords() ) {
 				System.out.println(wordResult);
 			}
 		}
@@ -144,7 +144,7 @@ public class UtilitySpecialTest {
 		// String pathFile = PATHFILE_LOCAL + "hal9000.wav";
 		//
 		Configuration configuration = getSphinxConfig();
-		LiveSpeechRecognizer lsRecognizer ;
+		LiveSpeechRecognizer lsRecognizer;
 		SpeechResult speechResultLS = null;
 		try {
 			// InputStream FIS = new FileInputStream(pathFile);
@@ -154,7 +154,7 @@ public class UtilitySpecialTest {
 			speechResultLS = lsRecognizer.getResult();
 			lsRecognizer.stopRecognition();
 			System.out.println(speechResultLS.getHypothesis());
-			for ( WordResult wordResult : speechResultLS.getWords()) {
+			for ( WordResult wordResult : speechResultLS.getWords() ) {
 				System.out.println(wordResult);
 			}
 		}

@@ -27,7 +27,8 @@ public class JsonTasks {
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
 			object = objectMapper.readValue(json, clazz);
-		} catch (JsonProcessingException ex) {
+		}
+		catch (JsonProcessingException ex) {
 			System.err.println(ex.getMessage());
 		}
 		return object;
@@ -41,7 +42,8 @@ public class JsonTasks {
 			JsonNode nodeRoot = objectMapper.readTree(json);
 			JsonNode nodePath = nodeRoot.at(fieldName);
 			txtLines = nodePath.textValue();
-		} catch (JsonProcessingException ex) {
+		}
+		catch (JsonProcessingException ex) {
 			System.err.println(ex.getMessage());
 		}
 		return txtLines;

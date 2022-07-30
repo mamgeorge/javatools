@@ -67,8 +67,8 @@ import java.util.zip.ZipInputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
-import static org.apache.http.HttpHeaders.USER_AGENT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import static org.apache.http.HttpHeaders.USER_AGENT;
 
 public class UtilityMain {
 
@@ -96,7 +96,7 @@ public class UtilityMain {
 	}
 
 	//#### basics
-	public static String showSys() {
+	public static String showSys( ) {
 		//
 		Map<String, String> mapEnv = System.getenv();
 		Map<String, String> mapEnvTree = new TreeMap<>(mapEnv);
@@ -115,7 +115,7 @@ public class UtilityMain {
 		return stringBuffer.toString();
 	}
 
-	public static String showTimes() {
+	public static String showTimes( ) {
 		//
 		String instantNow = Instant.now().toString();
 		//
@@ -149,20 +149,21 @@ public class UtilityMain {
 			catch (IOException ex) { LOGGER.warning( ex.getMessage( ) ); }
 		 */
 		String txtLines = "";
-		if (pathFile == null || pathFile.equals("")) {
+		if ( pathFile == null || pathFile.equals("") ) {
 			pathFile = FLD_SAMPLE + TXT_SAMPLE;
 		}
-		if (eol == null || eol.equals("")) {
+		if ( eol == null || eol.equals("") ) {
 			eol = EOL;
 		}
 		//
 		List<String> list;
-		try (BufferedReader bReader = Files.newBufferedReader(Paths.get(pathFile))) {
+		try ( BufferedReader bReader = Files.newBufferedReader(Paths.get(pathFile)) ) {
 			//
 			list = bReader.lines().collect(Collectors.toList());
 			txtLines = String.join(EOL, list);
 			txtLines = txtLines.replaceAll(EOL, eol);
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			LOGGER.warning(ex.getMessage());
 		}
 		//
@@ -174,14 +175,15 @@ public class UtilityMain {
 		// https://howtodoinjava.com/java/io/read-file-from-resources-folder/
 		// File file = ResourceUtils.getFile("classpath:config/sample.txt")
 		String txtLines = "";
-		if (pathFile == null || pathFile.equals("")) {
+		if ( pathFile == null || pathFile.equals("") ) {
 			pathFile = FLD_SAMPLE + TXT_SAMPLE;
 		}
 		try {
 			File fileLocal = new File(pathFile);
 			File pathFileLocal = new File(fileLocal.getAbsolutePath());
 			txtLines = Files.readString(pathFileLocal.toPath());
-		} catch (IOException | NullPointerException ex) {
+		}
+		catch (IOException | NullPointerException ex) {
 			LOGGER.warning(ex.getMessage());
 		}
 		return txtLines;
@@ -191,7 +193,7 @@ public class UtilityMain {
 		//
 		// https://www.baeldung.com/java-compress-and-uncompress
 		List<File> list = new ArrayList<>();
-		if (fileName == null || fileName.equals("")) {
+		if ( fileName == null || fileName.equals("") ) {
 			fileName = FLD_SAMPLE + ZIP_SAMPLE;
 		}
 		int BUFFER_SIZE = 4096;
@@ -208,21 +210,22 @@ public class UtilityMain {
 			byte[] bytes;
 			int intReadLen;
 			File file;
-			while (zipEntry != null) {
+			while ( zipEntry != null ) {
 				//
 				fileItem = zipEntry.getName();
 				file = new File(PATH_LOCAL_TEMP + fileItem);
 				intReadLen = 0;
 				bytes = new byte[BUFFER_SIZE];
 				fos = new FileOutputStream(file);
-				while ((intReadLen = zis.read(bytes)) > 0) {
+				while ( ( intReadLen = zis.read(bytes) ) > 0 ) {
 					fos.write(bytes, 0, intReadLen);
 				}
 				fos.close();
 				zipEntry = zis.getNextEntry();
 				list.add(file);
 			}
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			LOGGER.warning(ex.getMessage());
 		}
 		return list;
@@ -232,12 +235,12 @@ public class UtilityMain {
 		//
 		// https://www.baeldung.com/java-compress-and-uncompress
 		StringBuilder stringBuilder = new StringBuilder();
-		if (eol == null || eol.equals("")) {
+		if ( eol == null || eol.equals("") ) {
 			eol = EOL;
 		}
 		//
 		List<File> list = UtilityMain.getFilesFromZip(fileName);
-		for (File file : list) {
+		for ( File file : list ) {
 			stringBuilder.append(file.getName()).append(eol);
 		}
 		return stringBuilder.toString();
@@ -273,11 +276,12 @@ public class UtilityMain {
 			BufferedReader bufferedReader = new BufferedReader(isr);
 			StringBuilder stringBuilder = new StringBuilder();
 			String txtLine;
-			while ((txtLine = bufferedReader.readLine()) != null) {
+			while ( ( txtLine = bufferedReader.readLine() ) != null ) {
 				stringBuilder.append(txtLine + EOL);
 			}
 			txtLines = stringBuilder.toString();
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			txtLines = ex.getMessage();
 			LOGGER.log(Level.SEVERE, "#### ERROR: {0} ", txtLines);
 		}
@@ -311,10 +315,10 @@ public class UtilityMain {
 			BufferedReader bufferedReader;
 			StringBuilder stringBuilder = new StringBuilder();
 			String txtLine;
-			if (responseCode == HttpURLConnection.HTTP_OK) {
+			if ( responseCode == HttpURLConnection.HTTP_OK ) {
 				//
 				bufferedReader = new BufferedReader(isr);
-				while ((txtLine = bufferedReader.readLine()) != null) {
+				while ( ( txtLine = bufferedReader.readLine() ) != null ) {
 					stringBuilder.append(txtLine);
 				}
 				bufferedReader.close();
@@ -322,7 +326,8 @@ public class UtilityMain {
 			} else {
 				LOGGER.info("POST failed to: " + link);
 			}
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			txtLines = ex.getMessage();
 			LOGGER.log(Level.SEVERE, "#### ERROR: {0} ", txtLines);
 		}
@@ -352,31 +357,31 @@ public class UtilityMain {
 			//
 			System.out.println("1 Send normal parms");
 			writer.append("--").append(boundary).append(CRLF)
-					.append("Content-Disposition: form-data; name=\"param\"").append(CRLF)
-					.append("Content-Type: text/plain; charset=").append(UTF_8.toString()).append(CRLF)
-					.append(CRLF).append(postParms).append(CRLF)
-					.flush();
+				.append("Content-Disposition: form-data; name=\"param\"").append(CRLF)
+				.append("Content-Type: text/plain; charset=").append(UTF_8.toString()).append(CRLF)
+				.append(CRLF).append(postParms).append(CRLF)
+				.flush();
 			//
 			System.out.println("2 Send text file in charset UTF_8");
 			writer.append("--").append(boundary).append(CRLF)
-					.append("Content-Disposition: form-data; name=\"textFile\"; filename=\"")
-					.append(fileTxt.getName()).append("\"").append(CRLF)
-					.append("Content-Type: text/plain; charset=").append(UTF_8.toString()).append(CRLF)
-					.append(CRLF)
-					.flush();
+				.append("Content-Disposition: form-data; name=\"textFile\"; filename=\"")
+				.append(fileTxt.getName()).append("\"").append(CRLF)
+				.append("Content-Type: text/plain; charset=").append(UTF_8.toString()).append(CRLF)
+				.append(CRLF)
+				.flush();
 			Files.copy(fileTxt.toPath(), outputStream);
 			outputStream.flush(); // Important before continuing with writer!
 			writer.append(CRLF).flush(); // CRLF indicates end of boundary
 			//
 			System.out.println("3 Send binary file");
 			writer.append("--").append(boundary).append(CRLF)
-					.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"")
-					.append(fileBin.getName()).append("\"").append(CRLF);
+				.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"")
+				.append(fileBin.getName()).append("\"").append(CRLF);
 			String fileBinContentType = URLConnection.guessContentTypeFromName(fileBin.getName());
 			writer.append("Content-Type: ").append(fileBinContentType).append(CRLF)
-					.append("Content-Transfer-Encoding: binary").append(CRLF)
-					.append(CRLF)
-					.flush();
+				.append("Content-Transfer-Encoding: binary").append(CRLF)
+				.append(CRLF)
+				.flush();
 			Files.copy(fileBin.toPath(), outputStream);
 			outputStream.flush(); // Important before continuing with writer!
 			writer.append(CRLF).flush(); // CRLF indicates end of boundary
@@ -385,9 +390,10 @@ public class UtilityMain {
 			writer.append("--").append(boundary).append("--").append(CRLF).flush();
 			//
 			System.out.println("5 request lazily fired to get response info");
-			int responseCode = ((HttpURLConnection) urlConn).getResponseCode();
+			int responseCode = ( (HttpURLConnection) urlConn ).getResponseCode();
 			txtLines = "responseCode: " + responseCode; // should be 200
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			txtLines = ex.getMessage();
 			LOGGER.log(Level.SEVERE, "#### ERROR: {0} ", txtLines);
 		}
@@ -405,7 +411,8 @@ public class UtilityMain {
 			field.setAccessible(true);
 			Object objectField = field.get(object);
 			txtLine = objectField.toString();
-		} catch (NoSuchFieldException | IllegalAccessException ex) {
+		}
+		catch (NoSuchFieldException | IllegalAccessException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return txtLine;
@@ -417,18 +424,19 @@ public class UtilityMain {
 		try {
 			int parmsCount = 0;
 			Object objectItem = null;
-			if (objectParms == null || objectParms.length == 0) {
+			if ( objectParms == null || objectParms.length == 0 ) {
 			} else {
 				parmsCount = objectParms.length;
 			}
 			Class<?>[] classArray = new Class<?>[parmsCount];
-			for (int ictr = 0; ictr < parmsCount; ictr++) {
+			for ( int ictr = 0; ictr < parmsCount; ictr++ ) {
 				try {
 					objectItem = objectParms[ictr];
-				} catch (NullPointerException ex) {
+				}
+				catch (NullPointerException ex) {
 					LOGGER.info(ex.getMessage());
 				}
-				if (objectItem == null) {
+				if ( objectItem == null ) {
 					classArray = new Class<?>[0];
 					objectParms = null;
 				} else {
@@ -441,8 +449,9 @@ public class UtilityMain {
 			Method method = clazz.getDeclaredMethod(nameMethod, classArray);
 			method.setAccessible(true);
 			objectReturn = method.invoke(objectInstance, objectParms);
-		} catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException |
-				InvocationTargetException | InstantiationException ex) {
+		}
+		catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException |
+		       InvocationTargetException | InstantiationException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return objectReturn;
@@ -462,32 +471,33 @@ public class UtilityMain {
 			//
 			Object objectVal = "";
 			String returnType = mthd.getReturnType().toString();
-			if (returnType.length() > MAXLEN) {
+			if ( returnType.length() > MAXLEN ) {
 				returnType = returnType.substring(returnType.length() - MAXLEN);
 			}
 			mthd.setAccessible(true);
 			boolean boolClass = mthd.getReturnType().toString().startsWith("class");
 			boolean boolCount = mthd.getParameterCount() == 0;
-			if (boolClass & boolCount) {
+			if ( boolClass & boolCount ) {
 				try {
 					objectVal = mthd.invoke(object, args);
-				} catch (IllegalAccessException | InvocationTargetException ex) {
+				}
+				catch (IllegalAccessException | InvocationTargetException ex) {
 					LOGGER.info(ex.getMessage());
 				}
-				if (objectVal == null) {
+				if ( objectVal == null ) {
 					objectVal = "NULL or EMPTY";
 				}
 			}
 			boolean boolAccess = mthd.getName().startsWith("access$");
-			if (!boolAccess) {
+			if ( !boolAccess ) {
 				set.add(String.format(FRMT, atomicInteger.incrementAndGet(),
-						mthd.getName(), returnType, mthd.getParameterCount(), objectVal));
+					mthd.getName(), returnType, mthd.getParameterCount(), objectVal));
 			}
 		});
 		//
 
 		stringBuilder.append(object.getClass().getName()).append(" has: [").append(methods.length)
-				.append("] methods\n\n");
+			.append("] methods\n\n");
 		set.stream().sorted().forEach(val -> stringBuilder.append(val));
 		return stringBuilder + "\n";
 	}
@@ -499,7 +509,8 @@ public class UtilityMain {
 			Field field = clazz.getDeclaredField(objectName);
 			field.setAccessible(true);
 			field.set(object, objectValue);
-		} catch (NoSuchFieldException | IllegalAccessException ex) {
+		}
+		catch (NoSuchFieldException | IllegalAccessException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 	}
@@ -514,7 +525,8 @@ public class UtilityMain {
 			InputSource inputSource = new InputSource(stringReader);
 			XPath xPath = XPathFactory.newInstance().newXPath();
 			txtLines = xPath.evaluate(xpathTxt, inputSource);
-		} catch (XPathExpressionException ex) {
+		}
+		catch (XPathExpressionException ex) {
 			LOGGER.warning(ex.getMessage());
 		}
 		return txtLines;
@@ -523,7 +535,7 @@ public class UtilityMain {
 	public static String formatXml(String xmlOld) {
 		//
 		String xml = "";
-		if (xmlOld == null || xmlOld.equals("")) {
+		if ( xmlOld == null || xmlOld.equals("") ) {
 			xmlOld = getFileLocal(FLD_SAMPLE + XML_SAMPLE);
 		}
 		//
@@ -534,7 +546,8 @@ public class UtilityMain {
 			StringReader stringReader = new StringReader(xmlOld);
 			InputSource inputSource = new InputSource(stringReader);
 			document = documentBuilder.parse(inputSource);
-		} catch (ParserConfigurationException | SAXException | IOException ex) {
+		}
+		catch (ParserConfigurationException | SAXException | IOException ex) {
 			LOGGER.warning(ex.getMessage());
 		}
 		try {
@@ -551,7 +564,8 @@ public class UtilityMain {
 			DOMSource domSource = new DOMSource(document);
 			transformer.transform(domSource, streamResultXML);
 			xml = streamResultXML.getWriter().toString();
-		} catch (TransformerException ex) {
+		}
+		catch (TransformerException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		return xml;
@@ -577,7 +591,8 @@ public class UtilityMain {
 			// transform it
 			transformer.transform(streamSourceXML, result);
 			txtLines = baos.toString();
-		} catch (TransformerException ex) {
+		}
+		catch (TransformerException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		//
@@ -605,8 +620,9 @@ public class UtilityMain {
 			// convert json to node object; "path" also works, "at" does not
 			ObjectMapper objectMapperNode = new ObjectMapper();
 			JsonNode jsonNode = objectMapperNode.readTree(json);
-			txtLine = (jsonNode.get(applicationNode)).asText();
-		} catch (IOException ex) {
+			txtLine = ( jsonNode.get(applicationNode) ).asText();
+		}
+		catch (IOException ex) {
 			LOGGER.warning(ex.getMessage());
 		}
 		//
@@ -626,14 +642,14 @@ public class UtilityMain {
 		String PFX = TAB;
 		String MID = " : ";
 		String SFX = "";
-		if (listFormat > 0) {
+		if ( listFormat > 0 ) {
 			PFX = "<tr><th>";
 			MID = "</th<td>";
 			SFX = "</td></tr>";
 		}
 		try {
 			arrayList = objectMapperHtml.readValue(jsonArr, typeReference);
-			for (LinkedHashMap<String, String> linkedHashMap : arrayList) {
+			for ( LinkedHashMap<String, String> linkedHashMap : arrayList ) {
 				//
 				set = linkedHashMap.keySet();
 				txtKey = set.toString().substring(1, set.toString().length() - 1);
@@ -642,7 +658,8 @@ public class UtilityMain {
 				txtLines += PFX + txtKey + MID + txtVal + SFX;
 			}
 			System.out.println("txtLines: " + txtLines);
-		} catch (JsonProcessingException ex) {
+		}
+		catch (JsonProcessingException ex) {
 			LOGGER.warning(ex.getMessage());
 		}
 		return txtLines;

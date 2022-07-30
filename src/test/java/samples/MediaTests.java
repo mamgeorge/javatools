@@ -126,7 +126,8 @@ public class MediaTests {
 		catch (UnsupportedAudioFileException | IOException | LineUnavailableException |
 		       InterruptedException ex) {
 			System.out.println("ERROR file: " + ex.getMessage());
-		} finally {
+		}
+		finally {
 			try {
 				clip.close();
 				AIS.close();

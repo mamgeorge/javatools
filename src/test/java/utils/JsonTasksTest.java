@@ -28,31 +28,31 @@ public class JsonTasksTest {
 	private static final String ASSERT_MSG = "ASSERT_MSG";
 	private String json = "";
 
-	@BeforeEach void init() {
+	@BeforeEach void init( ) {
 		//
 		json = UtilityMain.getFileLocal(JSONFILE);
 		System.out.println(json.substring(0, 20));
 	}
 
-	@Test void getJsonPath() {
+	@Test void getJsonPath( ) {
 		//
 		String txtLines = "#### getJsonPath" + EOL;
-		String[] fieldNames = {"id", "author", "price", "title"}; // catalog.book[*].
+		String[] fieldNames = { "id", "author", "price", "title" }; // catalog.book[*].
 		int aint = 1;
 		//
 		// txtLines += JsonTasks.getJsonPath(json, "vehicle[*].model");
 		StringBuilder stringBuilder = new StringBuilder();
-		for (String jpath : fieldNames) {
+		for ( String jpath : fieldNames ) {
 			stringBuilder
-					.append(String.format("\t%s",
-							JsonTasks.getJsonPath(json, "catalog.book[" + aint + "]." + jpath)));
+				.append(String.format("\t%s",
+					JsonTasks.getJsonPath(json, "catalog.book[" + aint + "]." + jpath)));
 		}
 		txtLines += stringBuilder.toString();
 		System.out.println(txtLines);
 		assertTrue(txtLines.contains("Midnight"));
 	}
 
-	@Test void getJsonNodeObject() {
+	@Test void getJsonNodeObject( ) {
 		//
 		String txtLines = "#### getJsonNodeObject" + EOL;
 		BooksCatalog booksCatalog = (BooksCatalog) JsonTasks.getJsonNodeObject(BooksCatalog.class, json);
@@ -63,10 +63,10 @@ public class JsonTasksTest {
 		assertTrue(title.contains("Developers"));
 	}
 
-	@Test void getJsonNode() {
+	@Test void getJsonNode( ) {
 		//
 		String txtLines = "#### getJsonNode" + EOL;
-		String[] fieldNames = {"id", "author", "price", "title"};
+		String[] fieldNames = { "id", "author", "price", "title" };
 		int aint = 3;
 		//
 		String jsonValue = JsonTasks.getJsonNode(json, "/catalog/book/" + aint + "/" + fieldNames[aint]);
@@ -76,7 +76,7 @@ public class JsonTasksTest {
 		assertTrue(jsonValue.contains("Oberon"));
 	}
 
-	@Test void test_objectMapper() {
+	@Test void test_objectMapper( ) {
 		//
 		String txtLine = "";
 		String JSON_PATH = "/catalog/book/0/author";
@@ -88,7 +88,8 @@ public class JsonTasksTest {
 			JsonNode jsonNodeAt = jsonNodeRoot.at(JSON_PATH);
 			txtLine = jsonNodeAt.asText();
 			// txtLine = jsonNodeRoot.at(JsonPointer.compile(jsonPath)).asText();
-		} catch (JsonProcessingException ex) {
+		}
+		catch (JsonProcessingException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
 		//
@@ -96,7 +97,7 @@ public class JsonTasksTest {
 		assertTrue(txtLine.equals("Gambardella , Matthew"), ASSERT_MSG);
 	}
 
-	@Test void test_getJsonValue_fromPath() {
+	@Test void test_getJsonValue_fromPath( ) {
 		//
 		String json = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.json");
 		String jsonPath = "catalog.book[0].price"; // "/catalog/book/0/price";
@@ -110,7 +111,7 @@ public class JsonTasksTest {
 		assertTrue(txtLine.equals("44.95"), ASSERT_MSG);
 	}
 
-	@Test void getXmlNode() {
+	@Test void getXmlNode( ) {
 		//
 		String xml = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.xml");
 		String xmlPath = "/catalog/book[5]/price";
@@ -119,7 +120,7 @@ public class JsonTasksTest {
 		assertTrue(txtLines.contains("5.95"), ASSERT_MSG);
 	}
 
-	@Test void formatXml() {
+	@Test void formatXml( ) {
 		//
 		String xml = "<a><b><c>Boo</c></b></a>";
 		String txtLines = UtilityMain.formatXml(xml);
@@ -127,7 +128,7 @@ public class JsonTasksTest {
 		assertTrue(txtLines.split("\n").length >= 5, ASSERT_MSG);
 	}
 
-	@Test void formatJson() {
+	@Test void formatJson( ) {
 		//
 		String json = "{\"a\":\"aleph\",\"b\":\"beth\",\"g\":\"gimmel\"}";
 		String txtLines = "";
@@ -136,7 +137,8 @@ public class JsonTasksTest {
 			ObjectMapper objectMapper = new ObjectMapper();
 			Object object = objectMapper.readValue(json, Object.class);
 			txtLines += objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object) + EOL;
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			LOGGER.info(ex.getMessage());
 		}
 		//
@@ -149,9 +151,9 @@ public class JsonTasksTest {
 		assertTrue(txtLines.split("\n").length >= 5, ASSERT_MSG);
 	}
 
-	@Test void parseYaml2JsonNode() {
+	@Test void parseYaml2JsonNode( ) {
 	}
 
-	@Test void parseJsonList2List() {
+	@Test void parseJsonList2List( ) {
 	}
 }

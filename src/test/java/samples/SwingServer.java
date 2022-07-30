@@ -1,7 +1,8 @@
 package samples;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
+import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class SwingServer extends JFrame {
 	private final JTextArea jTextArea = new JTextArea();
 	private final int PORT = 9000;
 
-	public SwingServer() {
+	public SwingServer( ) {
 		setTitle("Additional_Server");
 		jTextArea.setBackground(Color.BLACK);
 		jTextArea.setForeground(Color.GREEN);
@@ -37,10 +38,10 @@ public class SwingServer extends JFrame {
 		new SwingServer();
 	}
 
-	private void startServer() {
+	private void startServer( ) {
 		//
 		boolean connected;
-		while (true) {
+		while ( true ) {
 			try {
 				InetAddress INA = InetAddress.getLocalHost();
 				System.out.println("INA: " + INA.toString());
@@ -60,7 +61,7 @@ public class SwingServer extends JFrame {
 				String txtClient = DIS.readUTF();
 				jTextArea.append("Connection established with " + txtClient + EOL);
 				int first, second, sum;
-				while (connected) {
+				while ( connected ) {
 					//
 					first = DIS.readInt();
 					second = DIS.readInt();
@@ -70,7 +71,8 @@ public class SwingServer extends JFrame {
 					jTextArea.append("Sum returned: " + sum + "\n\n");
 					DOS.writeInt(sum); // DOS.writeUTF(txtSum);
 				}
-			} catch (IOException ex) {
+			}
+			catch (IOException ex) {
 				connected = false;
 				LOGGER.info(ex.getMessage());
 			}

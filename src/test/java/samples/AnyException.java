@@ -9,7 +9,7 @@ public class AnyException extends IllegalStateException {
 
 	static final Logger LOGGER = Logger.getLogger(UtilityMainTest.class.getName());
 
-	public AnyException() {
+	public AnyException( ) {
 		//
 		LOGGER.info("AnyException(" + Instant.now().toString() + ")");
 	}

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class Catalog {
 
-	@JsonProperty("book") public List<Book> book;
+	@JsonProperty( "book" ) public List<Book> book;
 }
