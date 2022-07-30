@@ -143,8 +143,6 @@ public class UtilityMockTest {
 	/*
 		https://roytuts.com/how-to-test-private-methods-using-junit-5/
 		Reflection, Spring ReflectionTestUtils, Powermock
-		https://stackoverflow.com/questions/46454995/how-to-hide-warning-illegal-reflective-access-in-java-9-without-jvm-argument
-		configure JDK compiler with flag: --illegal-access=permit
 	*/
 	@Test void testReflection_getPrivateText( ) {
 		//
@@ -169,6 +167,9 @@ public class UtilityMockTest {
 
 	@Test void testWhitebox_getPrivateText( ) {
 		//
+		// https://stackoverflow.com/questions/46454995/how-to-hide-warning-illegal-reflective-access-in-java-9-without-jvm-argument
+		// configure JDK compiler with flag: --illegal-access=permit
+		// System.err.close(); System.setErr(System.out);
 		String results = "";
 		String expects = "PRIVATE_TEXT!";
 		System.err.close();
@@ -184,6 +185,8 @@ public class UtilityMockTest {
 
 	@Test void testRTU_getPrivateText( ) {
 		//
+		// for SLF4J multiple bindings used by ReflectionTestUtils, build.gradle needs:
+		// exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
 		String expects = "PRIVATE_TEXT!";
 		AnyObject anyObject = new AnyObject();
 		String results = ReflectionTestUtils.invokeMethod(anyObject, "getPrivateText");
