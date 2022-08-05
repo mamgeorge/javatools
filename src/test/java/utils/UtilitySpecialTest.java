@@ -22,6 +22,7 @@ import io.opentracing.Tracer;
 import org.apache.commons.collections4.list.TreeList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import samples.AnyException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,6 +36,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,6 +47,25 @@ public class UtilitySpecialTest {
 
 	static final String PATHFILE_LOCAL = "src/test/resources/";
 	static final String ASSERT_MSG = "ASSERT_MSG";
+
+	@Test void test_UUID( ) {
+		//
+		String txtLines = "";
+		byte[] bytes = "1234".getBytes();
+		txtLines += "base64 getEncoder: " + Base64.getEncoder().encodeToString(bytes) + EOL;
+		txtLines += "base64 getUrlEncoder: " + Base64.getUrlEncoder().encodeToString(bytes) + EOL;
+		txtLines += "base64 getMimeEncoder: " + Base64.getMimeEncoder().encodeToString(bytes) + EOL;
+		txtLines += new String(new char[20]).replace('\u0000', '-') + EOL;
+		//
+		UUID uuid = UUID.randomUUID();
+		txtLines += "UUID randomUUID(): " + uuid + EOL;
+		txtLines += "UUID replace toUpperCase: " + uuid.toString().replace("-", "").toUpperCase() + EOL;
+		try { txtLines += "UUID fromString(): " + UUID.fromString("3bf121bc-14e9-45fa-9b38-b264759eb233") + EOL; }
+		catch (IllegalArgumentException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		//
+		System.out.println(txtLines);
+		assertNotNull(txtLines);
+	}
 
 	@Test void test_transformXslt( ) {
 		//
@@ -92,7 +113,7 @@ public class UtilitySpecialTest {
 		assertTrue(list.size() >= 7, ASSERT_MSG);
 	}
 
-	@Test @Disabled void test_sphinx4_STT( ) {
+	@Test @Disabled("too slow") void test_sphinx4_STT( ) {
 		//
 		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
 		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
@@ -114,7 +135,7 @@ public class UtilitySpecialTest {
 		assertNotNull(speechResult, ASSERT_MSG);
 	}
 
-	@Test @Disabled void test_sphinx4_TTS_SS( ) {
+	@Test @Disabled("too slow") void test_sphinx4_TTS_SS( ) {
 		//
 		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
 		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
@@ -138,7 +159,7 @@ public class UtilitySpecialTest {
 		assertNotNull(speechResultSS, ASSERT_MSG);
 	}
 
-	@Test @Disabled void test_sphinx4_TTS_LS( ) {
+	@Test @Disabled("too slow") void test_sphinx4_TTS_LS( ) {
 		//
 		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
 		// String pathFile = PATHFILE_LOCAL + "hal9000.wav";
@@ -229,6 +250,7 @@ public class UtilitySpecialTest {
 		//
 		System.out.println(controller.toString());
 		// controller.run();
+		assertNotNull(controller.toString());
 	}
 
 	//#### statics

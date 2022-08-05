@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.TAB;
@@ -182,12 +183,6 @@ public class UtilityMainTest {
 		assertEquals(countFiles, fileNames.length, ASSERT_MSG);
 	}
 
-	@Test void getZipFileList( ) {
-	}
-
-	@Test void putFilesIntoZip( ) {
-	}
-
 	//#### url
 	@Test void urlGet( ) {
 		//
@@ -196,27 +191,21 @@ public class UtilityMainTest {
 		assertTrue(html.contains("DOCTYPE"), ASSERT_MSG);
 	}
 
-	@Test void urlPost( ) {
-	}
-
-	@Test void urlPostFile( ) {
-	}
-
 	//#### reflection
 	@Test void test_getField( ) {
 		//
-		String txtLine = UtilityMain.getField(new AnyObject(), "gamma");
-		System.out.println("txtLine: " + txtLine);
-		assertEquals(txtLine, "GIMMEL", ASSERT_MSG);
+		String results = UtilityMain.getField(new AnyObject(), "gamma");
+		System.out.println("results: " + results);
+		assertEquals("GIMMEL", results, ASSERT_MSG);
 	}
 
 	@Test void test_getMethod( ) {
 		//
 		Object objectParms = null;
 		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma", objectParms);
-		String txtLine = object.toString();
-		System.out.println(txtLine);
-		assertEquals(txtLine, "GIMMEL", ASSERT_MSG);
+		String results = object.toString();
+		System.out.println(results);
+		assertEquals("GIMMEL", results, ASSERT_MSG);
 	}
 
 	@Test void test_exposeObject( ) {
@@ -224,16 +213,16 @@ public class UtilityMainTest {
 		AnyObject anyObject = new AnyObject();
 		String txtLines = UtilityMain.exposeObject(anyObject);
 		System.out.println(txtLines);
-		assertTrue(txtLines.split(EOL).length >= 6, ASSERT_MSG);
+		assertNotNull(txtLines, ASSERT_MSG);
 	}
 
 	@Test void test_putObject( ) {
 		//
 		AnyObject anyObject = new AnyObject();
 		UtilityMain.putObject(anyObject, "gamma", "STUFF");
-		String txtLine = UtilityMain.getField(anyObject, "gamma");
-		System.out.println(txtLine);
-		assertEquals(txtLine, "STUFF", ASSERT_MSG);
+		String results = UtilityMain.getField(anyObject, "gamma");
+		System.out.println(results);
+		assertEquals("STUFF", results, ASSERT_MSG);
 	}
 }
 //----

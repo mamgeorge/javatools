@@ -63,7 +63,7 @@ public class MediaTests {
 		}
 	}
 
-	@Test void audio_tone_test( ) {
+	@Test @Disabled("too slow") void audio_tone_test( ) {
 		//
 		System.out.println("AudioFormat tone");
 		// https://stackoverflow.com/questions/34611134/java-beep-sound-produce-sound-of-some-specific-frequencies
@@ -96,7 +96,7 @@ public class MediaTests {
 		sourceDataLine.close();
 	}
 
-	@Test @Disabled void audio_file_test( ) {
+	@Test @Disabled("too slow") void audio_file_test( ) {
 		//
 		System.out.println("AudioInputStream file");
 		int fileNum = 0;

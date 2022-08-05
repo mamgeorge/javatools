@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import lombok.NonNull;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -50,10 +51,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -100,19 +104,19 @@ public class UtilityMain {
 		//
 		Map<String, String> mapEnv = System.getenv();
 		Map<String, String> mapEnvTree = new TreeMap<>(mapEnv);
-		StringBuffer stringBuffer = new StringBuffer();
-		stringBuffer.append("[");
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[");
 		AtomicInteger aint = new AtomicInteger();
 		mapEnvTree.forEach((key, val) -> {
 			//
 			val = val.replace("\\", "/");
 			val = val.replace("\"", "'");
 			// stringBuffer.append("{\"" + key + "\":\"" + val + "\"},");
-			stringBuffer.append(String.format("\t%03d %-20s : %s\n", aint.incrementAndGet(), key, val));
+			stringBuilder.append(String.format("\t%03d %-20s : %s\n", aint.incrementAndGet(), key, val));
 		});
-		stringBuffer.append("]\n");
-		stringBuffer.append("\tUSERNAME: ").append(System.getenv("USERNAME")).append(EOL);
-		return stringBuffer.toString();
+		stringBuilder.append("]\n");
+		stringBuilder.append("\tUSERNAME: ").append(System.getenv("USERNAME")).append(EOL);
+		return stringBuilder.toString();
 	}
 
 	public static String showTimes( ) {
@@ -324,7 +328,7 @@ public class UtilityMain {
 				bufferedReader.close();
 				txtLines = stringBuilder.toString();
 			} else {
-				LOGGER.info("POST failed to: " + link);
+				LOGGER.info(String.format("POST failed to: %s", link));
 			}
 		}
 		catch (IOException ex) {
@@ -348,7 +352,6 @@ public class UtilityMain {
 			urlConn = url.openConnection();
 			urlConn.setDoOutput(true);
 			urlConn.setRequestProperty(CONTENT_TYPE, "multipart/form-data; boundary=" + boundary);
-			//	urlConn.setRequestProperty( "Authorization", "JWT " + jwtSourceId );
 			//
 			System.out.println("0 urlConn.getOutputStream( )");
 			OutputStream outputStream = urlConn.getOutputStream();
@@ -444,7 +447,6 @@ public class UtilityMain {
 				}
 			}
 			//
-			// Class clazz = object.getClass();
 			Object objectInstance = clazz.getDeclaredConstructor().newInstance();
 			Method method = clazz.getDeclaredMethod(nameMethod, classArray);
 			method.setAccessible(true);
@@ -460,46 +462,63 @@ public class UtilityMain {
 	public static String exposeObject(Object object) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
-		Set set = new TreeSet();
+		Set<String> setString = new TreeSet<>();
 		Method[] methods = object.getClass().getDeclaredMethods();
+		List<Method> listMethods = new ArrayList<>();
+		Arrays.stream(methods).forEach(method -> listMethods.add(method));
+		Collections.sort(listMethods, Comparator.comparing(Method::getName));
 		//
-		Object[] args = null;
 		int MAXLEN = 35;
-		String FRMT = "\t%02d %-25s | %-35s | %02d | %s \n";
-		AtomicInteger atomicInteger = new AtomicInteger();
-		Arrays.stream(methods).forEach(mthd -> {
+		AtomicInteger usedMethods = new AtomicInteger();
+		String FRMT = "%-30s | %-35s | %02d | %s \n";
+		listMethods.forEach(method -> {
 			//
-			Object objectVal = "";
-			String returnType = mthd.getReturnType().toString();
-			if ( returnType.length() > MAXLEN ) {
-				returnType = returnType.substring(returnType.length() - MAXLEN);
-			}
-			mthd.setAccessible(true);
-			boolean boolClass = mthd.getReturnType().toString().startsWith("class");
-			boolean boolCount = mthd.getParameterCount() == 0;
-			if ( boolClass & boolCount ) {
+			String methodName = method.getName();
+			boolean boolAccess = methodName.startsWith("access$") | methodName.startsWith("$$$");
+			if ( !boolAccess ) {
+				usedMethods.incrementAndGet();
+				Object objectVal = "";
+				String returnType = method.getReturnType().toString();
+				if ( returnType.length() > MAXLEN ) {
+					returnType = returnType.substring(returnType.length() - MAXLEN);
+				}
+				method.setAccessible(true);
+				Object[] args;
+				if ( method.getParameterCount() > 0 ) {
+					if ( method.getParameterTypes()[0].getName().contains("String") ) {
+						args = new Object[]{ "RANDOM: " + getRandomString(8) };
+					} else if ( method.getParameterTypes()[0].getName().contains("Date") ) {
+						args = new Object[]{ new Date() };
+					} else if ( method.getParameterTypes()[0].getName().contains("int") ) {
+						args = new Object[]{ (int) Math.round(Math.random() * 4000) };
+					} else {
+						String parmname = method.getParameterTypes()[0].getName();
+						args = new Object[]{ parmname };
+					}
+				} else { args = null; }
 				try {
-					objectVal = mthd.invoke(object, args);
+					objectVal = method.invoke(object, args);
+					if ( objectVal == null ) {
+						if ( method.getParameterCount() == 0 ) { objectVal = null; } else {
+							objectVal = args[0];
+						}
+					}
 				}
 				catch (IllegalAccessException | InvocationTargetException ex) {
-					LOGGER.info(ex.getMessage());
+					LOGGER.info(methodName + " | " + ex.getMessage());
 				}
-				if ( objectVal == null ) {
-					objectVal = "NULL or EMPTY";
-				}
-			}
-			boolean boolAccess = mthd.getName().startsWith("access$");
-			if ( !boolAccess ) {
-				set.add(String.format(FRMT, atomicInteger.incrementAndGet(),
-					mthd.getName(), returnType, mthd.getParameterCount(), objectVal));
+				catch (IllegalArgumentException IAE) { objectVal = "REQUIRES: " + args[0]; }
+				setString.add(String.format(FRMT, methodName, returnType, method.getParameterCount(), objectVal));
 			}
 		});
 		//
-
-		stringBuilder.append(object.getClass().getName()).append(" has: [").append(methods.length)
+		stringBuilder.append(object.getClass().getName()).append(" has: [").append(usedMethods)
 			.append("] methods\n\n");
-		set.stream().sorted().forEach(val -> stringBuilder.append(val));
-		return stringBuilder + "\n";
+		AtomicInteger atomicInteger = new AtomicInteger();
+		setString.stream().forEach(
+			val -> stringBuilder.append(
+				String.format("\t %02d %s", atomicInteger.incrementAndGet(), val)));
+		return stringBuilder + EOL;
 	}
 
 	public static void putObject(Object object, String objectName, Object objectValue) {
@@ -513,6 +532,18 @@ public class UtilityMain {
 		catch (NoSuchFieldException | IllegalAccessException ex) {
 			LOGGER.severe(ex.getMessage());
 		}
+	}
+
+	@NonNull private static String getRandomString(int num) {
+		//
+		StringBuilder txtRandom = new StringBuilder();
+		Random random = new Random();
+		char[] chars =
+			( "1234567890abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWZYZ" ).toCharArray();
+		for ( int ictr = 0; ictr < num; ictr++ ) {
+			txtRandom.append(chars[random.nextInt(chars.length)]);
+		}
+		return txtRandom.toString();
 	}
 
 	//#### xml/yml/json
@@ -554,7 +585,7 @@ public class UtilityMain {
 			StringWriter stringWriter = new StringWriter();
 			StreamResult streamResultXML = new StreamResult(stringWriter);
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			// tf.setAttribute( "indent-number", 4 );
+			//
 			Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
@@ -610,14 +641,10 @@ public class UtilityMain {
 			YAMLFactory yamlFactory = new YAMLFactory();
 			ObjectMapper objectMapperYaml = new ObjectMapper(yamlFactory);
 			Object objectYaml = objectMapperYaml.readValue(inputStream, Map.class);
-			// System.out.println( "yaml: " + objectYaml );
 			//
-			// convert yaml to json
 			ObjectMapper objectMapperJson = new ObjectMapper();
 			String json = objectMapperJson.writeValueAsString(objectYaml);
-			// System.out.println( "json: " + json );
 			//
-			// convert json to node object; "path" also works, "at" does not
 			ObjectMapper objectMapperNode = new ObjectMapper();
 			JsonNode jsonNode = objectMapperNode.readTree(json);
 			txtLine = ( jsonNode.get(applicationNode) ).asText();
