@@ -22,4 +22,6 @@ public class AnyObject {
 		beta = "BETH";
 		gamma = "GIMMEL";
 	}
+
+	public void printedSomething() { System.out.println("PRINTED_SOMETHING"); };
 }

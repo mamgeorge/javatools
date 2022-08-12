@@ -462,7 +462,7 @@ public class UtilityMain {
 	public static String exposeObject(Object object) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
-		Set<String> setString = new TreeSet<>();
+		Set<String> setLines = new TreeSet<>();
 		Method[] methods = object.getClass().getDeclaredMethods();
 		List<Method> listMethods = new ArrayList<>();
 		Arrays.stream(methods).forEach(method -> listMethods.add(method));
@@ -508,16 +508,17 @@ public class UtilityMain {
 					LOGGER.info(methodName + " | " + ex.getMessage());
 				}
 				catch (IllegalArgumentException IAE) { objectVal = "REQUIRES: " + args[0]; }
-				setString.add(String.format(FRMT, methodName, returnType, method.getParameterCount(), objectVal));
+				setLines.add(
+					String.format(FRMT, methodName, returnType, method.getParameterCount(), objectVal));
 			}
 		});
 		//
 		stringBuilder.append(object.getClass().getName()).append(" has: [").append(usedMethods)
 			.append("] methods\n\n");
+
 		AtomicInteger atomicInteger = new AtomicInteger();
-		setString.stream().forEach(
-			val -> stringBuilder.append(
-				String.format("\t %02d %s", atomicInteger.incrementAndGet(), val)));
+		setLines.stream().forEach(val -> stringBuilder.append(String.format("\t %02d %s",
+			atomicInteger.incrementAndGet(), val)));
 		return stringBuilder + EOL;
 	}
 
@@ -525,7 +526,12 @@ public class UtilityMain {
 		//
 		try {
 			Class<?> clazz = object.getClass();
-			Field field = clazz.getDeclaredField(objectName);
+			Field field = null;
+			try { field = clazz.getDeclaredField(objectName); }
+			catch (NoSuchFieldException ex) {
+				Class<?> superClazz = clazz.getSuperclass();
+				field = superClazz.getDeclaredField(objectName);
+			}
 			field.setAccessible(true);
 			field.set(object, objectValue);
 		}

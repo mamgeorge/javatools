@@ -1,7 +1,10 @@
 package utils;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 import org.springframework.test.util.ReflectionTestUtils;
 import samples.AnyException;
@@ -17,19 +20,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.doNothing;
 
+@TestInstance( TestInstance.Lifecycle.PER_CLASS ) // requried for @BeforeAll
 public class UtilityMockTest {
 
 	static final Logger LOGGER = Logger.getLogger(UtilityMockTest.class.getName());
 	static final String ASSERT_MSG = "ASSERT_MSG";
 	static final String SAMPLE = "OMEGA";
 	static final String EOL = "\n";
+
+	@BeforeAll void init( ) {
+		// PowerMock use of private static final types require resources MockMaker mock-maker-inline
+
+		// PowerMock remove mock reflection error
+		System.err.close();
+		System.setErr(System.out);
+	}
 
 	@Test void testmock_when_thenReturn( ) {
 		//
@@ -165,24 +178,6 @@ public class UtilityMockTest {
 		assertEquals(expects, results, ASSERT_MSG);
 	}
 
-	@Test void testWhitebox_getPrivateText( ) {
-		//
-		// https://stackoverflow.com/questions/46454995/how-to-hide-warning-illegal-reflective-access-in-java-9-without-jvm-argument
-		// configure JDK compiler with flag: --illegal-access=permit
-		// System.err.close(); System.setErr(System.out);
-		String results = "";
-		String expects = "PRIVATE_TEXT!";
-		System.err.close();
-		System.setErr(System.out);
-		//
-		AnyObject anyObject = new AnyObject();
-		try { results = Whitebox.invokeMethod(anyObject, "getPrivateText").toString(); }
-		catch (Exception ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		//
-		System.out.println("results: " + results);
-		assertEquals(expects, results, ASSERT_MSG);
-	}
-
 	@Test void testRTU_getPrivateText( ) {
 		//
 		// for SLF4J multiple bindings used by ReflectionTestUtils, build.gradle needs:
@@ -193,5 +188,43 @@ public class UtilityMockTest {
 		//
 		System.out.println("results: " + results);
 		assertEquals(expects, results, ASSERT_MSG);
+	}
+
+	@Test void testWhitebox_getPrivateText( ) {
+		//
+		// https://stackoverflow.com/questions/46454995/how-to-hide-warning-illegal-reflective-access-in-java-9-without-jvm-argument
+		// configure JDK compiler with flag: --illegal-access=permit
+		String results = "";
+		String expects = "PRIVATE_TEXT!";
+		//
+		AnyObject anyObject = new AnyObject();
+		try { results = Whitebox.invokeMethod(anyObject, "getPrivateText").toString(); }
+		catch (Exception ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		//
+		System.out.println("results: " + results);
+		assertEquals(expects, results, ASSERT_MSG);
+	}
+
+	@Test void testPowerMock_given( ) {
+		//
+		String expects = "POWERMOCKED!";
+		AnyObject anyObject = PowerMockito.mock(AnyObject.class);
+		given(anyObject.getPrivateText()).willReturn(expects);
+		//
+		String results = anyObject.getPrivateText();
+		System.out.println("results: " + results);
+		assertEquals(expects, results, ASSERT_MSG);
+	}
+
+	@Test void testPowerMock_doNothing( ) {
+		//
+		AnyObject anyObject = PowerMockito.mock(AnyObject.class);
+		// AnyObject anyObject = new AnyObject();
+
+		// try { doNothing().when(anyObject, "printedSomething" ); } // , any(String.class) ); }
+		// catch (Exception ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		//
+		anyObject.printedSomething();
+		assertEquals(0, 0, ASSERT_MSG);
 	}
 }
