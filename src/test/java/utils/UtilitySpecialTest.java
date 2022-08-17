@@ -22,7 +22,6 @@ import io.opentracing.Tracer;
 import org.apache.commons.collections4.list.TreeList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import samples.AnyException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +32,8 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
@@ -48,6 +49,29 @@ public class UtilitySpecialTest {
 	static final String PATHFILE_LOCAL = "src/test/resources/";
 	static final String ASSERT_MSG = "ASSERT_MSG";
 
+	@Test void test_error( ) {
+		//
+		int intVal = 0;
+		try { intVal = 1 / 0; }
+		catch (ArithmeticException ex) {
+			System.out.println("ERROR ex.toString(): " + ex.toString());
+			System.out.println("ERROR ex.getMessage(): " + ex.getMessage());
+			System.out.println("ERROR ex.getLocalizedMessage(): " + ex.getLocalizedMessage());
+			//
+			String txtLines = "";
+			int ictr=0;
+			StackTraceElement[] STEs = ex.getStackTrace();
+			System.out.println("ERROR ex.getStackTrace(): " + STEs.length);
+			for (StackTraceElement STE : STEs){
+				txtLines += String.format("\t %02d %s\n", ++ictr, STE.toString());
+			}
+			System.out.println(txtLines);
+			// ex.printStackTrace();
+		}
+		System.out.println("intVal: " + intVal);
+		assertNotNull(intVal);
+	}
+
 	@Test void test_UUID( ) {
 		//
 		String txtLines = "";
@@ -60,7 +84,9 @@ public class UtilitySpecialTest {
 		UUID uuid = UUID.randomUUID();
 		txtLines += "UUID randomUUID(): " + uuid + EOL;
 		txtLines += "UUID replace toUpperCase: " + uuid.toString().replace("-", "").toUpperCase() + EOL;
-		try { txtLines += "UUID fromString(): " + UUID.fromString("3bf121bc-14e9-45fa-9b38-b264759eb233") + EOL; }
+		try {
+			txtLines += "UUID fromString(): " + UUID.fromString("3bf121bc-14e9-45fa-9b38-b264759eb233") + EOL;
+		}
 		catch (IllegalArgumentException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		//
 		System.out.println(txtLines);
@@ -111,76 +137,6 @@ public class UtilitySpecialTest {
 		txtLines += stringBuilder.toString();
 		System.out.println(txtLines);
 		assertTrue(list.size() >= 7, ASSERT_MSG);
-	}
-
-	@Test @Disabled("too slow") void test_sphinx4_STT( ) {
-		//
-		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
-		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
-		//
-		Configuration configuration = getSphinxConfig();
-		StreamSpeechRecognizer ssRecognizer;
-		SpeechResult speechResult = null;
-		try {
-			ssRecognizer = new StreamSpeechRecognizer(configuration);
-			File file = new File(pathFile);
-			InputStream FIS = new FileInputStream(file);
-			ssRecognizer.startRecognition(FIS);
-			while ( ( speechResult = ssRecognizer.getResult() ) != null ) {
-				System.out.format("Hypothesis: %s\n", speechResult.getHypothesis());
-			}
-			ssRecognizer.stopRecognition();
-		}
-		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		assertNotNull(speechResult, ASSERT_MSG);
-	}
-
-	@Test @Disabled("too slow") void test_sphinx4_TTS_SS( ) {
-		//
-		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
-		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
-		//
-		Configuration configuration = getSphinxConfig();
-		StreamSpeechRecognizer ssRecognizer;
-		SpeechResult speechResultSS = null;
-		try {
-			FileInputStream FIS = new FileInputStream(pathFile);
-			ssRecognizer = new StreamSpeechRecognizer(configuration);
-			ssRecognizer.startRecognition(FIS);
-			//
-			speechResultSS = ssRecognizer.getResult();
-			ssRecognizer.stopRecognition();
-			System.out.println(speechResultSS.getHypothesis());
-			for ( WordResult wordResult : speechResultSS.getWords() ) {
-				System.out.println(wordResult);
-			}
-		}
-		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		assertNotNull(speechResultSS, ASSERT_MSG);
-	}
-
-	@Test @Disabled("too slow") void test_sphinx4_TTS_LS( ) {
-		//
-		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
-		// String pathFile = PATHFILE_LOCAL + "hal9000.wav";
-		//
-		Configuration configuration = getSphinxConfig();
-		LiveSpeechRecognizer lsRecognizer;
-		SpeechResult speechResultLS = null;
-		try {
-			// InputStream FIS = new FileInputStream(pathFile);
-			lsRecognizer = new LiveSpeechRecognizer(configuration);
-			lsRecognizer.startRecognition(true);
-			//
-			speechResultLS = lsRecognizer.getResult();
-			lsRecognizer.stopRecognition();
-			System.out.println(speechResultLS.getHypothesis());
-			for ( WordResult wordResult : speechResultLS.getWords() ) {
-				System.out.println(wordResult);
-			}
-		}
-		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		assertNotNull(speechResultLS, ASSERT_MSG);
 	}
 
 	@Test void test_JaegerClient_tracing( ) {
@@ -251,6 +207,76 @@ public class UtilitySpecialTest {
 		System.out.println(controller.toString());
 		// controller.run();
 		assertNotNull(controller.toString());
+	}
+
+	@Test @Disabled( "too slow" ) void test_sphinx4_STT( ) {
+		//
+		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
+		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
+		//
+		Configuration configuration = getSphinxConfig();
+		StreamSpeechRecognizer ssRecognizer;
+		SpeechResult speechResult = null;
+		try {
+			ssRecognizer = new StreamSpeechRecognizer(configuration);
+			File file = new File(pathFile);
+			InputStream FIS = new FileInputStream(file);
+			ssRecognizer.startRecognition(FIS);
+			while ( ( speechResult = ssRecognizer.getResult() ) != null ) {
+				System.out.format("Hypothesis: %s\n", speechResult.getHypothesis());
+			}
+			ssRecognizer.stopRecognition();
+		}
+		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		assertNotNull(speechResult, ASSERT_MSG);
+	}
+
+	@Test @Disabled( "too slow" ) void test_sphinx4_TTS_SS( ) {
+		//
+		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
+		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
+		//
+		Configuration configuration = getSphinxConfig();
+		StreamSpeechRecognizer ssRecognizer;
+		SpeechResult speechResultSS = null;
+		try {
+			FileInputStream FIS = new FileInputStream(pathFile);
+			ssRecognizer = new StreamSpeechRecognizer(configuration);
+			ssRecognizer.startRecognition(FIS);
+			//
+			speechResultSS = ssRecognizer.getResult();
+			ssRecognizer.stopRecognition();
+			System.out.println(speechResultSS.getHypothesis());
+			for ( WordResult wordResult : speechResultSS.getWords() ) {
+				System.out.println(wordResult);
+			}
+		}
+		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		assertNotNull(speechResultSS, ASSERT_MSG);
+	}
+
+	@Test @Disabled( "too slow" ) void test_sphinx4_TTS_LS( ) {
+		//
+		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
+		// String pathFile = PATHFILE_LOCAL + "hal9000.wav";
+		//
+		Configuration configuration = getSphinxConfig();
+		LiveSpeechRecognizer lsRecognizer;
+		SpeechResult speechResultLS = null;
+		try {
+			// InputStream FIS = new FileInputStream(pathFile);
+			lsRecognizer = new LiveSpeechRecognizer(configuration);
+			lsRecognizer.startRecognition(true);
+			//
+			speechResultLS = lsRecognizer.getResult();
+			lsRecognizer.stopRecognition();
+			System.out.println(speechResultLS.getHypothesis());
+			for ( WordResult wordResult : speechResultLS.getWords() ) {
+				System.out.println(wordResult);
+			}
+		}
+		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		assertNotNull(speechResultLS, ASSERT_MSG);
 	}
 
 	//#### statics
