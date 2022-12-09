@@ -18,7 +18,14 @@ import com.mongodb.client.MongoDatabase;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bson.Document;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -28,7 +35,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -37,15 +47,68 @@ import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static utils.DbProfile.EOL;
+import static utils.DbProfile.DLM;
 import static utils.DbProfile.ERROR_NOT_INTEGRATED;
 import static utils.DbProfile.ERROR_NO_CREDENTIALS;
 import static utils.DbProfile.ERROR_PKIX_CERT_PATH;
 import static utils.DbProfile.ERROR_SSL_ENCRYPT;
 
 public class DBaseTest {
-	//
-	private static final String EOL = "\n";
-	private static final String DLM = " | ";
+
+	@Test void test_dataSource_jdbcTemplate( ) {
+		//
+		String txtLines = "";
+		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
+		String dbUrl = "jdbc:sqlite:" + DbProfile.DBASES.SQLITE_CHINOOK.host + dbName;
+		String sqlPrepare = "SELECT * FROM customers WHERE Country = ? ORDER BY LastName ASC";
+		String parameter = "USA";
+		//
+		Properties properties = DbProfile.getOCI_KerberosProps(DbProfile.PATH_KRB5_CONF);
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName(java.sql.DriverManager.class.getName());
+		dataSource.setUrl(dbUrl);
+		System.out.println("properties: " + properties);
+		// dataSource.setConnectionProperties(properties);
+		//
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		RowMapperChinook rowMapperChinook = new RowMapperChinook();
+		List<String> list = jdbcTemplate.query(sqlPrepare, rowMapperChinook, parameter);
+		StringBuilder stringBuilder = new StringBuilder();
+		list.stream().forEach(val -> stringBuilder.append(val + DLM));
+		//
+		txtLines = stringBuilder.toString();
+		System.out.println("txtLines: " + txtLines);
+		assertNotNull(txtLines);
+	}
+
+	@Test @Disabled("Requires a DB with Procedure!") void test_dataSource_simpleJdbcCall( ) {
+		//
+		String txtLines = "";
+		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
+		String dbUrl = "jdbc:sqlite:" + DbProfile.DBASES.SQLITE_CHINOOK.host + dbName;
+		String sqlDefault = DbProfile.DBASES.SQLITE_CHINOOK.sqlDefault;
+		String sqlPrepare = "SELECT * FROM customers WHERE Country = ? ORDER BY LastName ASC";
+		String parameter = "USA";
+		//
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName(java.sql.DriverManager.class.getName());
+		dataSource.setUrl(dbUrl);
+		//
+		// https://www.codejava.net/frameworks/spring/spring-simplejdbccall-examples
+		// REQUIRES A PROCEDURE
+		SimpleJdbcCall SJC = new SimpleJdbcCall(dataSource);
+		SJC.withProcedureName("sample");
+		MapSqlParameterSource MSPS = new MapSqlParameterSource();
+		MSPS.addValue("Country", parameter);
+		Map<String, Object> map = SJC.execute(MSPS);
+		Collection<Object> collection = map.values();
+		for (Object object : collection)
+		{ txtLines+= object.toString()+EOL;}
+
+		System.out.println("txtLines: " + txtLines);
+		assertNotNull(txtLines);
+	}
 
 	@Test void test_readDbLines_sqlite( ) {
 		//
@@ -335,6 +398,23 @@ public class DBaseTest {
 		// hazelcastInstance.shutDown();
 		System.out.println(txtLines);
 		assertNotNull(txtLines);
+	}
+}
+
+class RowMapperChinook implements RowMapper<String> {
+
+	//public RowMapperChinook( ) { super(); }
+
+	@Override public String mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+
+		ResultSetMetaData RSMD = resultSet.getMetaData();
+		int rsColumnCount = RSMD.getColumnCount();
+		String txtLine = "";
+		for ( int colCtr = 1; colCtr < rsColumnCount; ++colCtr ) {
+			txtLine += resultSet.getString(colCtr) + DLM;
+		}
+		txtLine += EOL;
+		return txtLine;
 	}
 }
 
