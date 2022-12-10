@@ -16,6 +16,7 @@ import java.sql.Statement;
 import java.util.Properties;
 
 import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_SERVICES;
+import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_KRB5_CC_NAME;
 import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_KRB5_MUTUAL;
 import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL;
 import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_CHECKSUM_TYPES;
@@ -26,8 +27,13 @@ import static oracle.net.ano.AnoServices.CHECKSUM_SHA1;
 import static oracle.net.ano.AnoServices.ENCRYPTION_AES256;
 import static oracle.net.ano.AnoServices.ENCRYPTION_AES128;
 
-@Getter @Setter @EqualsAndHashCode @NoArgsConstructor public class DbProfile {
-	//
+@Getter @Setter @EqualsAndHashCode @NoArgsConstructor
+public class DbProfile {
+	/*
+		Normally DriverManager creates the connection and can be fed properties.
+		When DataSource (or DriverManagerDataSource, JdbcTemplate) are used,
+		the connection may be made based on the settings in app.props.
+	*/
 	public enum DBTYPE {sqlite, mysql, oracle, oracleTns, mssql, mongodb}
 
 	public enum DBASES {
@@ -65,6 +71,8 @@ import static oracle.net.ano.AnoServices.ENCRYPTION_AES128;
 	static final String PATHFILE_LOCAL = "src/test/resources/"; // "C:/Users/mamge/Kerberos/config/"
 	public static final String PATH_TNS_DEFAULT = PATHFILE_LOCAL + "local_tnsnames.ora";
 	public static final String PATH_KRB5_CONF = PATHFILE_LOCAL + "krb5.conf";
+	public static final String PATH_KRB5_CACHE = "C:/Users/mamgeorge/krb5cc_mamgeorge";
+
 	public static final String EOL = "\n";
 	public static final String DLM = " | ";
 
@@ -227,21 +235,24 @@ import static oracle.net.ano.AnoServices.ENCRYPTION_AES128;
 	}
 
 	public static Properties getOCI_KerberosProps(String pathKrb5) {
-		//
+
+		// https://docs.oracle.com/en/database/oracle/oracle-database/21/jajdb/oracle/jdbc/OracleConnection.html
+		Properties properties = new Properties();
+		// properties.setProperty(CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL, "REQUIRED");
+		// properties.setProperty(CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL, "( " + ENCRYPTION_AES256 + "," + ENCRYPTION_AES128 + " )");
+		// properties.setProperty(CONNECTION_PROPERTY_THIN_NET_CHECKSUM_TYPES, "( " + CHECKSUM_SHA1 + " )");
+
+		String KERBEROS5 = "(" + AUTHENTICATION_KERBEROS5 + ")";
 		// oracle.net.authentication_services			KERBEROS5
 		// oracle.net.kerberos5_mutual_authentication	true
-		// java.security.krb5.conf						pathKrb5
-		Properties properties = new Properties();
-		String KERBEROS5 = "(" + AUTHENTICATION_KERBEROS5 + ")";
+		// oracle.net.allow_weak_crypto             	true
+		// oracle.net.kerberos5_cc_name					pathkrb5cc
 		properties.setProperty(CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_SERVICES, KERBEROS5);
 		properties.setProperty(CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_KRB5_MUTUAL, "true");
-		if (false) {
-			properties.setProperty(CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL, "REQUIRED");
-			properties.setProperty(CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL,
-				"( " + ENCRYPTION_AES256 + "," + ENCRYPTION_AES128 + " )");
-			properties.setProperty(CONNECTION_PROPERTY_THIN_NET_CHECKSUM_TYPES, "( " + CHECKSUM_SHA1 + " )");
-			properties.setProperty(CONNECTION_PROPERTY_THIN_NET_ALLOW_WEAK_CRYPTO, "true");
-		}
+		properties.setProperty(CONNECTION_PROPERTY_THIN_NET_ALLOW_WEAK_CRYPTO, "true");
+		properties.setProperty(CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_KRB5_CC_NAME, PATH_KRB5_CACHE);
+
+		// java.security.krb5.conf						pathKrb5
 		System.setProperty("java.security.krb5.conf", pathKrb5);
 		System.out.println("properties: " + properties);
 		return properties;

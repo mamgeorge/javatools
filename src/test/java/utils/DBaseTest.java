@@ -65,13 +65,12 @@ public class DBaseTest {
 		String parameter = "USA";
 		//
 		Properties properties = DbProfile.getOCI_KerberosProps(DbProfile.PATH_KRB5_CONF);
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(java.sql.DriverManager.class.getName());
-		dataSource.setUrl(dbUrl);
-		System.out.println("properties: " + properties);
-		// dataSource.setConnectionProperties(properties);
+		DriverManagerDataSource dmDataSource = new DriverManagerDataSource();
+		dmDataSource.setDriverClassName(java.sql.DriverManager.class.getName());
+		dmDataSource.setUrl(dbUrl);
+		dmDataSource.setConnectionProperties(properties);
 		//
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dmDataSource);
 		RowMapperChinook rowMapperChinook = new RowMapperChinook();
 		List<String> list = jdbcTemplate.query(sqlPrepare, rowMapperChinook, parameter);
 		StringBuilder stringBuilder = new StringBuilder();
@@ -91,13 +90,13 @@ public class DBaseTest {
 		String sqlPrepare = "SELECT * FROM customers WHERE Country = ? ORDER BY LastName ASC";
 		String parameter = "USA";
 		//
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(java.sql.DriverManager.class.getName());
-		dataSource.setUrl(dbUrl);
+		DriverManagerDataSource dmDataSource = new DriverManagerDataSource();
+		dmDataSource.setDriverClassName(java.sql.DriverManager.class.getName());
+		dmDataSource.setUrl(dbUrl);
 		//
 		// https://www.codejava.net/frameworks/spring/spring-simplejdbccall-examples
 		// REQUIRES A PROCEDURE
-		SimpleJdbcCall SJC = new SimpleJdbcCall(dataSource);
+		SimpleJdbcCall SJC = new SimpleJdbcCall(dmDataSource);
 		SJC.withProcedureName("sample");
 		MapSqlParameterSource MSPS = new MapSqlParameterSource();
 		MSPS.addValue("Country", parameter);
