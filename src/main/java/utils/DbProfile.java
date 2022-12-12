@@ -71,7 +71,7 @@ public class DbProfile {
 	static final String PATHFILE_LOCAL = "src/test/resources/"; // "C:/Users/mamge/Kerberos/config/"
 	public static final String PATH_TNS_DEFAULT = PATHFILE_LOCAL + "local_tnsnames.ora";
 	public static final String PATH_KRB5_CONF = PATHFILE_LOCAL + "krb5.conf";
-	public static final String PATH_KRB5_CACHE = "C:/Users/mamgeorge/krb5cc_mamgeorge";
+	public static final String PATH_KRB5_CACHE = PATHFILE_LOCAL + "krb5cc_mamgeorge";
 
 	public static final String EOL = "\n";
 	public static final String DLM = " | ";

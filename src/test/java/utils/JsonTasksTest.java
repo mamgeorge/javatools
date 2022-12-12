@@ -24,7 +24,6 @@ public class JsonTasksTest {
 	private static final Logger LOGGER = Logger.getLogger(JsonTasksTest.class.getName());
 	private static final String BASE_PATH = "src/test/resources/";
 	private static final String JSONFILE = BASE_PATH + "booksCatalog.json";
-	private static final String PATHFILE_LOCAL = "src/test/resources/";
 	private static final String ASSERT_MSG = "ASSERT_MSG";
 	private String json = "";
 
@@ -80,7 +79,7 @@ public class JsonTasksTest {
 		//
 		String txtLine = "";
 		String JSON_PATH = "/catalog/book/0/author";
-		String PATHFILE_LOCALJSON = PATHFILE_LOCAL + "booksCatalog.json";
+		String PATHFILE_LOCALJSON = BASE_PATH + "booksCatalog.json";
 		String body = UtilityMain.getFileLocal(PATHFILE_LOCALJSON);
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
@@ -99,7 +98,7 @@ public class JsonTasksTest {
 
 	@Test void test_getJsonValue_fromPath( ) {
 		//
-		String json = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.json");
+		String json = UtilityMain.getFileLocal(BASE_PATH + "booksCatalog.json");
 		String jsonPath = "catalog.book[0].price"; // "/catalog/book/0/price";
 		//
 		// JsonPath.parse(json).read(fieldPath).toString();
@@ -113,7 +112,7 @@ public class JsonTasksTest {
 
 	@Test void getXmlNode( ) {
 		//
-		String xml = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.xml");
+		String xml = UtilityMain.getFileLocal(BASE_PATH + "booksCatalog.xml");
 		String xmlPath = "/catalog/book[5]/price";
 		String txtLines = UtilityMain.getXmlNode(xml, xmlPath);
 		System.out.println(txtLines);
