@@ -41,6 +41,7 @@ import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
 import static utils.UtilityMain.LOGGER;
 import static utils.UtilityMain.TAB;
 
+// note: xml xPathupdates required javax DocumentBuilders, w3c Documents, jaxen xPaths, javax Transformers
 public class UtilityFormats {
 
 	public static final String INDENT_AMOUNT = "{http://xml.apache.org/xslt}indent-amount";
