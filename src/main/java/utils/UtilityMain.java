@@ -1,31 +1,8 @@
 package utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import lombok.NonNull;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -35,8 +12,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -85,13 +59,11 @@ public class UtilityMain {
 	public static final String EOL = "\n";
 	public static final String CRLF = "\r\n";
 
+	public static final String PATH_PREF = "/src/main/resources";
 	public static final String FLD_SAMPLE = "static/";
 	public static final String TXT_SAMPLE = "Genesis_01.txt";
-	public static final String XML_SAMPLE = "xml/books.xml";
 	public static final String ZIP_SAMPLE = "xml_wav_plants_w10.zip";
-	public static final String PATH_LOCAL_TEMP = "src/main/resources/temp/";
-	public static final String PATH_PREF = "C:/workspace/github/spring_annotations/src/main/resources/";
-	//
+	public static final String PATH_LOCAL_TEMP = PATH_PREF +"/temp/";
 
 	public static void main(String[] strings) {
 		//
@@ -550,152 +522,6 @@ public class UtilityMain {
 			txtRandom.append(chars[random.nextInt(chars.length)]);
 		}
 		return txtRandom.toString();
-	}
-
-	//#### xml/yml/json
-	public static String getXmlNode(String xml, String xpathTxt) {
-		//
-		// https://howtodoinjava.com/xml/evaluate-xpath-on-xml-string/
-		String txtLines = "";
-		try {
-			StringReader stringReader = new StringReader(xml);
-			InputSource inputSource = new InputSource(stringReader);
-			XPath xPath = XPathFactory.newInstance().newXPath();
-			txtLines = xPath.evaluate(xpathTxt, inputSource);
-		}
-		catch (XPathExpressionException ex) {
-			LOGGER.warning(ex.getMessage());
-		}
-		return txtLines;
-	}
-
-	public static String formatXml(String xmlOld) {
-		//
-		String xml = "";
-		if ( xmlOld == null || xmlOld.equals("") ) {
-			xmlOld = getFileLocal(FLD_SAMPLE + XML_SAMPLE);
-		}
-		//
-		Document document = null;
-		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
-			StringReader stringReader = new StringReader(xmlOld);
-			InputSource inputSource = new InputSource(stringReader);
-			document = documentBuilder.parse(inputSource);
-		}
-		catch (ParserConfigurationException | SAXException | IOException ex) {
-			LOGGER.warning(ex.getMessage());
-		}
-		try {
-			StringWriter stringWriter = new StringWriter();
-			StreamResult streamResultXML = new StreamResult(stringWriter);
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			//
-			Transformer transformer = transformerFactory.newTransformer();
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.ENCODING, UTF_8.toString());
-			DOMSource domSource = new DOMSource(document);
-			transformer.transform(domSource, streamResultXML);
-			xml = streamResultXML.getWriter().toString();
-		}
-		catch (TransformerException ex) {
-			LOGGER.severe(ex.getMessage());
-		}
-		return xml;
-	}
-
-	public static String transformXslt(String xml, String xsl) {
-		//
-		String txtLines = "";
-		try {
-			// bring in data in a way that can be processed
-			StreamSource streamSourceXML = new StreamSource(new StringReader(xml));
-			StreamSource streamSourceXSL = new StreamSource(new StringReader(xsl));
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			Result result = new StreamResult(baos);
-			//
-			// setup transformers
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer(streamSourceXSL);
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.MEDIA_TYPE, "MediaType.TEXT_XML_VALUE");
-			transformer.setOutputProperty(OutputKeys.ENCODING, UTF_8.toString());
-			//
-			// transform it
-			transformer.transform(streamSourceXML, result);
-			txtLines = baos.toString();
-		}
-		catch (TransformerException ex) {
-			LOGGER.severe(ex.getMessage());
-		}
-		//
-		return txtLines;
-	}
-
-	public static String parseYaml2JsonNode(String yamlFileName, String applicationNode) {
-		//
-		String txtLine = "";
-		try {
-			ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-			InputStream inputStream = classLoader.getResourceAsStream(yamlFileName);
-			//
-			// create yaml from file
-			YAMLFactory yamlFactory = new YAMLFactory();
-			ObjectMapper objectMapperYaml = new ObjectMapper(yamlFactory);
-			Object objectYaml = objectMapperYaml.readValue(inputStream, Map.class);
-			//
-			ObjectMapper objectMapperJson = new ObjectMapper();
-			String json = objectMapperJson.writeValueAsString(objectYaml);
-			//
-			ObjectMapper objectMapperNode = new ObjectMapper();
-			JsonNode jsonNode = objectMapperNode.readTree(json);
-			txtLine = ( jsonNode.get(applicationNode) ).asText();
-		}
-		catch (IOException ex) {
-			LOGGER.warning(ex.getMessage());
-		}
-		//
-		return txtLine;
-	}
-
-	public static String parseJsonList2List(String jsonArr, int listFormat) {
-		//
-		String txtLines = "";
-		ObjectMapper objectMapperHtml = new ObjectMapper();
-		TypeReference<ArrayList<LinkedHashMap<String, String>>> typeReference = new TypeReference<>() {
-		};
-		ArrayList<LinkedHashMap<String, String>> arrayList;
-		Set<?> set;
-		String txtKey, txtVal;
-		Object objVal;
-		String PFX = TAB;
-		String MID = " : ";
-		String SFX = "";
-		if ( listFormat > 0 ) {
-			PFX = "<tr><th>";
-			MID = "</th<td>";
-			SFX = "</td></tr>";
-		}
-		try {
-			arrayList = objectMapperHtml.readValue(jsonArr, typeReference);
-			for ( LinkedHashMap<String, String> linkedHashMap : arrayList ) {
-				//
-				set = linkedHashMap.keySet();
-				txtKey = set.toString().substring(1, set.toString().length() - 1);
-				objVal = linkedHashMap.get(txtKey);
-				txtVal = objVal.toString();
-				txtLines += PFX + txtKey + MID + txtVal + SFX;
-			}
-			System.out.println("txtLines: " + txtLines);
-		}
-		catch (JsonProcessingException ex) {
-			LOGGER.warning(ex.getMessage());
-		}
-		return txtLines;
 	}
 }
 //----

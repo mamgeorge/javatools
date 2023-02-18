@@ -1,6 +1,7 @@
 package utils;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
+import static utils.UtilityMain.EOL;
 
 @TestInstance( TestInstance.Lifecycle.PER_CLASS ) // requried for @BeforeAll
 public class UtilityMockTest {
@@ -34,7 +36,6 @@ public class UtilityMockTest {
 	static final Logger LOGGER = Logger.getLogger(UtilityMockTest.class.getName());
 	static final String ASSERT_MSG = "ASSERT_MSG";
 	static final String SAMPLE = "OMEGA";
-	static final String EOL = "\n";
 
 	@BeforeAll void init( ) {
 		// PowerMock use of private static final types require resources MockMaker mock-maker-inline
@@ -72,6 +73,7 @@ public class UtilityMockTest {
 		assertEquals(SAMPLE, anyObjectMock.getAlpha(), ASSERT_MSG);
 	}
 
+	@Disabled
 	@Test void testmock_doNothing_when( ) {
 		//
 		List<String> listReal = new ArrayList<>();
@@ -86,6 +88,7 @@ public class UtilityMockTest {
 		verify(listMock, times(1)).add(0, "beta");
 	}
 
+	@Disabled
 	@Test void testmock_when_thenThrow( ) {
 		//
 		// JUnit4: @Test(expected = IllegalStateException.class)

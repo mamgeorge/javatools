@@ -28,9 +28,9 @@ import static utils.UtilityMain.TAB;
 
 public class UtilityMainTest {
 
-	static final Logger LOGGER = Logger.getLogger(UtilityMainTest.class.getName());
-	static final String PATHFILE_LOCAL = "src/test/resources/";
-	static final String ASSERT_MSG = "ASSERT_MSG";
+	public static final Logger LOGGER = Logger.getLogger(UtilityMainTest.class.getName());
+	public static final String PATHFILE_LOCAL = "src/test/resources/";
+	public static final String ASSERT_MSG = "ASSERT_MSG";
 
 	//#### basics
 	@Test void test_template( ) {

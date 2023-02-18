@@ -13,7 +13,6 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -107,7 +106,7 @@ public class KafkaHandler {
 		}
 	}
 
-	@NotNull private static Properties getPropertiesProducer(String bootstrapServers) {
+	private static Properties getPropertiesProducer(String bootstrapServers) {
 		//
 		Properties properties = new Properties();
 		properties.put("bootstrap.servers", bootstrapServers);
@@ -123,7 +122,7 @@ public class KafkaHandler {
 		return properties;
 	}
 
-	@NotNull private static Properties getPropertiesConsumer(String bootstrapServers) {
+	private static Properties getPropertiesConsumer(String bootstrapServers) {
 		//
 		Properties properties = new Properties();
 		properties.put("bootstrap.servers", bootstrapServers);

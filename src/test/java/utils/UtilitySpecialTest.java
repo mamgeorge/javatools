@@ -5,21 +5,6 @@ import edu.cmu.sphinx.api.LiveSpeechRecognizer;
 import edu.cmu.sphinx.api.SpeechResult;
 import edu.cmu.sphinx.api.StreamSpeechRecognizer;
 import edu.cmu.sphinx.result.WordResult;
-import io.kubernetes.client.extended.controller.Controller;
-import io.kubernetes.client.extended.controller.builder.ControllerBuilder;
-import io.kubernetes.client.extended.controller.reconciler.Reconciler;
-import io.kubernetes.client.extended.controller.reconciler.Request;
-import io.kubernetes.client.extended.controller.reconciler.Result;
-import io.kubernetes.client.informer.SharedIndexInformer;
-import io.kubernetes.client.informer.SharedInformerFactory;
-import io.kubernetes.client.informer.cache.Lister;
-import io.kubernetes.client.openapi.ApiCallback;
-import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.V1Node;
-import io.kubernetes.client.openapi.models.V1NodeList;
-import io.kubernetes.client.util.CallGeneratorParams;
-import io.opentracing.Tracer;
-import org.apache.commons.collections4.list.TreeList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -30,16 +15,12 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.NumberFormat;
-import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
@@ -54,15 +35,15 @@ public class UtilitySpecialTest {
 		int intVal = 0;
 		try { intVal = 1 / 0; }
 		catch (ArithmeticException ex) {
-			System.out.println("ERROR ex.toString(): " + ex.toString());
+			System.out.println("ERROR ex.toString(): " + ex);
 			System.out.println("ERROR ex.getMessage(): " + ex.getMessage());
 			System.out.println("ERROR ex.getLocalizedMessage(): " + ex.getLocalizedMessage());
 			//
 			String txtLines = "";
-			int ictr=0;
+			int ictr = 0;
 			StackTraceElement[] STEs = ex.getStackTrace();
 			System.out.println("ERROR ex.getStackTrace(): " + STEs.length);
-			for (StackTraceElement STE : STEs){
+			for ( StackTraceElement STE : STEs ) {
 				txtLines += String.format("\t %02d %s\n", ++ictr, STE.toString());
 			}
 			System.out.println(txtLines);
@@ -93,21 +74,6 @@ public class UtilitySpecialTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test void test_transformXslt( ) {
-		//
-		String filename_XML = PATHFILE_LOCAL + "booksCatalog" + ".xml";
-		String filename_XSL = PATHFILE_LOCAL + "booksXml2Html" + ".xslt";
-		String xml = UtilityMain.getFileLocal(filename_XML);
-		String xsl = UtilityMain.getFileLocal(filename_XSL);
-		//
-		String txtLines = UtilityMain.transformXslt(xml, xsl);
-		//
-		System.out.println(txtLines);
-		try { Files.write(Paths.get(PATHFILE_LOCAL + "booksCatalog.html"), txtLines.getBytes(UTF_8)); }
-		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		assertTrue(txtLines.length() > 20, ASSERT_MSG);
-	}
-
 	@Test void test_NetworkAddress( ) { /**/
 		//
 		String txtLines = EOL + "InetAddress" + EOL;
@@ -123,7 +89,7 @@ public class UtilitySpecialTest {
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		//
 		txtLines += "NetworkInterface SSIDs" + EOL;
-		List<String> list = new TreeList<>();
+		List<String> list = new ArrayList<>();
 		Enumeration<NetworkInterface> enums = null;
 		try { enums = NetworkInterface.getNetworkInterfaces(); }
 		catch (SocketException ex) { System.out.println("ERROR: " + ex.getMessage()); }
@@ -137,76 +103,6 @@ public class UtilitySpecialTest {
 		txtLines += stringBuilder.toString();
 		System.out.println(txtLines);
 		assertTrue(list.size() >= 7, ASSERT_MSG);
-	}
-
-	@Test void test_JaegerClient_tracing( ) {
-		//
-		String[] ENVVAR = { "FOO", "USERNAME" };
-		io.jaegertracing.Configuration configuration = new io.jaegertracing.Configuration(ENVVAR[0]);
-		Tracer tracer = configuration.getTracer();
-		String txtLines = UtilityMain.exposeObject(tracer);
-		System.out.println(txtLines);
-		assertTrue(txtLines.split(EOL).length >= 20, ASSERT_MSG);
-	}
-
-	@Test void test_K8Controller( ) {
-		//
-		// JIB, Dekorate, JKube
-		// io.kubernetes:client-java-extended:6.0.1
-		SharedInformerFactory SIF = new SharedInformerFactory();
-		CoreV1Api coreV1Api = new CoreV1Api();
-		String pretty = "", continues = "", fieldSelector = "", labelSelector = "",
-			resourceVersionMatch =
-				"";
-		int limit = 0;
-		boolean allowWatchBookmarks = true, watch = true;
-		Integer timeoutSeconds = null;
-		ApiCallback<?> apiCallback = null;
-		//
-		SharedIndexInformer<V1Node> SII =
-			SIF.sharedIndexInformerFor(
-				(CallGeneratorParams params) -> coreV1Api.listNodeCall(
-					pretty, allowWatchBookmarks, continues, fieldSelector, labelSelector, limit,
-					params.resourceVersion, resourceVersionMatch,
-					timeoutSeconds, watch, apiCallback),
-				V1Node.class, V1NodeList.class);
-		SIF.startAllRegisteredInformers();
-		//
-		class NodePrintingReconciler implements Reconciler {
-			//
-			final Lister<V1Node> listerV1Node;
-
-			//
-			public NodePrintingReconciler(SharedIndexInformer<V1Node> nodeInformer) {
-				this.listerV1Node = new Lister<>(nodeInformer.getIndexer());
-			}
-
-			//
-			@Override public Result reconcile(Request request) {
-				V1Node v1Node = this.listerV1Node.get(request.getName());
-				System.out.println("triggered reconciling " + v1Node.getMetadata().getName());
-				return new Result(false);
-			}
-		}
-		//
-		NodePrintingReconciler NPR = new NodePrintingReconciler(SII);
-		//
-		Controller controller =
-			ControllerBuilder.defaultBuilder(SIF)
-				.watch(
-					(workQueue) -> ControllerBuilder.controllerWatchBuilder(V1Node.class,
-							workQueue)
-						.build())
-				.withReconciler(NPR) // required, set the actual reconciler
-				.withName(
-					"node-printing-controller") // optional, set name for logging, thread-tracing
-				.withWorkerCount(4) // optional, set worker thread count
-				.withReadyFunc(SII::hasSynced) // optional, only starts when cache synced up
-				.build();
-		//
-		System.out.println(controller.toString());
-		// controller.run();
-		assertNotNull(controller.toString());
 	}
 
 	@Test @Disabled( "too slow" ) void test_sphinx4_STT( ) {
