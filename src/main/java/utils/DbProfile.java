@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import java.lang.reflect.Field;
 import java.sql.Clob;
@@ -288,5 +289,15 @@ public class DbProfile {
 		catch (NoSuchFieldException | IllegalAccessException ex) {
 			System.out.println("ERROR: " + ex.getMessage());
 		}
+	}
+
+	public static DriverManagerDataSource getDataSource(String dbUrl) {
+		//
+		Properties properties = getOCI_KerberosProps(DbProfile.PATH_KRB5_CONF);
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName(DriverManager.class.getName());
+		dataSource.setUrl(dbUrl);
+		dataSource.setConnectionProperties(properties);
+		return dataSource;
 	}
 }

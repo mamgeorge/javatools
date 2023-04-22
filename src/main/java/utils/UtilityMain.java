@@ -435,7 +435,7 @@ public class UtilityMain {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		Set<String> setLines = new TreeSet<>();
-		Method[] methods = object.getClass().getDeclaredMethods();
+		Method[] methods = object.getClass().getMethods(); // getDeclaredMethods()
 		List<Method> listMethods = new ArrayList<>();
 		Arrays.stream(methods).forEach(method -> listMethods.add(method));
 		Collections.sort(listMethods, Comparator.comparing(Method::getName));
