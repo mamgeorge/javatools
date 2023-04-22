@@ -133,6 +133,7 @@ public class UtilityMainTest {
 	}
 
 	@Test void test_Stream_Iterator( ) throws SocketException {
+
 		// better for larger numbers
 		StringBuilder stringBuilder = new StringBuilder();
 		Iterator<NetworkInterface> iterator = NetworkInterface.getNetworkInterfaces().asIterator();
