@@ -1,5 +1,8 @@
 package utils;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.Level;
+import static ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.cluster.Cluster;
@@ -19,8 +22,10 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.val;
 import org.bson.Document;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -57,6 +62,13 @@ import static utils.UtilityMain.exposeObject;
 
 public class DBaseTest {
 
+	@BeforeAll void initJdbcLogging() {
+
+		// initJdbcLogging
+		Logger LOGGER = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
+		LOGGER.setLevel(Level.toLevel("error"));
+	}
+
 	@Test void dataSource( ) {
 		//
 		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
@@ -76,8 +88,8 @@ public class DBaseTest {
 
 		DriverManagerDataSource dataSource = getDataSource(dbUrl);
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		RowMapperChinook rowMapperChinook = new RowMapperChinook();
-		List<String> list = jdbcTemplate.query(sqlPrepare, rowMapperChinook, parameter);
+		DBRowMapperChinook dbRowMapperChinook = new DBRowMapperChinook();
+		List<String> list = jdbcTemplate.query(sqlPrepare, dbRowMapperChinook, parameter);
 
 		StringBuilder stringBuilder = new StringBuilder(EOL + DLM);
 		list.stream().forEach(rows -> stringBuilder.append(rows + DLM));
@@ -367,8 +379,8 @@ public class DBaseTest {
 		//
 		for ( int ictr = 0; ictr < setMembers.size(); ictr++ ) {
 			// send a task for each member on service of HazelcastInstance
-			ClusterWorkingTask CWT = new ClusterWorkingTask();
-			Future<String> future = executorService.submit(CWT);
+			DBClusterWorkingTask DBCWT = new DBClusterWorkingTask();
+			Future<String> future = executorService.submit(DBCWT);
 			txtLines = "";
 			try {
 				txtLines += future.get() + EOL;
@@ -418,26 +430,4 @@ public class DBaseTest {
 		System.out.println(txtLines);
 		assertNotNull(txtLines);
 	}
-}
-
-class RowMapperChinook implements RowMapper<String> {
-
-	// public RowMapperChinook( ) { super(); }
-
-	@Override public String mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-
-		String txtLine = "";
-		ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-		int rsColumnCount = resultSetMetaData.getColumnCount();
-
-		for ( int colCtr = 1; colCtr < rsColumnCount; ++colCtr ) {
-			txtLine += String.format("%-4s" + DLM, resultSet.getString(colCtr) );
-		}
-		return txtLine + EOL;
-	}
-}
-
-class ClusterWorkingTask implements Callable<String>, Serializable {
-	@Override
-	public String call( ) throws Exception { return "Hello World!"; }
 }
