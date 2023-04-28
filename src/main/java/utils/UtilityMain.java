@@ -512,7 +512,7 @@ public class UtilityMain {
 		}
 	}
 
-	@NonNull private static String getRandomString(int num) {
+	public static String getRandomString(int num) {
 		//
 		StringBuilder txtRandom = new StringBuilder();
 		Random random = new Random();

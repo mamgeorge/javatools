@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.TAB;
+import static utils.UtilityMain.getRandomString;
 
 public class UtilityMainTest {
 
@@ -33,7 +34,7 @@ public class UtilityMainTest {
 	public static final String ASSERT_MSG = "ASSERT_MSG";
 
 	//#### basics
-	@Test void test_template( ) {
+	@Test void template( ) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		//
@@ -44,7 +45,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
 	}
 
-	@SuppressWarnings( { "all" } ) @Test void test_booleans( ) {
+	@Test void booleans( ) {
 		//
 		String txtLines = EOL;
 		//
@@ -60,7 +61,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() >= 1, ASSERT_MSG);
 	}
 
-	@Test void test_showSys( ) {
+	@Test void showSys( ) {
 
 		String txtLines = UtilityMain.showSys();
 		String[] envr = txtLines.split(EOL);
@@ -70,7 +71,7 @@ public class UtilityMainTest {
 		assertTrue(envr.length > 40, ASSERT_MSG);
 	}
 
-	@Test void test_showTimes( ) {
+	@Test void showTimes( ) {
 
 		String showTimes = UtilityMain.showTimes();
 		//
@@ -80,7 +81,7 @@ public class UtilityMainTest {
 		assertTrue(showTimesLen > 4, ASSERT_MSG);
 	}
 
-	@Test void test_Stream_sort( ) throws SocketException {
+	@Test void stream_sort( ) throws SocketException {
 		//
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -92,7 +93,7 @@ public class UtilityMainTest {
 		assertTrue(set.size() >= 7, ASSERT_MSG);
 	}
 
-	@Test void test_Stream_filter( ) throws SocketException {
+	@Test void stream_filter( ) throws SocketException {
 		//
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -119,7 +120,7 @@ public class UtilityMainTest {
 		assertTrue(set.size() >= 5, ASSERT_MSG);
 	}
 
-	@Test void test_Stream_Collections( ) throws SocketException {
+	@Test void stream_Collections( ) throws SocketException {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -132,7 +133,7 @@ public class UtilityMainTest {
 		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
-	@Test void test_Stream_Iterator( ) throws SocketException {
+	@Test void stream_Iterator( ) throws SocketException {
 
 		// better for larger numbers
 		StringBuilder stringBuilder = new StringBuilder();
@@ -147,8 +148,24 @@ public class UtilityMainTest {
 		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
+	@Test void lineChunker() {
+
+		String txtLines = "";
+		String txtLine = "123456789012345678901234567890123456789012345678901234567890";
+		int intChunk = 10;
+
+		txtLines = lineChunker(txtLine, intChunk, EOL);
+		System.out.println(txtLine + EOL + EOL + txtLines);
+		assertNotNull(txtLines);
+
+		txtLine = getRandomString(1000);
+		txtLines = lineChunker(txtLine, 80, EOL);
+		System.out.println(txtLine + EOL + EOL + txtLines);
+		assertNotNull(txtLines);
+	}
+
 	//#### files
-	@Test void test_getFileLines( ) {
+	@Test void getFileLines( ) {
 
 		String txtLines = UtilityMain.getFileLines("c:/workspace/greetings.txt", "");
 		//
@@ -156,7 +173,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() > 12, ASSERT_MSG);
 	}
 
-	@Test void test_getFileLocal( ) {
+	@Test void getFileLocal( ) {
 
 		String txtLines = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.json");
 		//
@@ -164,7 +181,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
-	@Test void test_getFileLocals( ) {
+	@Test void getFileLocals( ) {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		String[] fileNames =
@@ -193,14 +210,14 @@ public class UtilityMainTest {
 	}
 
 	//#### reflection
-	@Test void test_getField( ) {
+	@Test void getField( ) {
 		//
 		String results = UtilityMain.getField(new AnyObject(), "gamma");
 		System.out.println("results: " + results);
 		assertEquals("GIMMEL", results, ASSERT_MSG);
 	}
 
-	@Test void test_getMethod( ) {
+	@Test void getMethod( ) {
 		//
 		Object objectParms = null;
 		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma", objectParms);
@@ -209,7 +226,7 @@ public class UtilityMainTest {
 		assertEquals("GIMMEL", results, ASSERT_MSG);
 	}
 
-	@Test void test_exposeObject( ) {
+	@Test void exposeObject( ) {
 		//
 		AnyObject anyObject = new AnyObject();
 		String txtLines = UtilityMain.exposeObject(anyObject);
@@ -217,13 +234,25 @@ public class UtilityMainTest {
 		assertNotNull(txtLines, ASSERT_MSG);
 	}
 
-	@Test void test_putObject( ) {
+	@Test void putObject( ) {
 		//
 		AnyObject anyObject = new AnyObject();
 		UtilityMain.putObject(anyObject, "gamma", "STUFF");
 		String results = UtilityMain.getField(anyObject, "gamma");
 		System.out.println(results);
 		assertEquals("STUFF", results, ASSERT_MSG);
+	}
+
+	//#### proposed statics
+	public static String lineChunker(String txtLine, int intChunk, String DLM) {
+
+		String txtLines;
+		String[] lineChunks =  txtLine.split("(?<=\\G.{" + intChunk + "})");
+
+		StringBuilder stringBuilder = new StringBuilder();
+		Arrays.stream(lineChunks).forEach( lineChunk -> stringBuilder.append(lineChunk + DLM));
+		txtLines = stringBuilder.toString();
+		return txtLines;
 	}
 }
 //----
