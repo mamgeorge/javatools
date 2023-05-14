@@ -111,7 +111,7 @@ public class UtilityFormats {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer(streamSourceXSL);
 			transformer.setOutputProperty(INDENT, "yes");
-			transformer.setOutputProperty(MEDIA_TYPE, "MediaType.TEXT_XML_VALUE");
+		//	transformer.setOutputProperty(MEDIA_TYPE, "MediaType.TEXT_XML_VALUE");
 			transformer.setOutputProperty(ENCODING, UTF_8.toString());
 			//
 			// transform it

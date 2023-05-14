@@ -2,12 +2,25 @@
     <head>
         <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Books</title>
-        <style>body { font-family: verdana; }</style>
+        <style>
+		body { font-family: verdana; }
+		td { padding: 4pt; }
+	</style>
+        <script>
+		let date = (new Date()).toISOString();
+		function myTimer() {
+			document.getElementById("timer").innerHTML= date;
+		}
+		window.addEventListener("load", myTimer);
+	</script>
     </head>
     <body>
         <center>
             <h3>Book Collection</h3>
-            <table border="1">
+            <h5>
+                <div id="timer"></div>
+            </h5>
+            <table border="1" cellspacing="0">
                 <tr>
                     <th>Title</th><th>Published</th><th>Author</th><th>Price</th>
                 </tr>

@@ -14,8 +14,6 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 /**
- * ToolAstro.java
- * <p>
  * http://calgary.rasc.ca/constellation.htm
  * http://www.iau.org/public/constellations/
  *
@@ -23,9 +21,6 @@ import java.util.logging.Logger;
  */
 public class ToolAstro {
 
-	/**
-	 * LOGGER
-	 */
 	private static final Logger LOGGER = Logger.getLogger(ToolAstro.class.getName());
 	private static final String IMG_GIF = "gif";
 	private static final String IMG_JPG = "jpg";
@@ -38,13 +33,6 @@ public class ToolAstro {
 	private static final String TXT_PATH_ASTRO = "C:/Martin/5Personal/Astronomy/icons/";
 	private static final String TXT_URL = "http://www.iau.org/static/public/constellations/";
 
-	/**
-	 * writeConsGifFromUrl.
-	 * <p>
-	 * This program creates gifs from urls then saves them as gifs.
-	 *
-	 * @param strings
-	 */
 	public static void writeConsGifFromUrl(final String[] strings) {
 		//
 		String txtIMG = "";
@@ -69,13 +57,6 @@ public class ToolAstro {
 		}
 	}
 
-	/**
-	 * writeConsPngFromUrl.
-	 * <p>
-	 * This program creates gifs from urls then saves them as pngs.
-	 *
-	 * @param strings
-	 */
 	public static void writeConsPngFromUrl(final String[] strings) {
 		//
 		String txtIMG = "";
@@ -111,13 +92,6 @@ public class ToolAstro {
 		}
 	}
 
-	/**
-	 * writeConsJpgFromDir.
-	 * <p>
-	 * This program takes a list of gifs and convets them to jpgs.
-	 *
-	 * @param strings
-	 */
 	public static void writeConsJpgFromDir(final String[] strings) {
 		//
 		String txtIMG = "";
