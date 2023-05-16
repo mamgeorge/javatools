@@ -153,6 +153,7 @@ public class UtilityFormatsTest {
 	@Test void transformCsv2Html( ) {
 
 		String html = "";
+		String PATHFILE_REMOTE = "C:/workspace/";
 		String filePath = PATHFILE_LOCAL + "battles.csv";
 		try {
 			Reader reader = Files.newBufferedReader(Path.of(filePath));
@@ -161,17 +162,30 @@ public class UtilityFormatsTest {
 
 			StringBuilder stringBuilder = new StringBuilder(EOL);
 			list.forEach(strings -> {
-				stringBuilder.append("<tr>");
-				Arrays.stream(strings).forEach(string -> stringBuilder.append("<td>" + string + "</td>"));
-				stringBuilder.append("</tr>" + EOL);
+				String classy = "";
+				if ( strings[1].equals("") ) {
+					stringBuilder.append("<tr><td colspan = \"4\"> </td></tr>" + EOL);
+				} else {
+					int year = Integer.parseInt(strings[0]);
+					if ( year >= -3300 && year < -2050 ) { classy = "red"; }
+					if ( year >= -2050 && year < -1406) { classy = "ora"; }
+					if ( year >= -1406 && year < -1050) { classy = "yel"; }
+					if ( year >= -1050 && year < -715) { classy = "grn"; }
+					if ( year >= -715 && year < -626) { classy = "blu"; }
+					if ( year >= -626 && year < -586) { classy = "ind"; }
+					if ( year >= -586 && year < -0) { classy = "vio"; }
+					stringBuilder.append("<tr class = \"" + classy + "\">");
+					Arrays.stream(strings).forEach(string -> stringBuilder.append("<td>" + string + "</td>"));
+					stringBuilder.append("</tr>" + EOL);
+				}
 			});
 			html = getFileLocal(PATHFILE_LOCAL + "header.html");
-			html = html.replaceAll("battleData",stringBuilder.toString());
+			html = html.replaceAll("battleData", stringBuilder.toString());
 		}
 		catch (IOException | CsvException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 
 		System.out.println(html);
-		try { Files.write(Paths.get(PATHFILE_LOCAL + "battles.html"), html.getBytes(UTF_8)); }
+		try { Files.write(Paths.get(PATHFILE_REMOTE + "battles.html"), html.getBytes(UTF_8)); }
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		assertNotNull(html);
 	}
