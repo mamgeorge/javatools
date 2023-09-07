@@ -1,13 +1,29 @@
 package utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
+
 import samples.AnyObject;
 
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +48,7 @@ public class UtilityMainTest {
 	public static final Logger LOGGER = Logger.getLogger(UtilityMainTest.class.getName());
 	public static final String PATHFILE_LOCAL = "src/test/resources/";
 	public static final String ASSERT_MSG = "ASSERT_MSG";
+	public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z' EEE"; // 'Z' shows UTC
 
 	//#### basics
 	@Test void template( ) {
@@ -164,6 +181,58 @@ public class UtilityMainTest {
 		assertNotNull(txtLines);
 	}
 
+	@Test void checkDates() {
+
+		StringBuilder sb = new StringBuilder();
+		SimpleDateFormat SDF = new SimpleDateFormat(ISO_FORMAT);
+		String dtfISO = DateTimeFormatter.ISO_DATE_TIME.toString();
+		String FRMT = "\t%-20s: %s \n";
+		sb.append(String.format(FRMT, "dtfISO", dtfISO));
+
+		// date
+		Date date = new Date();
+		Date dateInstant = Date.from(Instant.now());
+		java.sql.Date dateSQL = new java.sql.Date(dateInstant.getTime());
+		String dateFormat = SDF.format(date);
+		String dateInstantFormat = SDF.format(dateInstant);
+		sb.append(String.format(FRMT, "date", date));
+		sb.append(String.format(FRMT, "dateInstant", dateInstant));
+		sb.append(String.format(FRMT, "dateSQL", dateSQL));
+		sb.append(String.format(FRMT, "dateFormat", dateFormat));
+		sb.append(String.format(FRMT, "dateInstantFormat", dateInstantFormat));
+		sb.append(StringUtils.repeat("-", 40)).append(EOL);
+
+		// calendar
+		Calendar calendar = Calendar.getInstance();
+		GregorianCalendar gregorianCalendar = (GregorianCalendar) calendar;
+		ZonedDateTime ZDT = gregorianCalendar.toZonedDateTime();
+		OffsetDateTime ODT = OffsetDateTime.now();
+		OffsetDateTime ODTZO = OffsetDateTime.now(ZoneOffset.UTC);
+		sb.append(String.format(FRMT, "calendar DATE", calendar.get(Calendar.DATE)));
+		sb.append(String.format(FRMT, "gregorianCalendar", gregorianCalendar.get(Calendar.DATE)));
+		sb.append(String.format(FRMT, "ZonedDateTime", ZDT));
+		sb.append(String.format(FRMT, "OffsetDateTime", ODT));
+		sb.append(String.format(FRMT, "ODT ZoneOffset", ODTZO));
+		sb.append(StringUtils.repeat("-", 40)).append(EOL);
+
+		// local
+		LocalDate localDate = LocalDate.of(2023, Month.SEPTEMBER,1);
+		LocalDate localDateNow = LocalDate.now();
+		LocalDate localDateZID = LocalDate.now(ZoneId.systemDefault());
+		LocalDateTime localDateTime = LocalDateTime.of(localDateNow, LocalTime.of(0,0));
+		Date dateLocalNow = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+		String dateLocalFormat = SDF.format(dateLocalNow);
+		sb.append(String.format(FRMT, "localDate", localDate));
+		sb.append(String.format(FRMT, "localDateNow", localDateNow));
+		sb.append(String.format(FRMT, "localDateZID", localDateZID));
+		sb.append(String.format(FRMT, "localDateTime", localDateTime));
+		sb.append(String.format(FRMT, "dateLocalNow", dateLocalNow));
+		sb.append(String.format(FRMT, "dateLocalFormat", dateLocalFormat));
+
+		System.out.println(sb);
+		assertNotNull(sb);
+	}
+
 	//#### files
 	@Test void getFileLines( ) {
 
@@ -201,7 +270,6 @@ public class UtilityMainTest {
 		assertEquals(countFiles, fileNames.length, ASSERT_MSG);
 	}
 
-	//#### url
 	@Test void urlGet( ) {
 		//
 		String html = UtilityMain.urlGet("https://mamgeorge.altervista.org");
