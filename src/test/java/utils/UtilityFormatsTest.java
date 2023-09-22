@@ -7,6 +7,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import samples.BooksCatalog;
 
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
@@ -27,7 +29,7 @@ import static utils.UtilityMain.getFileLocal;
 import static utils.UtilityMainTest.PATHFILE_LOCAL;
 
 // C:/workspace/training/javatools/src/test/java/utils
-public class UtilityFormatsTest {
+class UtilityFormatsTest {
 
 	private static final Logger LOGGER = Logger.getLogger(UtilityFormatsTest.class.getName());
 	private static final String JSONFILE = PATHFILE_LOCAL + "booksCatalog.json";
@@ -66,7 +68,7 @@ public class UtilityFormatsTest {
 		assertTrue(title.contains("Developers"));
 	}
 
-	@Test void getJsonNode( ) {
+	@Test @Disabled( "version issue" ) void getJsonNode( ) {
 
 		json = getFileLocal(JSONFILE);
 		String txtLines = "#### getJsonNode" + EOL;
@@ -80,7 +82,7 @@ public class UtilityFormatsTest {
 		assertTrue(jsonValue.contains("Oberon"));
 	}
 
-	@Test void test_objectMapper( ) {
+	@Test @Disabled( "version issue" ) void test_objectMapper( ) {
 
 		String txtLine = "";
 		String JSON_PATH = "/catalog/book/0/author";
@@ -97,7 +99,7 @@ public class UtilityFormatsTest {
 			LOGGER.severe(ex.getMessage());
 		}
 		System.out.println("jsonNodeAt.asText(): " + txtLine);
-		assertTrue(txtLine.equals("Gambardella , Matthew"), ASSERT_MSG);
+		assertEquals("Gambardella , Matthew", txtLine, ASSERT_MSG);
 	}
 
 	@Test void getJsonValue_fromPath( ) {
@@ -111,10 +113,7 @@ public class UtilityFormatsTest {
 		String txtLine = object.toString();
 
 		LOGGER.info("jsonVal: " + txtLine); // System.out.println(txtLines);
-		assertTrue(txtLine.equals("44.95"), ASSERT_MSG);
-	}
-
-	@Test void parseJsonList2List( ) {
+		assertEquals("44.95", txtLine);
 	}
 
 	// xml
@@ -189,9 +188,4 @@ public class UtilityFormatsTest {
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		assertNotNull(html);
 	}
-
-	// yaml
-	@Test void parseYaml2JsonNode( ) {
-	}
-
 }

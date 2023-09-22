@@ -5,28 +5,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_SERVICES;
+import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_ALLOW_WEAK_CRYPTO;
 import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_KRB5_CC_NAME;
 import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_KRB5_MUTUAL;
-import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL;
-import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_CHECKSUM_TYPES;
-import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_ALLOW_WEAK_CRYPTO;
-
+import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_SERVICES;
 import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
-import static oracle.net.ano.AnoServices.CHECKSUM_SHA1;
-import static oracle.net.ano.AnoServices.ENCRYPTION_AES256;
-import static oracle.net.ano.AnoServices.ENCRYPTION_AES128;
+import static org.apache.commons.codec.CharEncoding.UTF_8;
+import static utils.UtilityMain.EOL;
 
 @Getter @Setter @EqualsAndHashCode @NoArgsConstructor
 public class DbProfile {
@@ -73,8 +73,9 @@ public class DbProfile {
 	public static final String PATH_TNS_DEFAULT = PATHFILE_LOCAL + "local_tnsnames.ora";
 	public static final String PATH_KRB5_CONF = PATHFILE_LOCAL + "krb5.conf";
 	public static final String PATH_KRB5_CACHE = PATHFILE_LOCAL + "krb5cc_mamgeorge";
-
-	public static final String EOL = "\n";
+	public static final String JAVA_LIB_PATH_MSSQL =
+		"C:/workspace/dbase/mssql/sqljdbc_10.2.1.0_enu/sqljdbc_10.2/enu/auth/x64";
+	public static final String ERR_PRFX = "ERROR: ";
 	public static final String DLM = " | ";
 
 	public static final String ERROR_SSL_ENCRYPT =
@@ -113,7 +114,7 @@ public class DbProfile {
 			//
 			// not needed
 			try { Class.forName(java.sql.DriverManager.class.getName()); }
-			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+			catch (ClassNotFoundException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.mysql) ) {
 			port = "3306";
@@ -121,7 +122,7 @@ public class DbProfile {
 			sqlDefault = DBASES.MYSQL_MYDB.sqlDefault;
 			//
 			try { Class.forName(com.mysql.cj.jdbc.Driver.class.getName()); }
-			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+			catch (ClassNotFoundException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.oracle) ) {
 			port = DBASES.ORACLE_XE.port;
@@ -129,7 +130,7 @@ public class DbProfile {
 			dbUrl = "jdbc:oracle:thin:@" + server + ":" + port + ":" + dbName;
 			//
 			try { Class.forName(oracle.jdbc.OracleDriver.class.getName()); }
-			catch (ClassNotFoundException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+			catch (ClassNotFoundException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.oracleTns) ) {
 			//
@@ -139,7 +140,7 @@ public class DbProfile {
 			properties = null;
 			//
 			try { DriverManager.registerDriver(new oracle.jdbc.OracleDriver()); }
-			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+			catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.mssql) ) {
 			// jdbc:sqlserver://2021-MARTIN\SQLEXPRESS;databaseName=mydb;integratedSecurity=true
@@ -164,7 +165,7 @@ public class DbProfile {
 			properties = new Properties();
 			properties.setProperty("integratedSecurity", "true");
 			try { DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver()); }
-			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+			catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.mongodb) ) {
 			//
@@ -190,12 +191,12 @@ public class DbProfile {
 			statement = connection.createStatement();
 			txtLines += getResults(statement, sqlDefault);
 		}
-		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		finally {
 			if ( statement != null ) try { statement.close(); }
-			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+			catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 			if ( connection != null ) try { connection.close(); }
-			catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+			catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		}
 		return txtLines;
 	}
@@ -230,7 +231,7 @@ public class DbProfile {
 				stringBuilder.append(EOL);
 			}
 		}
-		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		//
 		return stringBuilder.toString();
 	}
@@ -239,9 +240,9 @@ public class DbProfile {
 
 		// https://docs.oracle.com/en/database/oracle/oracle-database/21/jajdb/oracle/jdbc/OracleConnection.html
 		Properties properties = new Properties();
-		// properties.setProperty(CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL, "REQUIRED");
-		// properties.setProperty(CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL, "( " + ENCRYPTION_AES256 + "," + ENCRYPTION_AES128 + " )");
-		// properties.setProperty(CONNECTION_PROPERTY_THIN_NET_CHECKSUM_TYPES, "( " + CHECKSUM_SHA1 + " )");
+		// CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL       "REQUIRED"
+		// CONNECTION_PROPERTY_THIN_NET_ENCRYPTION_LEVEL    "( " + ENCRYPTION_AES256 + "," + ENCRYPTION_AES128 + " )"
+		// CONNECTION_PROPERTY_THIN_NET_CHECKSUM_TYPES      "( " + CHECKSUM_SHA1 + " )"
 
 		String KERBEROS5 = "(" + AUTHENTICATION_KERBEROS5 + ")";
 		// oracle.net.authentication_services			KERBEROS5
@@ -270,34 +271,66 @@ public class DbProfile {
 	}
 
 	public static void setupLibraryPath( ) {
-		/*
-			note: MSSQL needs the "sqljdbc_auth.dll" library when reading Windows Authentication
-
-			-Djava.library.path=
-			C:/workspace/dbase/mssql/type4_sqljdbc642/sqljdbc_6.0/enu/auth/x64;
-			C:/workspace/dbase/mssql/sqljdbc_10.2.1.0_enu/sqljdbc_10.2/enu/auth/x64;
-			https://stackoverflow.com/questions/5419039/is-djava-library-path-equivalent-to-system-setpropertyjava-library-path
-		*/
+		/* note: MSSQL needs the "sqljdbc_auth.dll" library when reading Windows Authentication */
 		try {
-			String JAVA_LIB_PATH_MSSQL =
-				"C:/workspace/dbase/mssql/sqljdbc_10.2.1.0_enu/sqljdbc_10.2/enu/auth/x64";
 			System.setProperty("java.library.path", JAVA_LIB_PATH_MSSQL);
 			Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
 			fieldSysPath.setAccessible(true);
 			fieldSysPath.set(null, null);
 		}
 		catch (NoSuchFieldException | IllegalAccessException ex) {
-			System.out.println("ERROR: " + ex.getMessage());
+			System.out.println(ERR_PRFX + ex.getMessage());
 		}
 	}
 
-	public static DriverManagerDataSource getDataSource(String dbUrl) {
-		//
+	public static DriverManagerDataSource getDataSource_DM(String dbUrl) {
+
 		Properties properties = getOCI_KerberosProps(DbProfile.PATH_KRB5_CONF);
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+
 		dataSource.setDriverClassName(DriverManager.class.getName());
 		dataSource.setUrl(dbUrl);
 		dataSource.setConnectionProperties(properties);
 		return dataSource;
+	}
+
+	public static DataSource getDataSource_EMB(EmbeddedDatabaseType EDT) {
+
+		// H2, HSQL, DERBY
+		if ( EDT == null ) { EDT = EmbeddedDatabaseType.H2; }
+		String edt = EDT.name();
+
+		String EMBED_PATH = "classpath:jdbc/";
+		String EMBED_DDL = EMBED_PATH + "embed_" + edt + "_DDL.sql";
+		String EMBED_DML = EMBED_PATH + "embed_" + edt + "_DML.sql";
+
+		DataSource dataSource = new EmbeddedDatabaseBuilder()
+			.setType(EDT)
+			.addScript(EMBED_DDL)
+			.addScript(EMBED_DML)
+			.setScriptEncoding(UTF_8)
+			.build();
+
+		return dataSource;
+	}
+
+	public static StringBuilder showQuery(DataSource dataSource, String sql, String delim) {
+
+		StringBuilder stringBuilder = new StringBuilder(EOL);
+		try ( Connection connection = dataSource.getConnection();
+		      PreparedStatement preparedStatement = connection.prepareStatement(sql) ) {
+
+			ResultSet resultSet = preparedStatement.executeQuery();
+			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+			int intColumnCount = resultSetMetaData.getColumnCount();
+			while ( resultSet.next() ) {
+				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
+					stringBuilder.append(resultSet.getString(ictr)).append(delim);
+				}
+				stringBuilder.append(EOL);
+			}
+		}
+		catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
+		return stringBuilder;
 	}
 }

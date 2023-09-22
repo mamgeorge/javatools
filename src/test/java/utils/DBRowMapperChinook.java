@@ -7,7 +7,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import static utils.DbProfile.DLM;
-import static utils.DbProfile.EOL;
+import static utils.UtilityMain.EOL;
 
 public class DBRowMapperChinook implements RowMapper<String> {
 

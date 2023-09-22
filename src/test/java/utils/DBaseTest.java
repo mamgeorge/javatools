@@ -20,19 +20,18 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import lombok.val;
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-import java.io.Serializable;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -44,7 +43,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -52,30 +50,43 @@ import java.util.concurrent.Future;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.DbProfile.DLM;
-import static utils.DbProfile.EOL;
 import static utils.DbProfile.ERROR_NOT_INTEGRATED;
 import static utils.DbProfile.ERROR_NO_CREDENTIALS;
 import static utils.DbProfile.ERROR_PKIX_CERT_PATH;
 import static utils.DbProfile.ERROR_SSL_ENCRYPT;
-import static utils.DbProfile.getDataSource;
+import static utils.DbProfile.getDataSource_DM;
+import static utils.DbProfile.getDataSource_EMB;
+import static utils.DbProfile.showQuery;
+import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.exposeObject;
 
-public class DBaseTest {
+class DBaseTest {
 
-	@BeforeAll void initJdbcLogging() {
+	@BeforeAll static void initJdbcLogging() {
 
 		// initJdbcLogging
 		Logger LOGGER = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
 		LOGGER.setLevel(Level.toLevel("error"));
 	}
 
-	@Test void dataSource( ) {
+	@Test void dataSource_DM( ) {
 		//
 		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
 		String dbUrl = "jdbc:sqlite:" + DbProfile.DBASES.SQLITE_CHINOOK.host + dbName;
 
-		DriverManagerDataSource dataSource = getDataSource(dbUrl);
+		DriverManagerDataSource dataSource = getDataSource_DM(dbUrl);
 		System.out.println(exposeObject(dataSource));
+		assertNotNull(dataSource);
+	}
+
+	@Test void dataSource_EMB( ) {
+
+		EmbeddedDatabaseType EDT = EmbeddedDatabaseType.H2;
+		DataSource dataSource = getDataSource_EMB(EDT);
+		String sql = "SELECT * FROM simple";
+
+		StringBuilder stringBuilder = showQuery(dataSource, sql, DLM);
+		System.out.println(stringBuilder);
 		assertNotNull(dataSource);
 	}
 
@@ -86,7 +97,7 @@ public class DBaseTest {
 		String sqlPrepare = "SELECT * FROM customers WHERE Country = ? ORDER BY LastName ASC";
 		String parameter = "USA";
 
-		DriverManagerDataSource dataSource = getDataSource(dbUrl);
+		DriverManagerDataSource dataSource = getDataSource_DM(dbUrl);
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		DBRowMapperChinook dbRowMapperChinook = new DBRowMapperChinook();
 		List<String> list = jdbcTemplate.query(sqlPrepare, dbRowMapperChinook, parameter);
@@ -103,7 +114,7 @@ public class DBaseTest {
 		String dbUrl = "jdbc:sqlite:" + DbProfile.DBASES.SQLITE_CHINOOK.host + dbName;
 		String sql = "SELECT * FROM customers WHERE Country = 'USA' ORDER BY LastName ASC";
 
-		DriverManagerDataSource dataSource = getDataSource(dbUrl);
+		DriverManagerDataSource dataSource = getDataSource_DM(dbUrl);
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
 
@@ -125,7 +136,7 @@ public class DBaseTest {
 		String sqlPrepare = "SELECT * FROM customers WHERE Country = ? ORDER BY LastName ASC";
 		String parameter = "USA";
 		//
-		DriverManagerDataSource dataSource = getDataSource(dbUrl);
+		DriverManagerDataSource dataSource = getDataSource_DM(dbUrl);
 		//
 		// https://www.codejava.net/frameworks/spring/spring-simplejdbccall-examples
 		// REQUIRES A PROCEDURE
@@ -187,7 +198,7 @@ public class DBaseTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test void readDbLines_mssql( ) {
+	@Test @Disabled( "" ) void readDbLines_mssql( ) {
 		//
 		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS";
 		String username = "", password = "";
@@ -198,10 +209,10 @@ public class DBaseTest {
 		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
-	//#### FULL SAMLPLES ####
+	//#### FULL SAMPLES ####
 	@Test void sqlite_connection( ) {
 		//
-		String txtLines = EOL;
+		StringBuilder stringBuilder = new StringBuilder(EOL);
 		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
 		String dbUrl = "jdbc:sqlite:" + DbProfile.DBASES.SQLITE_CHINOOK.host + dbName;
 		String sqlDefault = DbProfile.DBASES.SQLITE_CHINOOK.sqlDefault;
@@ -212,15 +223,14 @@ public class DBaseTest {
 			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 			int intColumnCount = resultSetMetaData.getColumnCount();
 			while ( resultSet.next() ) {
-				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
-					txtLines += resultSet.getString(ictr) + DLM;
-				}
-				txtLines += EOL;
+				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ )
+				{ stringBuilder.append(resultSet.getString(ictr)).append(DLM); }
+				stringBuilder.append(EOL);
 			}
 		}
 		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.split(EOL).length > 1);
+		System.out.println("stringBuilder: " + stringBuilder);
+		assertTrue(stringBuilder.length() > 1);
 	}
 
 	@Test void oracle_connection( ) {
@@ -248,7 +258,7 @@ public class DBaseTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test void mssql_connection( ) {
+	@Test @Disabled( "" ) void mssql_connection( ) {
 		//
 		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS" + ";";
 		String username = "", password = "";

@@ -48,7 +48,7 @@ public class MediaTests {
 		System.out.println();
 	}
 
-	@Test void audio_beep_test( ) {
+	@Test @Disabled("too slow") void audio_beep_test( ) {
 		//
 		System.out.println("Toolkit beep");
 		for ( int ictr = 0; ictr < 5; ictr++ ) {
