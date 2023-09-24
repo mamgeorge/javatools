@@ -1,4 +1,4 @@
-package utils;
+package samples;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;

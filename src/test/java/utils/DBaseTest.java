@@ -1,8 +1,7 @@
 package utils;
 
-import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.Level;
-import static ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME;
+import ch.qos.logback.classic.Logger;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.cluster.Cluster;
@@ -30,6 +29,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import samples.DBClusterWorkingTask;
+import samples.DBRowMapperChinook;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -47,6 +48,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import static ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.DbProfile.DLM;
@@ -56,13 +58,13 @@ import static utils.DbProfile.ERROR_PKIX_CERT_PATH;
 import static utils.DbProfile.ERROR_SSL_ENCRYPT;
 import static utils.DbProfile.getDataSource_DM;
 import static utils.DbProfile.getDataSource_EMB;
-import static utils.DbProfile.showQuery;
+import static utils.DbProfile.showGenericQuery;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.exposeObject;
 
 class DBaseTest {
 
-	@BeforeAll static void initJdbcLogging() {
+	@BeforeAll static void initJdbcLogging( ) {
 
 		// initJdbcLogging
 		Logger LOGGER = (Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
@@ -85,7 +87,7 @@ class DBaseTest {
 		DataSource dataSource = getDataSource_EMB(EDT);
 		String sql = "SELECT * FROM simple";
 
-		StringBuilder stringBuilder = showQuery(dataSource, sql, DLM);
+		StringBuilder stringBuilder = showGenericQuery(dataSource, sql, DLM);
 		System.out.println(stringBuilder);
 		assertNotNull(dataSource);
 	}
@@ -119,8 +121,8 @@ class DBaseTest {
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
 
 		StringBuilder stringBuilder = new StringBuilder(EOL);
-		list.stream().forEach(rows ->{
-			rows.values().stream().forEach(col -> stringBuilder.append(col+ DLM));
+		list.stream().forEach(rows -> {
+			rows.values().stream().forEach(col -> stringBuilder.append(col + DLM));
 			stringBuilder.append(EOL);
 		});
 		System.out.println(stringBuilder);
@@ -223,8 +225,9 @@ class DBaseTest {
 			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 			int intColumnCount = resultSetMetaData.getColumnCount();
 			while ( resultSet.next() ) {
-				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ )
-				{ stringBuilder.append(resultSet.getString(ictr)).append(DLM); }
+				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
+					stringBuilder.append(resultSet.getString(ictr)).append(DLM);
+				}
 				stringBuilder.append(EOL);
 			}
 		}

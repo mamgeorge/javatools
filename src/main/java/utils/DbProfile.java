@@ -107,8 +107,8 @@ public class DbProfile {
 		//
 		if ( dbType.equals(DBTYPE.sqlite) ) {
 			//
-			if ( dbName == null || dbName.equals("") ) { dbName = DBASES.SQLITE_CHINOOK.dbname + ".db"; }
-			if ( host == null || host.equals("") ) { server = DBASES.SQLITE_CHINOOK.host; }
+			if ( dbName == null || dbName.isEmpty() ) { dbName = DBASES.SQLITE_CHINOOK.dbname + ".db"; }
+			if ( host == null || host.isEmpty() ) { server = DBASES.SQLITE_CHINOOK.host; }
 			dbUrl = "jdbc:sqlite:" + server + dbName;
 			sqlDefault = DBASES.SQLITE_CHINOOK.sqlDefault;
 			//
@@ -133,12 +133,11 @@ public class DbProfile {
 			catch (ClassNotFoundException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.oracleTns) ) {
-			//
+
 			sqlDefault = "SELECT * FROM (" + DBASES.ORACLE_XE.sqlDefault + ") WHERE ROWNUM <= 10";
 			dbUrl = getOCI_TnsUrl(PATH_TNS_DEFAULT);
 			properties = getOCI_KerberosProps(PATH_KRB5_CONF);
-			properties = null;
-			//
+
 			try { DriverManager.registerDriver(new oracle.jdbc.OracleDriver()); }
 			catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		}
@@ -168,7 +167,7 @@ public class DbProfile {
 			catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
 		}
 		if ( dbType.equals(DBTYPE.mongodb) ) {
-			//
+			System.out.println("UNDER CONSTRUCTION!");
 		}
 	}
 
@@ -181,7 +180,7 @@ public class DbProfile {
 			if ( properties != null ) {
 				System.out.println("USING PROPERTIES!");
 				connection = DriverManager.getConnection(dbUrl, properties);
-			} else if ( username == null || username.equals("") ) {
+			} else if ( username == null || username.isEmpty() ) {
 				System.out.println("NO PASSWORD!");
 				connection = DriverManager.getConnection(dbUrl);
 			} else {
@@ -236,6 +235,27 @@ public class DbProfile {
 		return stringBuilder.toString();
 	}
 
+	public static StringBuilder showGenericQuery(DataSource dataSource, String sql, String delim) {
+
+		StringBuilder stringBuilder = new StringBuilder(EOL);
+		try ( Connection connection = dataSource.getConnection();
+		      PreparedStatement preparedStatement = connection.prepareStatement(sql) ) {
+
+			ResultSet resultSet = preparedStatement.executeQuery();
+			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+			int intColumnCount = resultSetMetaData.getColumnCount();
+			while ( resultSet.next() ) {
+				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
+					stringBuilder.append(resultSet.getString(ictr)).append(delim);
+				}
+				stringBuilder.append(EOL);
+			}
+		}
+		catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
+		return stringBuilder;
+	}
+
+	// configurations
 	public static Properties getOCI_KerberosProps(String pathKrb5) {
 
 		// https://docs.oracle.com/en/database/oracle/oracle-database/21/jajdb/oracle/jdbc/OracleConnection.html
@@ -296,7 +316,11 @@ public class DbProfile {
 
 	public static DataSource getDataSource_EMB(EmbeddedDatabaseType EDT) {
 
-		// H2, HSQL, DERBY
+		/*
+			required all pom dependencies for all variations (H2, HSQL, DERBY)
+			required DDl (create) & DML (insert) files with specific syntax dialect
+			added both DDL & DML scripts to dataSource EmbeddedDatabaseBuilder
+		*/
 		if ( EDT == null ) { EDT = EmbeddedDatabaseType.H2; }
 		String edt = EDT.name();
 
@@ -312,25 +336,5 @@ public class DbProfile {
 			.build();
 
 		return dataSource;
-	}
-
-	public static StringBuilder showQuery(DataSource dataSource, String sql, String delim) {
-
-		StringBuilder stringBuilder = new StringBuilder(EOL);
-		try ( Connection connection = dataSource.getConnection();
-		      PreparedStatement preparedStatement = connection.prepareStatement(sql) ) {
-
-			ResultSet resultSet = preparedStatement.executeQuery();
-			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-			int intColumnCount = resultSetMetaData.getColumnCount();
-			while ( resultSet.next() ) {
-				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
-					stringBuilder.append(resultSet.getString(ictr)).append(delim);
-				}
-				stringBuilder.append(EOL);
-			}
-		}
-		catch (SQLException ex) { System.out.println(ERR_PRFX + ex.getMessage()); }
-		return stringBuilder;
 	}
 }

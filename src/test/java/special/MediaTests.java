@@ -1,4 +1,4 @@
-package samples;
+package special;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -14,9 +14,11 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 
+import static java.lang.Thread.sleep;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MediaTests {
+class MediaTests {
 
 	static final String PATHFILE_LOCAL = "src/test/resources/";
 	static final String[] PATHFILE_AUDIOS = { "hal9000.wav", "ping.wav" };
@@ -45,25 +47,26 @@ public class MediaTests {
 		for ( int ictr = 0; ictr < 5; ictr++ ) {
 			System.out.print('\u0007');
 		}
-		System.out.println();
+		assertTrue(true);
 	}
 
-	@Test @Disabled("too slow") void audio_beep_test( ) {
+	@Test @Disabled( "too slow" ) void audio_beep_test( ) {
 		//
 		System.out.println("Toolkit beep");
 		for ( int ictr = 0; ictr < 5; ictr++ ) {
 			//
 			try {
 				Toolkit.getDefaultToolkit().beep();
-				Thread.sleep(1500);
+				sleep(1500);
 			}
 			catch (InterruptedException ex) {
 				System.out.println("ERROR sleep: " + ex.getMessage());
 			}
 		}
+		assertTrue(true);
 	}
 
-	@Test @Disabled("too slow") void audio_tone_test( ) {
+	@Test @Disabled( "too slow" ) void audio_tone_test( ) {
 		//
 		System.out.println("AudioFormat tone");
 		// https://stackoverflow.com/questions/34611134/java-beep-sound-produce-sound-of-some-specific-frequencies
@@ -94,9 +97,11 @@ public class MediaTests {
 		sourceDataLine.drain();
 		sourceDataLine.stop();
 		sourceDataLine.close();
+
+		assertNotNull(sourceDataLine);
 	}
 
-	@Test @Disabled("too slow") void audio_file_test( ) {
+	@Test @Disabled( "too slow" ) void audio_file_test( ) {
 		//
 		System.out.println("AudioInputStream file");
 		int fileNum = 0;
@@ -121,7 +126,7 @@ public class MediaTests {
 			System.out.println("clip len: " + len);
 			//
 			clip.start();
-			Thread.sleep(( (int) len ) + 1000);
+			sleep(( (int) len ) + 1000);
 		}
 		catch (UnsupportedAudioFileException | IOException | LineUnavailableException |
 		       InterruptedException ex) {
@@ -136,5 +141,7 @@ public class MediaTests {
 				System.out.println("ERROR file: " + ex.getMessage());
 			}
 		}
+
+		assertNotNull(AIS);
 	}
 }

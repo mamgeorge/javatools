@@ -1,4 +1,4 @@
-package utils;
+package samples;
 
 import org.springframework.jdbc.core.RowMapper;
 
@@ -20,7 +20,7 @@ public class DBRowMapperChinook implements RowMapper<String> {
 		int rsColumnCount = resultSetMetaData.getColumnCount();
 
 		for ( int colCtr = 1; colCtr < rsColumnCount; ++colCtr ) {
-			txtLine += String.format("%-4s" + DLM, resultSet.getString(colCtr) );
+			txtLine += String.format("%-4s" + DLM, resultSet.getString(colCtr));
 		}
 		return txtLine + EOL;
 	}

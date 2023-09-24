@@ -1,4 +1,4 @@
-package utils;
+package special;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -44,7 +44,7 @@ public class RabbitMQHandler {
 	private static final int MQ_PORT = 5672;
 	private static final String MQ_USER = "username";
 	private static final String MQ_PASS = "password";
-	private static boolean isExchanged = false;
+	private static final boolean isExchanged = false;
 
 	private static Channel channel = null;
 	private static Connection connection = null;
