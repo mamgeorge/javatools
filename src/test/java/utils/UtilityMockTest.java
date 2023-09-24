@@ -79,7 +79,7 @@ class UtilityMockTest {
 		List<String> listReal = new ArrayList<>();
 		listReal.add(0, "alpha");
 		//
-		List<String> listMock = Mockito.mock(ArrayList.class);
+		ArrayList<String> listMock = Mockito.mock(ArrayList.class);
 		doNothing().when(listMock).add(isA(Integer.class), isA(String.class));
 		listMock.add(0, "beta");
 		//
@@ -221,11 +221,6 @@ class UtilityMockTest {
 	@Test void testPowerMock_doNothing( ) {
 		//
 		AnyObject anyObject = PowerMockito.mock(AnyObject.class);
-		// AnyObject anyObject = new AnyObject();
-
-		// try { doNothing().when(anyObject, "printedSomething" ); } // , any(String.class) ); }
-		// catch (Exception ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		//
 		anyObject.printedSomething();
 		assertNotNull(anyObject);
 	}

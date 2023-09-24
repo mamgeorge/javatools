@@ -31,7 +31,6 @@ import java.util.Spliterators;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -127,7 +126,7 @@ public class UtilityMainTest {
 					}
 					return mtu > 1 && !nifc.getDisplayName().startsWith("VMware");
 				})
-				.collect(Collectors.toList());
+				.toList();
 		//
 		listFilt.forEach(nifc -> set.add(TAB + nifc.getDisplayName()));
 		//
@@ -166,7 +165,7 @@ public class UtilityMainTest {
 
 	@Test void lineChunker( ) {
 
-		String txtLines = "";
+		String txtLines;
 		String txtLine = "123456789012345678901234567890123456789012345678901234567890";
 		int intChunk = 10;
 
@@ -317,7 +316,7 @@ public class UtilityMainTest {
 		String[] lineChunks = txtLine.split("(?<=\\G.{" + intChunk + "})");
 
 		StringBuilder stringBuilder = new StringBuilder();
-		Arrays.stream(lineChunks).forEach(lineChunk -> stringBuilder.append(lineChunk + DLM));
+		Arrays.stream(lineChunks).forEach(lineChunk -> stringBuilder.append(lineChunk).append(DLM));
 		txtLines = stringBuilder.toString();
 		return txtLines;
 	}

@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -144,7 +143,7 @@ class UtilityFormatsTest {
 		String html = UtilityFormats.transformXslt(xml, xsl);
 
 		System.out.println(html);
-		try { Files.write(Paths.get(PATHFILE_LOCAL + "booksCatalog.html"), html.getBytes(UTF_8)); }
+		try { Files.writeString(Paths.get(PATHFILE_LOCAL + "booksCatalog.html"), html); }
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		assertNotNull(html);
 	}
@@ -184,7 +183,7 @@ class UtilityFormatsTest {
 		catch (IOException | CsvException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 
 		System.out.println(html);
-		try { Files.write(Paths.get(PATHFILE_REMOTE + "battles.html"), html.getBytes(UTF_8)); }
+		try { Files.writeString(Paths.get(PATHFILE_REMOTE + "battles.html"), html); }
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		assertNotNull(html);
 	}
