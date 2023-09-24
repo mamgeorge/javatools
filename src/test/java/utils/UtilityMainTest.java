@@ -163,74 +163,6 @@ public class UtilityMainTest {
 		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
-	@Test void lineChunker( ) {
-
-		String txtLines;
-		String txtLine = "123456789012345678901234567890123456789012345678901234567890";
-		int intChunk = 10;
-
-		txtLines = lineChunker(txtLine, intChunk, EOL);
-		System.out.println(txtLine + EOL + EOL + txtLines);
-		assertNotNull(txtLines);
-
-		txtLine = getRandomString(1000);
-		txtLines = lineChunker(txtLine, 80, EOL);
-		System.out.println(txtLine + EOL + EOL + txtLines);
-		assertNotNull(txtLines);
-	}
-
-	@Test void checkDates( ) {
-
-		StringBuilder sb = new StringBuilder();
-		SimpleDateFormat SDF = new SimpleDateFormat(ISO_FORMAT);
-		String dtfISO = DateTimeFormatter.ISO_DATE_TIME.toString();
-		String FRMT = "\t%-20s: %s \n";
-		sb.append(String.format(FRMT, "dtfISO", dtfISO));
-
-		// date
-		Date date = new Date();
-		Date dateInstant = Date.from(Instant.now());
-		java.sql.Date dateSQL = new java.sql.Date(dateInstant.getTime());
-		String dateFormat = SDF.format(date);
-		String dateInstantFormat = SDF.format(dateInstant);
-		sb.append(String.format(FRMT, "date", date));
-		sb.append(String.format(FRMT, "dateInstant", dateInstant));
-		sb.append(String.format(FRMT, "dateSQL", dateSQL));
-		sb.append(String.format(FRMT, "dateFormat", dateFormat));
-		sb.append(String.format(FRMT, "dateInstantFormat", dateInstantFormat));
-		sb.append(StringUtils.repeat("-", 40)).append(EOL);
-
-		// calendar
-		Calendar calendar = Calendar.getInstance();
-		GregorianCalendar gregorianCalendar = (GregorianCalendar) calendar;
-		ZonedDateTime ZDT = gregorianCalendar.toZonedDateTime();
-		OffsetDateTime ODT = OffsetDateTime.now();
-		OffsetDateTime ODTZO = OffsetDateTime.now(ZoneOffset.UTC);
-		sb.append(String.format(FRMT, "calendar DATE", calendar.get(Calendar.DATE)));
-		sb.append(String.format(FRMT, "gregorianCalendar", gregorianCalendar.get(Calendar.DATE)));
-		sb.append(String.format(FRMT, "ZonedDateTime", ZDT));
-		sb.append(String.format(FRMT, "OffsetDateTime", ODT));
-		sb.append(String.format(FRMT, "ODT ZoneOffset", ODTZO));
-		sb.append(StringUtils.repeat("-", 40)).append(EOL);
-
-		// local
-		LocalDate localDate = LocalDate.of(2023, Month.SEPTEMBER, 1);
-		LocalDate localDateNow = LocalDate.now();
-		LocalDate localDateZID = LocalDate.now(ZoneId.systemDefault());
-		LocalDateTime localDateTime = LocalDateTime.of(localDateNow, LocalTime.of(0, 0));
-		Date dateLocalNow = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-		String dateLocalFormat = SDF.format(dateLocalNow);
-		sb.append(String.format(FRMT, "localDate", localDate));
-		sb.append(String.format(FRMT, "localDateNow", localDateNow));
-		sb.append(String.format(FRMT, "localDateZID", localDateZID));
-		sb.append(String.format(FRMT, "localDateTime", localDateTime));
-		sb.append(String.format(FRMT, "dateLocalNow", dateLocalNow));
-		sb.append(String.format(FRMT, "dateLocalFormat", dateLocalFormat));
-
-		System.out.println(sb);
-		assertNotNull(sb);
-	}
-
 	//#### files
 	@Test void getFileLines( ) {
 
@@ -300,6 +232,76 @@ public class UtilityMainTest {
 		String results = UtilityMain.getField(anyObject, "gamma");
 		System.out.println(results);
 		assertEquals("STUFF", results, ASSERT_MSG);
+	}
+
+	// special
+
+	@Test void lineChunker( ) {
+
+		String txtLines;
+		String txtLine = "123456789012345678901234567890123456789012345678901234567890";
+		int intChunk = 10;
+
+		txtLines = lineChunker(txtLine, intChunk, EOL);
+		System.out.println(txtLine + EOL + EOL + txtLines);
+		assertNotNull(txtLines);
+
+		txtLine = getRandomString(1000);
+		txtLines = lineChunker(txtLine, 80, EOL);
+		System.out.println(txtLine + EOL + EOL + txtLines);
+		assertNotNull(txtLines);
+	}
+
+	@Test void checkDates( ) {
+
+		StringBuilder sb = new StringBuilder();
+		SimpleDateFormat SDF = new SimpleDateFormat(ISO_FORMAT);
+		String dtfISO = DateTimeFormatter.ISO_DATE_TIME.toString();
+		String FRMT = "\t%-20s: %s \n";
+		sb.append(String.format(FRMT, "dtfISO", dtfISO));
+
+		// date
+		Date date = new Date();
+		Date dateInstant = Date.from(Instant.now());
+		java.sql.Date dateSQL = new java.sql.Date(dateInstant.getTime());
+		String dateFormat = SDF.format(date);
+		String dateInstantFormat = SDF.format(dateInstant);
+		sb.append(String.format(FRMT, "date", date));
+		sb.append(String.format(FRMT, "dateInstant", dateInstant));
+		sb.append(String.format(FRMT, "dateSQL", dateSQL));
+		sb.append(String.format(FRMT, "dateFormat", dateFormat));
+		sb.append(String.format(FRMT, "dateInstantFormat", dateInstantFormat));
+		sb.append(StringUtils.repeat("-", 40)).append(EOL);
+
+		// calendar
+		Calendar calendar = Calendar.getInstance();
+		GregorianCalendar gregorianCalendar = (GregorianCalendar) calendar;
+		ZonedDateTime ZDT = gregorianCalendar.toZonedDateTime();
+		OffsetDateTime ODT = OffsetDateTime.now();
+		OffsetDateTime ODTZO = OffsetDateTime.now(ZoneOffset.UTC);
+		sb.append(String.format(FRMT, "calendar DATE", calendar.get(Calendar.DATE)));
+		sb.append(String.format(FRMT, "gregorianCalendar", gregorianCalendar.get(Calendar.DATE)));
+		sb.append(String.format(FRMT, "ZonedDateTime", ZDT));
+		sb.append(String.format(FRMT, "OffsetDateTime", ODT));
+		sb.append(String.format(FRMT, "ODT ZoneOffset", ODTZO));
+		sb.append(StringUtils.repeat("-", 40)).append(EOL);
+
+		// local
+		LocalDate localDate = LocalDate.of(2023, Month.SEPTEMBER, 1);
+		LocalDate localDateNow = LocalDate.now();
+		LocalDate localDateZID = LocalDate.now(ZoneId.systemDefault());
+		LocalDateTime localDateTime = LocalDateTime.of(localDateNow, LocalTime.of(0, 0));
+		Date dateLocalNow = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+		String dateLocalFormat = SDF.format(dateLocalNow);
+		sb.append(String.format(FRMT, "localDate", localDate));
+		sb.append(String.format(FRMT, "localDateNow", localDateNow));
+		sb.append(String.format(FRMT, "localDateZID", localDateZID));
+		sb.append(String.format(FRMT, "localDateTime", localDateTime));
+		sb.append(String.format(FRMT, "dateLocalNow", dateLocalNow));
+		sb.append(String.format(FRMT, "dateLocalFormat", dateLocalFormat));
+
+		System.out.println(sb);
+		assertNotNull(sb);
 	}
 
 	//#### proposed statics
