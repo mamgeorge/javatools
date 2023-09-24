@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.net.HttpURLConnection.HTTP_OK;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.apache.http.HttpHeaders.USER_AGENT;
 
@@ -57,21 +58,21 @@ public class UtilityMain {
 	public static final String ERR_VAL = "#### ERROR: {0} ";
 
 	public static void main(String[] strings) {
-		//
+
 		LOGGER.info("UtilityMain");
 		System.out.println(GREEN + "DONE" + RESET);
 	}
 
 	//#### basics
 	public static String showSys( ) {
-		//
+
 		Map<String, String> mapEnv = System.getenv();
 		Map<String, String> mapEnvTree = new TreeMap<>(mapEnv);
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("[");
 		AtomicInteger aint = new AtomicInteger();
 		mapEnvTree.forEach((key, val) -> {
-			//
+
 			val = val.replace("\\", "/");
 			val = val.replace("\"", "'");
 			stringBuilder.append(String.format("\t%03d %-20s : %s%n", aint.incrementAndGet(), key, val));
@@ -82,27 +83,27 @@ public class UtilityMain {
 	}
 
 	public static String showTimes( ) {
-		//
+
 		String instantNow = Instant.now().toString();
-		//
+
 		LocalDateTime localDateTime = LocalDateTime.now();
 		String ldtFormat = ISO_DATE_TIME.format(localDateTime);
-		//
+
 		String DATE_PATTERN_UTC = "yyyy-MM-dd'T'HH:mm:ss:SSS'Z'";
 		SimpleDateFormat SDF = new SimpleDateFormat(DATE_PATTERN_UTC);
 		String sdfFormat = SDF.format(new Date());
-		//
+
 		String DATE_PATTERN_UTCZ = "yyyy-MM-dd'T'HH:mm:ss:SSS z";
 		SimpleDateFormat SDFZ = new SimpleDateFormat(DATE_PATTERN_UTCZ);
 		SDFZ.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
 		String stzFormat = SDFZ.format(new Date());
-		//
+
 		String txtLines = "showTimes()" + EOL;
 		txtLines += String.format("\t instantNow: %s %n", instantNow);
 		txtLines += String.format("\t ldtFormat : %s %n", ldtFormat);
 		txtLines += String.format("\t sdfFormat : %s %n", sdfFormat);
 		txtLines += String.format("\t stzFormat : %s %n", stzFormat);
-		//
+
 		return txtLines;
 	}
 
@@ -116,10 +117,10 @@ public class UtilityMain {
 		if ( eol == null || eol.isEmpty() ) {
 			eol = EOL;
 		}
-		//
+
 		List<String> list;
 		try ( BufferedReader bReader = Files.newBufferedReader(Paths.get(pathFile)) ) {
-			//
+
 			list = bReader.lines().toList();
 			txtLines = String.join(EOL, list);
 			txtLines = txtLines.replace(EOL, eol);
@@ -127,12 +128,12 @@ public class UtilityMain {
 		catch (IOException ex) {
 			LOGGER.warning(ex.getMessage());
 		}
-		//
+
 		return txtLines;
 	}
 
 	public static String getFileLocal(String pathFile) {
-		//
+
 		// https://howtodoinjava.com/java/io/read-file-from-resources-folder/
 		// File file = ResourceUtils.getFile("classpath:config/sample.txt")
 		String txtLines = "";
@@ -152,23 +153,23 @@ public class UtilityMain {
 
 	//#### url
 	public static String urlGet(String link) {
-		//
+
 		String txtLines;
 		try {
 			URL url = new URL(link);
-			HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-			httpConn.setRequestMethod("GET");
-			httpConn.setRequestProperty(USER_AGENT, USER_AGENT_VAL);
-			// HttpHeaders.CONTENT_TYPE, CONTENTTYPE_JSON
-			// HttpHeaders.AUTHORIZATION, "JWT " + jwtSourceId
-			httpConn.setConnectTimeout(5000);
-			httpConn.setReadTimeout(5000);
-			//
-			int responseCode = httpConn.getResponseCode();
+			HttpURLConnection HUC = (HttpURLConnection) url.openConnection();
+			HUC.setRequestMethod("GET");
+			HUC.setRequestProperty(USER_AGENT, USER_AGENT_VAL);
+			// HttpHeaders CONTENT_TYPE, CONTENTTYPE_JSON
+			// HttpHeaders AUTHORIZATION, "JWT " + jwtSourceId
+			HUC.setConnectTimeout(5000);
+			HUC.setReadTimeout(5000);
+
+			int responseCode = HUC.getResponseCode();
 			LOGGER.info("sends GET to: " + url);
 			LOGGER.info("responseCode: " + responseCode);
-			//
-			InputStream inputStream = httpConn.getInputStream();
+
+			InputStream inputStream = HUC.getInputStream();
 			InputStreamReader isr = new InputStreamReader(inputStream);
 			BufferedReader bufferedReader = new BufferedReader(isr);
 			StringBuilder stringBuilder = new StringBuilder();
@@ -186,35 +187,35 @@ public class UtilityMain {
 	}
 
 	public static String urlPost(String link, String postParms) {
-		//
+
 		// http://zetcode.com/java/getpostrequest/
 		String txtLines = "";
 		try {
 			URL url = new URL(link);
-			HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-			httpConn.setDoOutput(true);
-			httpConn.setRequestMethod("POST");
+			HttpURLConnection HUC = (HttpURLConnection) url.openConnection();
+			HUC.setDoOutput(true);
+			HUC.setRequestMethod("POST");
 			// USER_AGENT, USER_AGENT
 			// CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE
 			// AUTHORIZATION, "JWT " + jwtSourceId
 			//
-			OutputStream outputStream = httpConn.getOutputStream();
+			OutputStream outputStream = HUC.getOutputStream();
 			outputStream.write(postParms.getBytes());
 			outputStream.flush();
 			outputStream.close();
-			//
-			int responseCode = httpConn.getResponseCode();
+
+			int responseCode = HUC.getResponseCode();
 			LOGGER.info("Sending POST : " + url);
 			LOGGER.info("Response code: " + responseCode);
-			//
-			InputStream inputStream = httpConn.getInputStream();
-			InputStreamReader isr = new InputStreamReader(inputStream);
+
+			InputStream inputStream = HUC.getInputStream();
+			InputStreamReader ISR = new InputStreamReader(inputStream);
 			BufferedReader bufferedReader;
 			StringBuilder stringBuilder = new StringBuilder();
 			String txtLine;
-			if ( responseCode == HttpURLConnection.HTTP_OK ) {
-				//
-				bufferedReader = new BufferedReader(isr);
+			if ( responseCode == HTTP_OK ) {
+
+				bufferedReader = new BufferedReader(ISR);
 				while ( ( txtLine = bufferedReader.readLine() ) != null ) {
 					stringBuilder.append(txtLine);
 				}
@@ -233,7 +234,7 @@ public class UtilityMain {
 
 	//#### reflection
 	public static String getField(Object object, String nameField) {
-		//
+
 		String txtLine = "";
 		try {
 			Class<?> clazz = object.getClass();
@@ -249,7 +250,7 @@ public class UtilityMain {
 	}
 
 	public static Object getMethod(Class<?> clazz, String nameMethod, Object... objectParms) {
-		//
+
 		Object objectReturn = "";
 		try {
 			int parmsCount = 0;
@@ -276,7 +277,7 @@ public class UtilityMain {
 					classArray[ictr] = objectItem.getClass();
 				}
 			}
-			//
+
 			Object objectInstance = clazz.getDeclaredConstructor().newInstance();
 			Method method = clazz.getDeclaredMethod(nameMethod, classArray);
 			method.setAccessible(true);
@@ -290,18 +291,18 @@ public class UtilityMain {
 	}
 
 	public static String exposeObject(Object object) {
-		//
+
 		StringBuilder stringBuilder = new StringBuilder();
 		Set<String> setLines = new TreeSet<>();
 		Method[] methods = object.getClass().getMethods(); // getDeclaredMethods()
 		List<Method> listMethods = new ArrayList<>(Arrays.asList(methods));
 		listMethods.sort(Comparator.comparing(Method::getName));
-		//
+
 		int MAXLEN = 35;
 		AtomicInteger usedMethods = new AtomicInteger();
 		String FRMT = "%-30s | %-35s | %02d | %s \n";
 		listMethods.forEach(method -> {
-			//
+
 			String methodName = method.getName();
 			boolean boolAccess = methodName.startsWith("access$") || methodName.startsWith("$$$");
 			if ( !boolAccess ) {
@@ -327,7 +328,7 @@ public class UtilityMain {
 				} else { args = null; }
 				try {
 					objectVal = method.invoke(object, args);
-					if ( objectVal == null && ( method.getParameterCount() != 0 )) {
+					if ( objectVal == null && ( method.getParameterCount() != 0 ) ) {
 						assert args != null;
 						objectVal = args[0];
 					}
@@ -335,13 +336,15 @@ public class UtilityMain {
 				catch (IllegalAccessException | InvocationTargetException ex) {
 					LOGGER.info(methodName + " | " + ex.getMessage());
 				}
-				catch (IllegalArgumentException IAE) { objectVal = "REQUIRES: " + Objects.requireNonNull(
-					args)[0]; }
+				catch (IllegalArgumentException IAE) {
+					objectVal = "REQUIRES: " + Objects.requireNonNull(
+						args)[0];
+				}
 				setLines.add(
 					String.format(FRMT, methodName, returnType, method.getParameterCount(), objectVal));
 			}
 		});
-		//
+
 		stringBuilder.append(object.getClass().getName()).append(" has: [").append(usedMethods)
 			.append("] methods\n\n");
 
@@ -352,7 +355,7 @@ public class UtilityMain {
 	}
 
 	public static void putObject(Object object, String objectName, Object objectValue) {
-		//
+
 		try {
 			Class<?> clazz = object.getClass();
 			Field field;
@@ -370,7 +373,7 @@ public class UtilityMain {
 	}
 
 	public static String getRandomString(int num) {
-		//
+
 		StringBuilder txtRandom = new StringBuilder();
 		char[] chars =
 			( "1234567890abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWZYZ" ).toCharArray();

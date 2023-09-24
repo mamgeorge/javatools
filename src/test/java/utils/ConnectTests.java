@@ -8,22 +8,21 @@ import static utils.UtilityMain.urlPost;
 
 class ConnectTests {
 
+	private static final String URL_VAL = "https://mamgeorge.altervista.org";
+
 	@Test void test_urlGet( ) {
 
-		String url = "https://mamgeorge.altervista.org";
-
-		String html = urlGet(url);
+		String html = urlGet(URL_VAL);
 		System.out.println("get: " + html);
 		assertTrue(html.contains("DOCTYPE"));
 	}
 
 	@Test void test_urlPost( ) {
 
-		String url = "https://mamgeorge.altervista.org";
 		String postParms = "";
 
-		String html = urlPost(url, postParms);
-		System.out.println("podt: " + html);
+		String html = urlPost(URL_VAL, postParms);
+		System.out.println("post: " + html);
 		assertTrue(html.contains("DOCTYPE"));
 	}
 }
