@@ -2,7 +2,6 @@ package utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-
 import samples.AnyObject;
 
 import java.net.NetworkInterface;
@@ -53,11 +52,11 @@ public class UtilityMainTest {
 	//#### basics
 	@Test void template( ) {
 		//
-		StringBuilder stringBuilder = new StringBuilder();
 		//
-		stringBuilder.append("template");
 		//
-		String txtLines = stringBuilder.toString();
+		String txtLines = "template"
+			//
+			;
 		System.out.println("txtLines: " + txtLines);
 		assertTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
 	}
@@ -66,13 +65,13 @@ public class UtilityMainTest {
 		//
 		String txtLines = EOL;
 		//
-		txtLines += String.format("\t true & true \t %s \n", true & true);
-		txtLines += String.format("\t true | false\t %s \n", true | false);
-		txtLines += String.format("\t true | true \t %s \n", true | true);
-		txtLines += String.format("\t false | true\t %s \n", false | true);
-		txtLines += String.format("\t false | false\t %s \n", false | false);
-		txtLines += String.format("\t true & true & false\t %s \n", true & true & false);
-		txtLines += String.format("\t true && true && false\t %s \n", true && true && false);
+		txtLines += String.format("\t true & true \t %s \n", true);
+		txtLines += String.format("\t true | false\t %s \n", true);
+		txtLines += String.format("\t true | true \t %s \n", true);
+		txtLines += String.format("\t false | true\t %s \n", true);
+		txtLines += String.format("\t false | false\t %s \n", false);
+		txtLines += String.format("\t true & true & false\t %s \n", false);
+		txtLines += String.format("\t true && true && false\t %s \n", false);
 		//
 		System.out.println("txtLines: " + txtLines);
 		assertTrue(txtLines.length() >= 1, ASSERT_MSG);
@@ -165,7 +164,7 @@ public class UtilityMainTest {
 		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
-	@Test void lineChunker() {
+	@Test void lineChunker( ) {
 
 		String txtLines = "";
 		String txtLine = "123456789012345678901234567890123456789012345678901234567890";
@@ -181,7 +180,7 @@ public class UtilityMainTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test void checkDates() {
+	@Test void checkDates( ) {
 
 		StringBuilder sb = new StringBuilder();
 		SimpleDateFormat SDF = new SimpleDateFormat(ISO_FORMAT);
@@ -216,10 +215,10 @@ public class UtilityMainTest {
 		sb.append(StringUtils.repeat("-", 40)).append(EOL);
 
 		// local
-		LocalDate localDate = LocalDate.of(2023, Month.SEPTEMBER,1);
+		LocalDate localDate = LocalDate.of(2023, Month.SEPTEMBER, 1);
 		LocalDate localDateNow = LocalDate.now();
 		LocalDate localDateZID = LocalDate.now(ZoneId.systemDefault());
-		LocalDateTime localDateTime = LocalDateTime.of(localDateNow, LocalTime.of(0,0));
+		LocalDateTime localDateTime = LocalDateTime.of(localDateNow, LocalTime.of(0, 0));
 		Date dateLocalNow = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 		String dateLocalFormat = SDF.format(dateLocalNow);
 		sb.append(String.format(FRMT, "localDate", localDate));
@@ -315,10 +314,10 @@ public class UtilityMainTest {
 	public static String lineChunker(String txtLine, int intChunk, String DLM) {
 
 		String txtLines;
-		String[] lineChunks =  txtLine.split("(?<=\\G.{" + intChunk + "})");
+		String[] lineChunks = txtLine.split("(?<=\\G.{" + intChunk + "})");
 
 		StringBuilder stringBuilder = new StringBuilder();
-		Arrays.stream(lineChunks).forEach( lineChunk -> stringBuilder.append(lineChunk + DLM));
+		Arrays.stream(lineChunks).forEach(lineChunk -> stringBuilder.append(lineChunk + DLM));
 		txtLines = stringBuilder.toString();
 		return txtLines;
 	}

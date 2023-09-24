@@ -74,7 +74,7 @@ class UtilityMockTest {
 		assertEquals(SAMPLE, anyObjectMock.getAlpha(), ASSERT_MSG);
 	}
 
-	@Test @Disabled ("because") void testmock_doNothing_when( ) {
+	@Test @Disabled( "because" ) void testmock_doNothing_when( ) {
 		//
 		List<String> listReal = new ArrayList<>();
 		listReal.add(0, "alpha");
@@ -88,7 +88,7 @@ class UtilityMockTest {
 		verify(listMock, times(1)).add(0, "beta");
 	}
 
-	@Test @Disabled ("because") void testmock_when_thenThrow( ) {
+	@Test @Disabled( "because" ) void testmock_when_thenThrow( ) {
 		//
 		// JUnit4: @Test(expected = IllegalStateException.class)
 		String results = EOL;
@@ -197,7 +197,7 @@ class UtilityMockTest {
 		// https://stackoverflow.com/questions/46454995/how-to-hide-warning-illegal-reflective-access-in-java-9-without-jvm-argument
 		// configure JDK compiler with flag: --illegal-access=permit
 		String results = "";
-		String expects = "" ; // PRIVATE_TEXT!";
+		String expects = ""; // PRIVATE_TEXT!";
 		//
 		AnyObject anyObject = new AnyObject();
 		try { results = Whitebox.invokeMethod(anyObject, "getPrivateText").toString(); }

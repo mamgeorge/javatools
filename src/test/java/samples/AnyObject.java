@@ -23,5 +23,6 @@ public class AnyObject {
 		gamma = "GIMMEL";
 	}
 
-	public void printedSomething() { System.out.println("PRINTED_SOMETHING"); };
+	public void printedSomething( ) { System.out.println("PRINTED_SOMETHING"); }
+
 }

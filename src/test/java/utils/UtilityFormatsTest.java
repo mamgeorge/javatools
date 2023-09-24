@@ -162,19 +162,19 @@ class UtilityFormatsTest {
 			StringBuilder stringBuilder = new StringBuilder(EOL);
 			list.forEach(strings -> {
 				String classy = "";
-				if ( strings[1].equals("") ) {
+				if ( strings[1].isEmpty() ) {
 					stringBuilder.append("<tr><td colspan = \"4\"> </td></tr>" + EOL);
 				} else {
 					int year = Integer.parseInt(strings[0]);
 					if ( year >= -3300 && year < -2050 ) { classy = "red"; }
-					if ( year >= -2050 && year < -1406) { classy = "ora"; }
-					if ( year >= -1406 && year < -1050) { classy = "yel"; }
-					if ( year >= -1050 && year < -715) { classy = "grn"; }
-					if ( year >= -715 && year < -626) { classy = "blu"; }
-					if ( year >= -626 && year < -586) { classy = "ind"; }
-					if ( year >= -586 && year < -0) { classy = "vio"; }
-					stringBuilder.append("<tr class = \"" + classy + "\">");
-					Arrays.stream(strings).forEach(string -> stringBuilder.append("<td>" + string + "</td>"));
+					if ( year >= -2050 && year < -1406 ) { classy = "ora"; }
+					if ( year >= -1406 && year < -1050 ) { classy = "yel"; }
+					if ( year >= -1050 && year < -715 ) { classy = "grn"; }
+					if ( year >= -715 && year < -626 ) { classy = "blu"; }
+					if ( year >= -626 && year < -586 ) { classy = "ind"; }
+					if ( year >= -586 && year < -0 ) { classy = "vio"; }
+					stringBuilder.append("<tr class = \"").append(classy).append("\">");
+					Arrays.stream(strings).forEach(string -> stringBuilder.append("<td>").append(string).append("</td>"));
 					stringBuilder.append("</tr>" + EOL);
 				}
 			});
