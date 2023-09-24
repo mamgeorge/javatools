@@ -268,13 +268,6 @@ public class UtilityMainTest {
 		assertEquals(countFiles, fileNames.length, ASSERT_MSG);
 	}
 
-	@Test void urlGet( ) {
-		//
-		String html = UtilityMain.urlGet("https://mamgeorge.altervista.org");
-		System.out.println("html: " + html);
-		assertTrue(html.contains("DOCTYPE"), ASSERT_MSG);
-	}
-
 	//#### reflection
 	@Test void getField( ) {
 		//

@@ -56,14 +56,14 @@ class SecurityCodeTests {
 
 
 	@Test void test_UUID( ) {
-		//
+
 		String txtLines = "";
 		byte[] bytes = "1234".getBytes();
 		txtLines += "base64 getEncoder: " + Base64.getEncoder().encodeToString(bytes) + EOL;
 		txtLines += "base64 getUrlEncoder: " + Base64.getUrlEncoder().encodeToString(bytes) + EOL;
 		txtLines += "base64 getMimeEncoder: " + Base64.getMimeEncoder().encodeToString(bytes) + EOL;
 		txtLines += new String(new char[20]).replace('\u0000', '-') + EOL;
-		//
+
 		UUID uuid = UUID.randomUUID();
 		txtLines += "UUID randomUUID(): " + uuid + EOL;
 		txtLines += "UUID replace toUpperCase: " + uuid.toString().replace("-", "").toUpperCase() + EOL;
@@ -71,13 +71,13 @@ class SecurityCodeTests {
 			txtLines += "UUID fromString(): " + UUID.fromString("3bf121bc-14e9-45fa-9b38-b264759eb233") + EOL;
 		}
 		catch (IllegalArgumentException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		//
+
 		System.out.println(txtLines);
 		assertNotNull(txtLines);
 	}
 
 	@Test void test_NetworkAddress( ) { /**/
-		//
+
 		String txtLines = EOL + "InetAddress" + EOL;
 		try {
 			InetAddress INA = InetAddress.getLocalHost();
@@ -89,7 +89,7 @@ class SecurityCodeTests {
 				INA.getCanonicalHostName());
 		}
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		//
+
 		txtLines += "NetworkInterface SSIDs" + EOL;
 		List<String> list = new ArrayList<>();
 		Enumeration<NetworkInterface> enums = null;
@@ -99,7 +99,7 @@ class SecurityCodeTests {
 			NetworkInterface netIface = enums.nextElement();
 			list.add(getNetIface(netIface, 1));
 		}
-		//
+
 		StringBuilder stringBuilder = new StringBuilder();
 		for ( String txt : list ) stringBuilder.append(txt);
 		txtLines += stringBuilder.toString();
@@ -125,23 +125,23 @@ class SecurityCodeTests {
 	}
 
 	@Test void test_EncryptDecrypt_getAESKeyFromPassword( ) {
-		//
+
 		SecretKey secretKey = getAESKeyFromPassword(PASSWORD, SALT_SAMPLE.getBytes(UTF_8));
 		String txtLines = showSecretKey(secretKey);
-		//
+
 		System.out.println("getAESKeyFromPassword " + txtLines);
 		assertTrue(secretKey.toString().length() > 10, ASSERT_MSG);
 	}
 
 	@Test void test_EncryptDecrypt_encrypt( ) {
-		//
+
 		String txtLines = "";
 		byte[] bytesEncrypted = null;
-		//
+
 		byte[] bytesContent = TXT_CONTENT.getBytes();
 		byte[] bytesIV = getRandomIV(BYTES_IV_LEN);
 		SecretKey secretKey = getAESKey(AES_KEY_BIT);
-		//
+
 		bytesEncrypted = encrypt(bytesContent, secretKey, bytesIV);
 		txtLines += "\tbytesEncrypted txt: " + new String(bytesEncrypted, UTF_8) + "\n";
 		txtLines += "\tbytesEncrypted Hex: " + getHex(bytesEncrypted) + "\n";
@@ -151,16 +151,16 @@ class SecurityCodeTests {
 	}
 
 	@Test void test_EncryptDecrypt_encryptPWD( ) {
-		//
+
 		String txtLines = "";
-		//
+
 		String contentEncryptedBase64 = encryptPWD(TXT_CONTENT, PASSWORD);
 		try {
 			Path pathEncr = Paths.get(FILE_ENCR);
 			Files.write(pathEncr, contentEncryptedBase64.getBytes(UTF_8));
 		}
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		//
+
 		byte[] bytesEncryptedBase64 = contentEncryptedBase64.getBytes(UTF_8);
 		txtLines += "\tTXT_CONTENT.........: " + TXT_CONTENT + "\n";
 		txtLines += "\tcontentEncrypted txt: " + contentEncryptedBase64 + "\n";
@@ -170,9 +170,9 @@ class SecurityCodeTests {
 	}
 
 	@Test void test_EncryptDecrypt_encryptFile( ) {
-		//
+
 		encryptFile(FILE_ORIG, FILE_ENCR, PASSWORD);
-		//
+
 		String contentEncryptedBase64 = UtilityMain.getFileLocal(FILE_ENCR);
 		String txtLines = "contentEncryptedBase64:\n" + contentEncryptedBase64;
 		System.out.println(txtLines);
@@ -180,16 +180,16 @@ class SecurityCodeTests {
 	}
 
 	@Test void test_EncryptDecrypt_decrypt( ) {
-		//
+
 		String txtLines = "";
-		//
+
 		byte[] bytesContent = TXT_CONTENT.getBytes();
 		byte[] bytesIV = getRandomIV(BYTES_IV_LEN);
 		SecretKey secretKey = getAESKey(AES_KEY_BIT);
 		byte[] bytesEncrypted = encrypt(bytesContent, secretKey, bytesIV);
-		//
+
 		String contentDecrypted = decrypt(bytesEncrypted, secretKey, bytesIV);
-		//
+
 		txtLines += "original!: " + TXT_CONTENT + "\n";
 		txtLines += "decrypted: " + contentDecrypted;
 		System.out.println(txtLines);
@@ -197,9 +197,9 @@ class SecurityCodeTests {
 	}
 
 	@Test void test_EncryptDecrypt_decryptPWD( ) {
-		//
+
 		String txtLines = "";
-		//
+
 		String contentEncrypted = encryptPWD(TXT_CONTENT, PASSWORD);
 		String contentDecrypted = decryptPWD(contentEncrypted, PASSWORD);
 		try {
@@ -207,7 +207,7 @@ class SecurityCodeTests {
 			Files.write(pathOrig, contentDecrypted.getBytes(UTF_8));
 		}
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		//
+
 		txtLines += "original!: " + TXT_CONTENT + "\n";
 		txtLines += "encrypted: " + contentEncrypted + "\n";
 		txtLines += "decrypted: " + contentDecrypted;
@@ -216,9 +216,9 @@ class SecurityCodeTests {
 	}
 
 	@Test void test_EncryptDecrypt_decryptFile( ) {
-		//
+
 		String contentDecrypted = decryptFile(FILE_ENCR, PASSWORD);
-		//
+
 		String txtLines = "contentDecrypted:\n" + contentDecrypted;
 		System.out.println(txtLines);
 		assertTrue(contentDecrypted.length() > 10, ASSERT_MSG);
@@ -226,7 +226,7 @@ class SecurityCodeTests {
 
 	// utilites
 	private String showSecretKey(SecretKey secretKey) {
-		//
+
 		String FRMT = "\t%-15s %s\n";
 		String txtLines = "SecretKey" + "\n";
 		txtLines += String.format(FRMT, "secretKey", secretKey.toString());
@@ -240,7 +240,7 @@ class SecurityCodeTests {
 	}
 
 	private static String getNetIface(NetworkInterface netIface, int mode) {
-		//
+
 		String txtLines = "", address;
 		try {
 			byte[] bytes = netIface.getHardwareAddress();
