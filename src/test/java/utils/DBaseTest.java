@@ -122,8 +122,8 @@ class DBaseTest {
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
 
 		StringBuilder stringBuilder = new StringBuilder(EOL);
-		list.stream().forEach(rows -> {
-			rows.values().stream().forEach(col -> stringBuilder.append(col + DLM));
+		list.forEach(rows -> {
+			rows.values().forEach(col -> stringBuilder.append(col).append(DLM));
 			stringBuilder.append(EOL);
 		});
 		System.out.println(stringBuilder);
@@ -132,11 +132,8 @@ class DBaseTest {
 
 	@Test @Disabled( "Requires a DB with Procedure!" ) void dataSource_simpleJdbcCall( ) {
 		//
-		String txtLines = "";
 		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
 		String dbUrl = "jdbc:sqlite:" + DbProfile.DBASES.SQLITE_CHINOOK.host + dbName;
-		String sqlDefault = DbProfile.DBASES.SQLITE_CHINOOK.sqlDefault;
-		String sqlPrepare = "SELECT * FROM customers WHERE Country = ? ORDER BY LastName ASC";
 		String parameter = "USA";
 		//
 		DriverManagerDataSource dataSource = getDataSource_DM(dbUrl);
@@ -149,10 +146,12 @@ class DBaseTest {
 		MSPS.addValue("Country", parameter);
 		Map<String, Object> map = simpleJdbcCall.execute(MSPS);
 		Collection<Object> collection = map.values();
-		for ( Object object : collection ) { txtLines += object.toString() + EOL; }
 
-		System.out.println("txtLines: " + txtLines);
-		assertNotNull(txtLines);
+		StringBuilder stringBuilder = new StringBuilder();
+		for ( Object object : collection ) { stringBuilder.append(object.toString()).append(EOL); }
+
+		System.out.println("stringBuilder: " + stringBuilder);
+		assertNotNull(stringBuilder);
 	}
 
 	// dbProfile & readDbLines
@@ -202,7 +201,7 @@ class DBaseTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test @Disabled( "" ) void readDbLines_mssql( ) {
+	@Test @Disabled( "time!" ) void readDbLines_mssql( ) {
 		//
 		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS";
 		String username = "", password = "";
@@ -275,7 +274,7 @@ class DBaseTest {
 		String sqlDefault = "SELECT * FROM simple;";
 		System.out.println("dbUrl: " + dbUrl);
 
-		String txtLines = "";
+		StringBuilder stringBuilder = new StringBuilder();
 		try {
 			Connection connection = DriverManager.getConnection(dbUrl);
 			Statement statement = connection.createStatement();
@@ -284,9 +283,9 @@ class DBaseTest {
 			int intColumnCount = resultSetMetaData.getColumnCount();
 			while ( resultSet.next() ) {
 				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
-					txtLines += resultSet.getString(ictr) + DLM;
+					stringBuilder.append(resultSet.getString(ictr)).append(DLM);
 				}
-				txtLines += EOL;
+				stringBuilder.append(EOL);
 			}
 		}
 		catch (SQLException ex) {
@@ -301,8 +300,8 @@ class DBaseTest {
 				System.out.println("ERROR: " + err);
 			}
 		}
-		System.out.println(txtLines);
-		assertNotNull(txtLines);
+		System.out.println(stringBuilder);
+		assertNotNull(stringBuilder);
 	}
 
 	@Test void client_mongoDB( ) {
@@ -315,7 +314,7 @@ class DBaseTest {
 		String database = "admin";
 		String collection = "employees";
 		//
-		MongoClient mongoClient = new MongoClient(host, Integer.valueOf(port));
+		MongoClient mongoClient = new MongoClient(host, Integer.parseInt(port));
 		MongoDatabase mongoDatabase = mongoClient.getDatabase(database);
 		MongoCollection<Document> mongoCollection =
 			mongoDatabase.getCollection(collection); // createCollection
@@ -324,11 +323,11 @@ class DBaseTest {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		Document document = null;
-		String firstNames = "";
+		StringBuilder firstNames = new StringBuilder();
 		while ( mongoCursor.hasNext() ) {
 			document = mongoCursor.next(); // toJson()
-			firstNames += document.getString("FIRST_NAME") + DLM;
-			stringBuilder.append(document.get("LAST_NAME") + DLM);
+			firstNames.append(document.getString("FIRST_NAME")).append(DLM);
+			stringBuilder.append(document.get("LAST_NAME")).append(DLM);
 			//stringBuilder.append(document.toString()+ EOL);
 		}
 		//
@@ -342,20 +341,13 @@ class DBaseTest {
 	}
 
 	@Test void client_hikariDB( ) {
+
 		// CP: Connection Pooling
-		//
-		String txtLines = EOL;
 		String dbURL = "jdbc:mysql://localhost:3306/mydb";
 		String sqlDefault = "SELECT * FROM mydb.history WHERE id > 0 ORDER BY dateend;";
 		String username = System.getenv("MYSQL_USER");
 		String password = System.getenv("MYSQL_PASS");
-		/*
-			HikariConfig hikariConfig = new  HikariConfig( properties );
-			HikariConfig hikariConfig = new  HikariConfig( "datasource.properties" );
-			dataSourceClassName = com.mysql.cj.jdbc.Driver;
-			dataSource.user = anyuser;
-			datasource.cachePrepStmts = true;
-		*/
+
 		HikariConfig hikariConfig = new HikariConfig();
 		hikariConfig.setJdbcUrl(dbURL);
 		hikariConfig.setUsername(username);
@@ -365,6 +357,7 @@ class DBaseTest {
 		hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 		//
 		HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
+		StringBuilder stringBuilder = new StringBuilder(EOL);
 		try {
 			Connection connection = hikariDataSource.getConnection();
 			PreparedStatement preparedStatement = connection.prepareStatement(sqlDefault);
@@ -373,27 +366,27 @@ class DBaseTest {
 			int intColumnCount = resultSetMetaData.getColumnCount();
 			while ( resultSet.next() ) {
 				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
-					txtLines += resultSet.getString(ictr) + DLM;
+					stringBuilder.append(resultSet.getString(ictr)).append(DLM);
 				}
-				txtLines += EOL;
+				stringBuilder.append(EOL);
 			}
 		}
 		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		System.out.println(txtLines);
-		assertNotNull(txtLines);
+		System.out.println(stringBuilder);
+		assertNotNull(stringBuilder);
 	}
 
 	@Test @Disabled( "time!" ) void connection_msSQL( ) {
 
 		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS" + ";";
-		String username = "", password = "";
 		String dbUrl = "jdbc:sqlserver://" + host
 			+ "databaseName=mydb;"
 			+ "trustServerCertificate=true;"
 			+ "integratedSecurity=true;";
 		String sqlDefault = "SELECT TOP (10) * FROM [" + dbName + "].[Person].[Address];";
 		System.out.println("dbUrl: " + dbUrl);
-		String txtLines = "";
+
+		StringBuilder stringBuilder = new StringBuilder();
 		DbProfile.setupLibraryPath();
 		try {
 			Connection connection = DriverManager.getConnection(dbUrl);
@@ -403,9 +396,9 @@ class DBaseTest {
 			int intColumnCount = resultSetMetaData.getColumnCount();
 			while ( resultSet.next() ) {
 				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
-					txtLines += resultSet.getString(ictr) + DLM;
+					stringBuilder.append(resultSet.getString(ictr)).append(DLM);
 				}
-				txtLines += EOL;
+				stringBuilder.append(EOL);
 			}
 		}
 		catch (SQLException ex) {
@@ -420,8 +413,8 @@ class DBaseTest {
 				System.out.println("ERROR: " + err);
 			}
 		}
-		System.out.println(txtLines);
-		assertNotNull(txtLines);
+		System.out.println(stringBuilder);
+		assertNotNull(stringBuilder);
 	}
 
 	@Test @Disabled( "time!" ) void hazelcast( ) {
@@ -452,8 +445,7 @@ class DBaseTest {
 	}
 
 	@Test @Disabled( "time!" ) void hazelcastNW( ) {
-		//
-		String txtLines = "";
+
 		String HOST_NAME = "localhost";
 		String clusterName = "anyMap";
 		int PORT = 5071;
@@ -466,25 +458,28 @@ class DBaseTest {
 		JoinConfig joinConfig = networkConfig.getJoin();
 		joinConfig.getMulticastConfig().setEnabled(true);
 		joinConfig.getTcpIpConfig().addMember(HOST_NAME).setEnabled(true);
-		//
+
 		HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance();
 		IMap<Long, String> iMap = hazelcastInstance.getMap(clusterName);
 		FlakeIdGenerator FIG = hazelcastInstance.getFlakeIdGenerator("newid");
 		for ( int ictr = 0; ictr < 10; ictr++ ) {
 			iMap.put(FIG.newId(), "message" + ictr);
 		}
+
 		// client
 		ClientConfig clientConfig = new ClientConfig();
 		clientConfig.setClusterName("dev");
 		HazelcastInstance hazelcastInstanceClient = HazelcastClient.newHazelcastClient(clientConfig);
 		Map<Long, String> map = hazelcastInstanceClient.getMap("data");
+
+		StringBuilder stringBuilder = new StringBuilder();
 		for ( Map.Entry<Long, String> entry : map.entrySet() ) {
 			//
-			txtLines += "\t" + entry.toString() + EOL;
+			stringBuilder.append(String.format("\t%s\n", entry.toString()));
 		}
 		//
 		// hazelcastInstance.shutDown();
-		System.out.println(txtLines);
-		assertNotNull(txtLines);
+		System.out.println(stringBuilder);
+		assertNotNull(stringBuilder);
 	}
 }
