@@ -71,6 +71,7 @@ class DBaseTest {
 		LOGGER.setLevel(Level.toLevel("error"));
 	}
 
+	// simplified
 	@Test void dataSource_DM( ) {
 		//
 		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
@@ -81,7 +82,7 @@ class DBaseTest {
 		assertNotNull(dataSource);
 	}
 
-	@Test void dataSource_EMB( ) {
+	@Test void dataSource_EMB_H2( ) {
 
 		EmbeddedDatabaseType EDT = EmbeddedDatabaseType.H2;
 		DataSource dataSource = getDataSource_EMB(EDT);
@@ -105,7 +106,7 @@ class DBaseTest {
 		List<String> list = jdbcTemplate.query(sqlPrepare, dbRowMapperChinook, parameter);
 
 		StringBuilder stringBuilder = new StringBuilder(EOL + DLM);
-		list.stream().forEach(rows -> stringBuilder.append(rows + DLM));
+		list.forEach(rows -> stringBuilder.append(rows).append(DLM));
 		System.out.println(stringBuilder);
 		assertNotNull(stringBuilder);
 	}
@@ -154,6 +155,7 @@ class DBaseTest {
 		assertNotNull(txtLines);
 	}
 
+	// dbProfile & readDbLines
 	@Test void readDbLines_sqlite( ) {
 		//
 		String dbName = "", host = "", username = "", password = "";
@@ -211,8 +213,8 @@ class DBaseTest {
 		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
-	//#### FULL SAMPLES ####
-	@Test void sqlite_connection( ) {
+	// connections & clients
+	@Test void connection_sqlite( ) {
 		//
 		StringBuilder stringBuilder = new StringBuilder(EOL);
 		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
@@ -236,7 +238,7 @@ class DBaseTest {
 		assertTrue(stringBuilder.length() > 1);
 	}
 
-	@Test void oracle_connection( ) {
+	@Test void connection_oracle( ) {
 		//
 		String txtLines = EOL;
 		String dbName = DbProfile.DBASES.ORACLE_XE.dbname;
@@ -261,18 +263,19 @@ class DBaseTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test @Disabled( "" ) void mssql_connection( ) {
-		//
-		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS" + ";";
-		String username = "", password = "";
-		String dbUrl = "jdbc:sqlserver://" + host
-			+ "databaseName=mydb;"
-			+ "trustServerCertificate=true;"
-			+ "integratedSecurity=true;";
-		String sqlDefault = "SELECT TOP (10) * FROM [" + dbName + "].[Person].[Address];";
+	@Test @Disabled( "avail!" ) void connection_mySQL( ) {
+
+		// connection to active AWS RDS MySQL DB
+		String host = "database-1.clzyctwoju9i.us-east-1.rds.amazonaws.com";
+		String dbName = "RDS_MYSQL";
+		String username = "admin";
+		String password = "adminrds";
+		String dbUrl = "jdbc:mysql://" + host
+			+ "/" + dbName + "?user=" + username + "&password=" + password;
+		String sqlDefault = "SELECT * FROM simple;";
 		System.out.println("dbUrl: " + dbUrl);
+
 		String txtLines = "";
-		DbProfile.setupLibraryPath();
 		try {
 			Connection connection = DriverManager.getConnection(dbUrl);
 			Statement statement = connection.createStatement();
@@ -302,7 +305,7 @@ class DBaseTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test void mongoDB_mongoClient( ) {
+	@Test void client_mongoDB( ) {
 		//
 		// https://docs.mongodb.com/drivers/java/sync/current/fundamentals/connection/connect/
 		// mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.1.9
@@ -338,7 +341,7 @@ class DBaseTest {
 		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
-	@Test void hikariCP_hikariConfig( ) {
+	@Test void client_hikariDB( ) {
 		// CP: Connection Pooling
 		//
 		String txtLines = EOL;
@@ -376,6 +379,47 @@ class DBaseTest {
 			}
 		}
 		catch (SQLException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		System.out.println(txtLines);
+		assertNotNull(txtLines);
+	}
+
+	@Test @Disabled( "time!" ) void connection_msSQL( ) {
+
+		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS" + ";";
+		String username = "", password = "";
+		String dbUrl = "jdbc:sqlserver://" + host
+			+ "databaseName=mydb;"
+			+ "trustServerCertificate=true;"
+			+ "integratedSecurity=true;";
+		String sqlDefault = "SELECT TOP (10) * FROM [" + dbName + "].[Person].[Address];";
+		System.out.println("dbUrl: " + dbUrl);
+		String txtLines = "";
+		DbProfile.setupLibraryPath();
+		try {
+			Connection connection = DriverManager.getConnection(dbUrl);
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(sqlDefault);
+			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+			int intColumnCount = resultSetMetaData.getColumnCount();
+			while ( resultSet.next() ) {
+				for ( int ictr = 1; ictr < intColumnCount + 1; ictr++ ) {
+					txtLines += resultSet.getString(ictr) + DLM;
+				}
+				txtLines += EOL;
+			}
+		}
+		catch (SQLException ex) {
+			String err = ex.getMessage();
+			if ( err.startsWith(ERROR_SSL_ENCRYPT) || err.contains(ERROR_PKIX_CERT_PATH) ) {
+				System.out.println("ERROR missing trustServerCertificate: " + err);
+			} else if ( err.startsWith(ERROR_NOT_INTEGRATED) ) {
+				System.out.println("ERROR missing valid sqljdbc_auth.dll: " + err);
+			} else if ( err.startsWith(ERROR_NO_CREDENTIALS) ) {
+				System.out.println("ERROR missing credentials (user/pass): " + err);
+			} else {
+				System.out.println("ERROR: " + err);
+			}
+		}
 		System.out.println(txtLines);
 		assertNotNull(txtLines);
 	}
