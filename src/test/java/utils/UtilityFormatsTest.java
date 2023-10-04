@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.getFileLocal;
+import static utils.UtilityMainTest.ASSERT_MSG;
 import static utils.UtilityMainTest.PATHFILE_LOCAL;
 
 // C:/workspace/training/javatools/src/test/java/utils
@@ -32,7 +33,6 @@ class UtilityFormatsTest {
 
 	private static final Logger LOGGER = Logger.getLogger(UtilityFormatsTest.class.getName());
 	private static final String JSONFILE = PATHFILE_LOCAL + "booksCatalog.json";
-	private static final String ASSERT_MSG = "ASSERT_MSG";
 	private String json = "";
 
 	// json
@@ -173,7 +173,8 @@ class UtilityFormatsTest {
 					if ( year >= -626 && year < -586 ) { classy = "ind"; }
 					if ( year >= -586 && year < -0 ) { classy = "vio"; }
 					stringBuilder.append("<tr class = \"").append(classy).append("\">");
-					Arrays.stream(strings).forEach(string -> stringBuilder.append("<td>").append(string).append("</td>"));
+					Arrays.stream(strings)
+						.forEach(string -> stringBuilder.append("<td>").append(string).append("</td>"));
 					stringBuilder.append("</tr>" + EOL);
 				}
 			});

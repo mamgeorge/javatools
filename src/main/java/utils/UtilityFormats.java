@@ -35,7 +35,6 @@ import java.util.Set;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.xml.transform.OutputKeys.ENCODING;
 import static javax.xml.transform.OutputKeys.INDENT;
-import static javax.xml.transform.OutputKeys.MEDIA_TYPE;
 import static javax.xml.transform.OutputKeys.METHOD;
 import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
 import static utils.UtilityMain.LOGGER;
@@ -111,7 +110,7 @@ public class UtilityFormats {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer(streamSourceXSL);
 			transformer.setOutputProperty(INDENT, "yes");
-		//	transformer.setOutputProperty(MEDIA_TYPE, "MediaType.TEXT_XML_VALUE");
+			//	transformer.setOutputProperty(MEDIA_TYPE, "MediaType.TEXT_XML_VALUE");
 			transformer.setOutputProperty(ENCODING, UTF_8.toString());
 			//
 			// transform it

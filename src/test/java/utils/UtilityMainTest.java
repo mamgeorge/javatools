@@ -166,7 +166,7 @@ public class UtilityMainTest {
 	//#### files
 	@Test void getFileLines( ) {
 
-		String txtLines = UtilityMain.getFileLines("c:/workspace/greetings.txt", "");
+		String txtLines = UtilityMain.getFileLines(PATHFILE_LOCAL + "battles.csv", "");
 		//
 		LOGGER.info(txtLines); // System.out.println(txtLines);
 		assertTrue(txtLines.length() > 12, ASSERT_MSG);

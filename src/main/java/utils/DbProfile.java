@@ -27,6 +27,7 @@ import static oracle.jdbc.OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTI
 import static oracle.net.ano.AnoServices.AUTHENTICATION_KERBEROS5;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static utils.UtilityMain.EOL;
+import static utils.UtilityMain.PATHFILE_LOCAL;
 
 @Getter @Setter @EqualsAndHashCode @NoArgsConstructor
 public class DbProfile {
@@ -69,7 +70,6 @@ public class DbProfile {
 		}
 	}
 
-	static final String PATHFILE_LOCAL = "src/test/resources/"; // "C:/Users/mamge/Kerberos/config/"
 	public static final String PATH_TNS_DEFAULT = PATHFILE_LOCAL + "local_tnsnames.ora";
 	public static final String PATH_KRB5_CONF = PATHFILE_LOCAL + "krb5.conf";
 	public static final String PATH_KRB5_CACHE = PATHFILE_LOCAL + "krb5cc_mamgeorge";

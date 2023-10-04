@@ -2,8 +2,8 @@ package utils;
 
 import org.junit.jupiter.api.Test;
 
-import static utils.UtilityMain.urlGet;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static utils.UtilityMain.urlGet;
 import static utils.UtilityMain.urlPost;
 
 class ConnectTests {

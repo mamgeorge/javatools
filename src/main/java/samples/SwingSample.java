@@ -140,9 +140,9 @@ public class SwingSample extends JPanel {
 		public void setGrid(Graphics graphics, Graphics2D g2d) {
 			//
 			graphics.setColor(Color.red);
-			g2d.drawLine(MNH + BFR, MNV + BFR - 00, MXH - BFR, MNV + BFR);
+			g2d.drawLine(MNH + BFR, MNV + BFR, MXH - BFR, MNV + BFR);
 			graphics.setColor(Color.blue);
-			g2d.drawLine(MXH - BFR, MNV + BFR - 00, MNH + BFR, MXV - BFR - 70);
+			g2d.drawLine(MXH - BFR, MNV + BFR, MNH + BFR, MXV - BFR - 70);
 			graphics.setColor(Color.green);
 			g2d.drawLine(MNH + BFR, MXV - BFR - 70, MXH - BFR, MXV - BFR - 70);
 			graphics.setColor(Color.magenta);

@@ -15,11 +15,10 @@ import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static utils.UtilityMainTest.ASSERT_MSG;
+import static utils.UtilityMainTest.PATHFILE_LOCAL;
 
 class SpecialTests {
-
-	static final String PATHFILE_LOCAL = "src/test/resources/";
-	static final String ASSERT_MSG = "ASSERT_MSG";
 
 	@Test void test_error( ) {
 		//

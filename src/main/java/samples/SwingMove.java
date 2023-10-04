@@ -93,7 +93,7 @@ public class SwingMove {
 
 		public void paintComponent(Graphics graphics) {
 			graphics.setColor(BLUE);
-			graphics.fillRect(0, 0, this.getWidth() - 0, this.getHeight() - 0);
+			graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
 			graphics.setColor(GREEN);
 			graphics.fillRect(3, 3, this.getWidth() - 6, this.getHeight() - 6);
 			graphics.setColor(BLACK);

@@ -30,12 +30,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static utils.UtilityMain.EOL;
+import static utils.UtilityMainTest.ASSERT_MSG;
 
 @TestInstance( TestInstance.Lifecycle.PER_CLASS ) // requried for @BeforeAll
 class UtilityMockTest {
 
 	static final Logger LOGGER = Logger.getLogger(UtilityMockTest.class.getName());
-	static final String ASSERT_MSG = "ASSERT_MSG";
 	static final String SAMPLE = "OMEGA";
 
 	@BeforeAll void init( ) {

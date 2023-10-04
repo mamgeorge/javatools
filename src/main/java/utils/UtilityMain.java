@@ -48,11 +48,11 @@ public class UtilityMain {
 	public static final String EOL = "\n";
 	public static final String CRLF = "\r\n";
 
-	public static final String PATH_PREF = "/src/main/resources";
+	public static final String PATHFILE_LOCAL = "src/test/resources/"; // "C:/Users/mamge/Kerberos/config/"
 	public static final String FLD_SAMPLE = "static/";
 	public static final String TXT_SAMPLE = "Genesis_01.txt";
 	public static final String ZIP_SAMPLE = "xml_wav_plants_w10.zip";
-	public static final String PATH_LOCAL_TEMP = PATH_PREF + "/temp/";
+	public static final String PATH_LOCAL_TEMP = PATHFILE_LOCAL + "/temp/";
 
 	public static final Random RANDOM = new Random();
 	public static final String ERR_VAL = "#### ERROR: {0} ";

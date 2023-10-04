@@ -1,7 +1,8 @@
-<html><head><title>Battles</title>
+<html lang="">
+<head><title>Battles</title>
 
-	<link type = "text/css" rel = "StyleSheet" href = "resources/basics.css" />
-	<script type = "text/javascript" src = "resources/basics.js" ></script>
+	<link type = "text/css" rel = "StyleSheet" href = "resources/basics.css"/>
+	<script type = "text/javascript" src = "resources/basics.js"></script>
 	<style>
 		body { background-color: black; color: white; font-family: verdana; }
 		h1,h2,h3,h4,h5,h6 { color: #a0a0f0; display: inline; }
@@ -29,14 +30,22 @@
 		window.addEventListener("load", myTimer);
 	</script>
 </head>
-<body><center><h3>Historical Battles</h3><h5><div id = "timer"></div></h5>
-<div class = "scroller"><table>
-	<tr>
-		<th>year</th>
-		<th>battle</th>
-		<th>type</th>
-		<th>description</th>
-	</tr>
-battleData
-</table></div>
-</center></body></html>
+<body>
+<center><h3>Historical Battles</h3>
+	<h5>
+		<div id = "timer" />
+	</h5>
+	<div class = "scroller">
+		<table>
+			<tr>
+				<th>year</th>
+				<th>battle</th>
+				<th>type</th>
+				<th>description</th>
+			</tr>
+			battleData
+		</table>
+	</div>
+</center>
+</body>
+</html>
