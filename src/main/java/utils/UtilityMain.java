@@ -46,13 +46,11 @@ public class UtilityMain {
 	public static final String RESET = "\u001b[0m";
 	public static final String TAB = "\t";
 	public static final String EOL = "\n";
-	public static final String CRLF = "\r\n";
+	public static final int MAXLEN = 60;
 
 	public static final String PATHFILE_LOCAL = "src/test/resources/"; // "C:/Users/mamge/Kerberos/config/"
 	public static final String FLD_SAMPLE = "static/";
 	public static final String TXT_SAMPLE = "Genesis_01.txt";
-	public static final String ZIP_SAMPLE = "xml_wav_plants_w10.zip";
-	public static final String PATH_LOCAL_TEMP = PATHFILE_LOCAL + "/temp/";
 
 	public static final Random RANDOM = new Random();
 	public static final String ERR_VAL = "#### ERROR: {0} ";
@@ -64,7 +62,7 @@ public class UtilityMain {
 	}
 
 	//#### basics
-	public static String showSys( ) {
+	public static String showSysEnv( ) {
 
 		Map<String, String> mapEnv = System.getenv();
 		Map<String, String> mapEnvTree = new TreeMap<>(mapEnv);
@@ -75,7 +73,8 @@ public class UtilityMain {
 
 			val = val.replace("\\", "/");
 			val = val.replace("\"", "'");
-			stringBuilder.append(String.format("\t%03d %-20s : %s%n", aint.incrementAndGet(), key, val));
+			if ( val.length() > MAXLEN ) { val = val.substring(1, MAXLEN) + "..."; }
+			stringBuilder.append(String.format("\t%03d %-25s | %s%n", aint.incrementAndGet(), key, val));
 		});
 		stringBuilder.append("]\n");
 		stringBuilder.append("\tUSERNAME: ").append(System.getenv("USERNAME")).append(EOL);

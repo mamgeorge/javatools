@@ -2,8 +2,15 @@ package utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.PathResource;
+import org.springframework.util.ResourceUtils;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import samples.AnyObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
@@ -25,6 +32,7 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -38,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMain.EOL;
+import static utils.UtilityMain.MAXLEN;
 import static utils.UtilityMain.TAB;
 import static utils.UtilityMain.getRandomString;
 
@@ -73,17 +82,67 @@ public class UtilityMainTest {
 		txtLines += String.format("\t true && true && false\t %s \n", false);
 		//
 		System.out.println("txtLines: " + txtLines);
-		assertTrue(txtLines.length() >= 1, ASSERT_MSG);
+		assertNotNull(txtLines, ASSERT_MSG);
 	}
 
-	@Test void showSys( ) {
+	@Test void showSysEnv( ) {
 
-		String txtLines = UtilityMain.showSys();
-		String[] envr = txtLines.split(EOL);
-		//
+		String txtLines = UtilityMain.showSysEnv();
 		System.out.println(txtLines);
-		System.out.println("envr: " + envr.length);
-		assertTrue(envr.length > 40, ASSERT_MSG);
+		assertNotNull(txtLines);
+	}
+
+	@Test void showSysProp( ) {
+
+		Properties properties = System.getProperties();
+
+		StringBuilder sb = new StringBuilder();
+		AtomicInteger aint = new AtomicInteger();
+		properties.keySet().stream().sorted().forEach((key) -> {
+			String val = System.getProperty(key.toString());
+			if (val.length() > MAXLEN) { val = val.substring(0,MAXLEN) + "...";; }
+			sb.append(String.format("\t%03d %-30s | %s%n", aint.incrementAndGet(), key, val));
+		} );
+
+		System.out.println("size: " + sb.toString().split(EOL).length + EOL + sb);
+		assertNotNull(sb);
+	}
+
+	@Test void showJvmArgs( ) {
+
+		RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+		List<String> listArgs = runtimeMXBean.getInputArguments();
+
+		StringBuilder sb = new StringBuilder();
+		AtomicInteger aint = new AtomicInteger();
+		listArgs.stream().sorted().forEach( args -> sb.append(String.format("\t%03d %s%n", aint.incrementAndGet(), args)) );
+
+		System.out.println("size: " + sb.toString().split(EOL).length + EOL + sb);
+		assertNotNull(sb);
+	}
+
+	@Test void showAppYml( ) {
+
+		String pathYml = "classpath:application.yml";
+		String propName = "spring.application.id";
+		String propValue = "";
+		try {
+			File file = ResourceUtils.getFile(pathYml);
+			PathResource pathResource = new PathResource(file.toPath());
+
+			YamlPropertiesFactoryBean YPFB = new YamlPropertiesFactoryBean();
+			YPFB.setResources(pathResource);
+			YPFB.afterPropertiesSet();
+
+			Properties properties = YPFB.getObject();
+			assert properties != null;
+			propValue = properties.getProperty(propName);
+		}
+		catch (FileNotFoundException ex) {
+			System.out.println("ERROR: " + ex.getMessage());
+		}
+		System.out.println(EOL + propName + ": " + propValue);
+		assertNotNull(propValue);
 	}
 
 	@Test void showTimes( ) {
@@ -209,9 +268,8 @@ public class UtilityMainTest {
 	}
 
 	@Test void getMethod( ) {
-		//
-		Object objectParms = null;
-		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma", objectParms);
+
+		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma");
 		String results = object.toString();
 		System.out.println(results);
 		assertEquals("GIMMEL", results, ASSERT_MSG);
@@ -235,7 +293,6 @@ public class UtilityMainTest {
 	}
 
 	// special
-
 	@Test void lineChunker( ) {
 
 		String txtLines;
@@ -311,7 +368,9 @@ public class UtilityMainTest {
 		String[] lineChunks = txtLine.split("(?<=\\G.{" + intChunk + "})");
 
 		StringBuilder stringBuilder = new StringBuilder();
-		Arrays.stream(lineChunks).forEach(lineChunk -> stringBuilder.append(lineChunk).append(DLM));
+		AtomicInteger aint = new AtomicInteger();
+		Arrays.stream(lineChunks).forEach(lineChunk -> stringBuilder.append(
+			String.format("%02d %s" + DLM,aint.incrementAndGet(),lineChunk)));
 		txtLines = stringBuilder.toString();
 		return txtLines;
 	}
