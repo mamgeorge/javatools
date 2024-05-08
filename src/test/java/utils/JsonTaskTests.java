@@ -55,7 +55,7 @@ class JsonTaskTests {
 			JsonNode jsonNodes = objectMapper.readTree(inputStreamJson);
 
 			Set<ValidationMessage> errors = jsonSchema.validate(jsonNodes);
-			if(errors.isEmpty()) { assertTrue(errors.isEmpty());} else {
+			if(errors.isEmpty()) { System.out.println("No Errors!"); } else {
 				errors.forEach(item -> System.out.println("ERROR: " + item.getMessage()));
 				assertFalse(errors.isEmpty());
 			}
