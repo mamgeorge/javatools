@@ -1,7 +1,5 @@
 <xsl:stylesheet
 		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-		xmlns:fn="fn"
-		xmlns:xs="http://www.w3.org/2001/XMLSchema"
 		version="2.0" exclude-result-prefixes="xs fn">
 
 	<xsl:output method="html"

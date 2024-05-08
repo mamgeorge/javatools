@@ -1,4 +1,4 @@
-package utils;
+package special;
 
 import edu.cmu.sphinx.api.Configuration;
 import edu.cmu.sphinx.api.LiveSpeechRecognizer;

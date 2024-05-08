@@ -1,4 +1,4 @@
-package samples;
+package database;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;

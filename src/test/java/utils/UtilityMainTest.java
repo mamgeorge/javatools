@@ -2,9 +2,9 @@ package utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.PathResource;
 import org.springframework.util.ResourceUtils;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import samples.AnyObject;
 
 import java.io.File;
@@ -100,9 +100,9 @@ public class UtilityMainTest {
 		AtomicInteger aint = new AtomicInteger();
 		properties.keySet().stream().sorted().forEach((key) -> {
 			String val = System.getProperty(key.toString());
-			if (val.length() > MAXLEN) { val = val.substring(0,MAXLEN) + "...";; }
+			if ( val.length() > MAXLEN ) { val = val.substring(0, MAXLEN) + "..."; }
 			sb.append(String.format("\t%03d %-30s | %s%n", aint.incrementAndGet(), key, val));
-		} );
+		});
 
 		System.out.println("size: " + sb.toString().split(EOL).length + EOL + sb);
 		assertNotNull(sb);
@@ -115,7 +115,8 @@ public class UtilityMainTest {
 
 		StringBuilder sb = new StringBuilder();
 		AtomicInteger aint = new AtomicInteger();
-		listArgs.stream().sorted().forEach( args -> sb.append(String.format("\t%03d %s%n", aint.incrementAndGet(), args)) );
+		listArgs.stream().sorted()
+			.forEach(args -> sb.append(String.format("\t%03d %s%n", aint.incrementAndGet(), args)));
 
 		System.out.println("size: " + sb.toString().split(EOL).length + EOL + sb);
 		assertNotNull(sb);
@@ -225,7 +226,7 @@ public class UtilityMainTest {
 	//#### files
 	@Test void getFileLines( ) {
 
-		String txtLines = UtilityMain.getFileLines(PATHFILE_LOCAL + "battles.csv", "");
+		String txtLines = UtilityMain.getFileLines(PATHFILE_LOCAL + "structured/battles.csv", "");
 		//
 		LOGGER.info(txtLines); // System.out.println(txtLines);
 		assertTrue(txtLines.length() > 12, ASSERT_MSG);
@@ -233,7 +234,7 @@ public class UtilityMainTest {
 
 	@Test void getFileLocal( ) {
 
-		String txtLines = UtilityMain.getFileLocal(PATHFILE_LOCAL + "booksCatalog.json");
+		String txtLines = UtilityMain.getFileLocal(PATHFILE_LOCAL + "structured/booksCatalog.json");
 		//
 		LOGGER.info(txtLines); // System.out.println(txtLines);
 		assertTrue(txtLines.length() > 20, ASSERT_MSG);
@@ -243,7 +244,7 @@ public class UtilityMainTest {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		String[] fileNames =
-			{ "booksCatalog.html", "booksCatalog.json", "booksCatalog.xml", "booksXml2Html.xslt" };
+			{ "structured/booksCatalog.html", "structured/booksCatalog.json", "structured/booksCatalog.xml", "booksXml2Html.xslt" };
 		//
 		AtomicInteger idx = new AtomicInteger();
 		Arrays.stream(fileNames).sequential().forEach(flnm -> {
@@ -370,7 +371,7 @@ public class UtilityMainTest {
 		StringBuilder stringBuilder = new StringBuilder();
 		AtomicInteger aint = new AtomicInteger();
 		Arrays.stream(lineChunks).forEach(lineChunk -> stringBuilder.append(
-			String.format("%02d %s" + DLM,aint.incrementAndGet(),lineChunk)));
+			String.format("%02d %s" + DLM, aint.incrementAndGet(), lineChunk)));
 		txtLines = stringBuilder.toString();
 		return txtLines;
 	}

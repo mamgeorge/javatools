@@ -1,0 +1,32 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"title": "Book Reports",
+	"description": "book validations",
+	"type": "object",
+	"properties": {
+		"catalog": {
+			"type": "object",
+			"description": "the list",
+			"properties": {
+				"book": {
+					"type": "array",
+					"description": "list of books",
+					"properties": {
+						"author": {
+							"type": "string",
+							"description": "writers name"
+						},
+						"price": {
+							"description": "cost of book",
+							"type": "float"
+						},
+						"genre": {
+							"description": "type of book",
+							"type": "string"
+						}
+					}, "required": [ "author", "price", "genre" ]
+				}
+			}, "required": [ "book" ]
+		}
+	}, "required": [ "catalog" ]
+}

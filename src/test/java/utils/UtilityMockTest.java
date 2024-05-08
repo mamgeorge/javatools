@@ -1,10 +1,15 @@
 package utils;
 
+import com.rabbitmq.utility.Utility;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -32,19 +37,18 @@ import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMainTest.ASSERT_MSG;
 
-@TestInstance( TestInstance.Lifecycle.PER_CLASS ) // requried for @BeforeAll
+// @TestInstance( TestInstance.Lifecycle.PER_CLASS ) // required for @BeforeAll
 class UtilityMockTest {
 
 	static final Logger LOGGER = Logger.getLogger(UtilityMockTest.class.getName());
 	static final String SAMPLE = "OMEGA";
 
-	@BeforeAll void init( ) {
-		// PowerMock use of private static final types require resources MockMaker mock-maker-inline
+	@Mock private AnyObject anyObjectMocked;
 
-		// PowerMock remove mock reflection error
-		System.err.close();
-		System.setErr(System.out);
-	}
+	@InjectMocks private UtilityMockTest utilityMockTest;
+
+	// @Mock, @InjectMocks are applied in @BeforeEach MockitoAnnotations!
+	@BeforeEach void init( ) { MockitoAnnotations.initMocks(this); }
 
 	@Test void testmock_when_thenReturn( ) {
 		//
