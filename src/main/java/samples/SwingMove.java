@@ -17,12 +17,12 @@ import static java.awt.Color.BLACK;
 import static java.awt.Color.BLUE;
 import static java.awt.Color.GREEN;
 import static java.awt.Color.WHITE;
-import static samples.SwingSample.ACTION_EXIT;
-import static samples.SwingSample.ACTION_TIME;
-import static samples.SwingSample.COLOR_GRN;
-import static samples.SwingSample.COLOR_PUR;
-import static samples.SwingSample.COLOR_RED;
-import static samples.SwingSample.getJButton;
+import static samples.SwingConsole.ACTION_EXIT;
+import static samples.SwingConsole.ACTION_TIME;
+import static samples.SwingConsole.COLOR_GRN;
+import static samples.SwingConsole.COLOR_PUR;
+import static samples.SwingConsole.COLOR_RED;
+import static samples.SwingConsole.getJButton;
 
 public class SwingMove {
 	//
