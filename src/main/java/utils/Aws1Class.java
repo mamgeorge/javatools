@@ -13,6 +13,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.Owner;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -51,7 +52,8 @@ public class Aws1Class {
 	private static final String ACCESS = ACCESS_LIST[ACCESS_INT];
 
 	public static final String[] BUCKET_NAMES = { "mamgeorgebucket1", "mlg-s3-events", "mlg-s3-sample" };
-	public static final String[] KEYFILE_NAMES = { "humor_properTea.txt", "coffee.jpg", "images/01_Gen0617_Flood3_DelugeTablet_Utnapishtim_t.jpg"};
+	public static final String[] KEYFILE_NAMES =
+		{ "humor_properTea.txt", "coffee.jpg", "images/01_Gen0617_Flood3_DelugeTablet_Utnapishtim_t.jpg" };
 	public static final int intVal = 2;
 	public static final String EOL = "\n";
 	public static final int MAX_DISPLAY = 80;
@@ -62,10 +64,8 @@ public class Aws1Class {
 		ProfileCredentialsProvider PCP = new ProfileCredentialsProvider();
 		AWSCredentials awsCredentials = PCP.getCredentials();
 
-		txtLines += awsCredentials.getAWSAccessKeyId() + EOL;
-		txtLines += awsCredentials.getAWSSecretKey() + EOL;
-		txtLines += showUsers();
-		System.out.println(txtLines);
+		String awsAccessKeyId = awsCredentials.getAWSAccessKeyId();
+		String awsSecretKey = awsCredentials.getAWSSecretKey();
 
 		switch ( ACCESS ) {
 			case "AWS":
@@ -74,17 +74,25 @@ public class Aws1Class {
 			case "IAM":
 				initAmazonS3_fromIAMcredentials(PCP, REGION, ROLE_ARN, ROLE_SESS);
 				break;
+			default:
+				throw new IllegalStateException("Unexpected ACCESS value: " + ACCESS);
 		}
+		String showUsers = showUsers();
+		txtLines += "awsAccessKeyId: " + awsAccessKeyId + EOL + "awsSecretKey: " + awsSecretKey + EOL +
+			"showUsers: " + showUsers + EOL;
+		System.out.println(txtLines);
 	}
 
 	private void initAmazonS3_fromAWSaccount(ProfileCredentialsProvider PCP, Regions region) {
 
-		// https://docs.aws.amazon.com/general/latest/gr/acct-identifiers.html
-		// https://docs.aws.amazon.com/AmazonS3/latest/userguide/AuthUsingAcctOrUserCredentials.html
-		// s3Client = AmazonS3ClientBuilder.standard().withRegion( US_EAST_2 ).build();
+		/*
+			https://docs.aws.amazon.com/general/latest/gr/acct-identifiers.html
+			https://docs.aws.amazon.com/AmazonS3/latest/userguide/AuthUsingAcctOrUserCredentials.html
+			s3Client = AmazonS3ClientBuilder.standard().withRegion( US_EAST_2 ).build();
+		*/
 		amazonS3 = AmazonS3ClientBuilder.standard()
 			.withCredentials(PCP)
-			.withRegion(REGION)
+			.withRegion(region)
 			.build();
 	}
 
@@ -128,53 +136,52 @@ public class Aws1Class {
 
 		// https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/examples-iam-users.html
 		String txtLines = "";
+		Owner owner = amazonS3.getS3AccountOwner();
+		txtLines = "Owner: " + owner.getId() + EOL + "getDisplayName: " + owner.getDisplayName() + EOL;
 		return txtLines;
 	}
 
 	public String listBuckets( ) {
 
-		String txtLine = "";
+		StringBuilder stringBuilder = new StringBuilder("listBuckets" + EOL);
 		List<Bucket> buckets = amazonS3.listBuckets();
 		for ( Bucket bucket : buckets ) {
-			txtLine += "* " + bucket.getName() + EOL;
+			stringBuilder.append("* ").append(bucket.getName()).append(EOL);
 		}
-		return txtLine;
+		return stringBuilder.toString();
 	}
 
 	public String listObjects(String bucket_name) {
 
-		String txtLines = "";
-
+		StringBuilder stringBuilder = new StringBuilder("listObjects" + EOL);
 		ListObjectsV2Result LO2_RES = amazonS3.listObjectsV2(bucket_name);
 		List<S3ObjectSummary> s3ObjectSummaries = LO2_RES.getObjectSummaries();
 		for ( S3ObjectSummary s3ObjectSummary : s3ObjectSummaries ) {
-			txtLines += s3ObjectSummary.getKey() + EOL;
+			stringBuilder.append("* ").append(s3ObjectSummary.getKey()).append(EOL) ;
 		}
-		return txtLines;
+		return stringBuilder.toString();
 	}
 
 	public String getObject(String bucket_name, String key_name) {
 
-		String txtLines = "";
+		StringBuilder stringBuilder = new StringBuilder("getObject" + EOL);
 		try {
 			S3Object s3Object = amazonS3.getObject(bucket_name, key_name);
 			S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
 
 			InputStreamReader ISR = new InputStreamReader(s3ObjectInputStream, UTF_8);
-			txtLines = new BufferedReader(ISR).lines().collect(Collectors.joining("\n"));
+			stringBuilder.append( new BufferedReader(ISR).lines().collect(Collectors.joining(EOL)) );
 			s3ObjectInputStream.close();
 		}
 		catch (AmazonServiceException ex) {
 			System.err.println(ex.getErrorMessage());
 		}
-		catch (FileNotFoundException ex) {
-			System.err.println(ex.getMessage());
-		}
 		catch (IOException ex) {
 			System.err.println(ex.getMessage());
 		}
-		if ( txtLines.length() > MAX_DISPLAY ) {
-			txtLines = txtLines.substring(0, txtLines.indexOf(EOL));
+		String txtLines = stringBuilder.toString();
+		if (txtLines.length() > MAX_DISPLAY ) {
+			txtLines = "[ " +txtLines.substring(0, MAX_DISPLAY) + " ]";
 		}
 		return txtLines;
 	}
