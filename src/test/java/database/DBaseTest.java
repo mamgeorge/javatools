@@ -69,6 +69,9 @@ import static utils.UtilityMain.exposeObject;
 
 class DBaseTest {
 
+	public static final String DISABLED_FOR_TIME = "Disabled for time";
+	public static final String DISABLED_FOR_AVAIL = "Disabled for availability";
+
 	@BeforeAll static void initJdbcLogging( ) {
 
 		// initJdbcLogging
@@ -234,7 +237,7 @@ class DBaseTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test @Disabled( "time!" ) void readDbLines_mssql( ) {
+	@Test @Disabled( DISABLED_FOR_TIME ) void readDbLines_mssql( ) {
 		//
 		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS";
 		String username = "", password = "";
@@ -295,7 +298,7 @@ class DBaseTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test @Disabled( "avail!" ) void connection_mySQL( ) {
+	@Test @Disabled( DISABLED_FOR_AVAIL ) void connection_mySQL( ) {
 
 		// connection to active AWS RDS MySQL DB
 		String host = "database-1.clzyctwoju9i.us-east-1.rds.amazonaws.com";
@@ -409,7 +412,7 @@ class DBaseTest {
 		assertNotNull(stringBuilder);
 	}
 
-	@Test @Disabled( "time!" ) void connection_msSQL( ) {
+	@Test @Disabled( DISABLED_FOR_TIME ) void connection_msSQL( ) {
 
 		String dbName = "AdventureWorks2019", host = "2021-MARTIN\\SQLEXPRESS" + ";";
 		String dbUrl = "jdbc:sqlserver://" + host
@@ -450,7 +453,7 @@ class DBaseTest {
 		assertNotNull(stringBuilder);
 	}
 
-	@Test @Disabled( "time!" ) void hazelcast( ) {
+	@Test @Disabled( DISABLED_FOR_TIME ) void hazelcast( ) {
 		//
 		String txtLines = "";
 		Config config = new Config();
@@ -477,7 +480,7 @@ class DBaseTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test @Disabled( "time!" ) void hazelcastNW( ) {
+	@Test @Disabled( DISABLED_FOR_TIME ) void hazelcastNW( ) {
 
 		String HOST_NAME = "localhost";
 		String clusterName = "anyMap";
