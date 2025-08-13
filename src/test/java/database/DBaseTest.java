@@ -29,6 +29,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import utils.Aws1Class;
+import utils.Aws2Class;
 import utils.DbProfile;
 
 import javax.sql.DataSource;
@@ -48,8 +50,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import static ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static utils.Aws1Class.BUCKET_NAMES;
+import static utils.Aws1Class.KEYFILE_NAMES;
+import static utils.Aws1Class.intVal;
 import static utils.DbProfile.DLM;
 import static utils.DbProfile.ERROR_NOT_INTEGRATED;
 import static utils.DbProfile.ERROR_NO_CREDENTIALS;
@@ -130,13 +136,13 @@ class DBaseTest {
 	}
 
 	@Test @Disabled( "Requires a DB with Procedure!" ) void dataSource_simpleJdbcCall( ) {
-		//
+
 		String dbName = DbProfile.DBASES.SQLITE_CHINOOK.dbname + ".db";
 		String dbUrl = "jdbc:sqlite:" + DbProfile.DBASES.SQLITE_CHINOOK.host + dbName;
 		String parameter = "USA";
-		//
+
 		DriverManagerDataSource dataSource = getDataSource_DM(dbUrl);
-		//
+
 		// https://www.codejava.net/frameworks/spring/spring-simplejdbccall-examples
 		// REQUIRES A PROCEDURE
 		SimpleJdbcCall simpleJdbcCall = new SimpleJdbcCall(dataSource);
@@ -151,6 +157,34 @@ class DBaseTest {
 
 		System.out.println("stringBuilder: " + stringBuilder);
 		assertNotNull(stringBuilder);
+	}
+
+	@Test void aws1Class_Lists() {
+
+		String txtLines = "";
+		Aws1Class aws1Class = new Aws1Class();
+		String listBuckets = aws1Class.listBuckets();
+		String listObjects = aws1Class.listObjects(BUCKET_NAMES[intVal]);
+		String getObject = aws1Class.getObject(BUCKET_NAMES[intVal], KEYFILE_NAMES[intVal]);
+		txtLines = listBuckets + EOL + listObjects + EOL + getObject + EOL;
+
+		System.out.println(txtLines);
+		System.out.println("DONE");
+		assertFalse(listBuckets.isEmpty());
+	}
+
+	@Test void aws2Class_Lists() {
+
+		String txtLines = "";
+		Aws2Class aws2Class = new Aws2Class();
+		String listBuckets = aws2Class.listBuckets();
+		String listObjects = aws2Class.listObjects(BUCKET_NAMES[intVal]);
+		String getObject = aws2Class.getObject(BUCKET_NAMES[intVal], KEYFILE_NAMES[intVal]);
+		txtLines = listBuckets + EOL + listObjects + EOL + getObject + EOL;
+
+		System.out.println(txtLines);
+		System.out.println("DONE");
+		assertFalse(listBuckets.isEmpty());
 	}
 
 	// dbProfile & readDbLines

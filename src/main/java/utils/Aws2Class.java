@@ -14,33 +14,19 @@ import software.amazon.awssdk.utils.IoUtils;
 
 import java.io.IOException;
 
-import static utils.Aws1Class.BUCKET_NAME;
 import static utils.Aws1Class.EOL;
-import static utils.Aws1Class.KEYFILE_NAME;
 import static utils.Aws1Class.MAX_DISPLAY;
 
 // implementation 'software.amazon.awssdk:s3:2.16.48' // for AWS2 2.16.48 > 2.16.59
 public class Aws2Class {
-	//
+
 	private S3Client s3Client = null;
 	private static final Region REGION = Region.US_EAST_2;
 
 	public Aws2Class( ) {
-		//
+
 		String txtLines = "#### Aws2Class ####" + EOL;
 		s3Client = S3Client.builder().region(REGION).build();
-	}
-
-	public static void main(String[] args) {
-		//
-		String txtLines = "";
-		Aws2Class aws2Class = new Aws2Class();
-		txtLines += aws2Class.listBuckets() + EOL;
-		txtLines += aws2Class.listObjects(BUCKET_NAME) + EOL;
-		txtLines += aws2Class.getObject(BUCKET_NAME, KEYFILE_NAME) + EOL;
-		//
-		System.out.println(txtLines);
-		System.out.println("DONE");
 	}
 
 	public String listBuckets( ) {
