@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
-import static utils.UtilityMain.EOL;
 
 public class AnyClass {
 
