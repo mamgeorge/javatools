@@ -35,13 +35,13 @@ public class AnyClass {
 		System.out.println("DONE");
 	}
 
-	static void extras() {
+	private static void extras() {
 
 		System.out.println("time: " + Instant.now().toString() );
 	}
 
 	//############
-	public static void responseTime( ) {
+	private static void responseTime( ) {
 
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -65,7 +65,7 @@ public class AnyClass {
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 	}
 
-	public static int countResponseTimeRegressions(List<Integer> responseTimes) {
+	private static int countResponseTimeRegressions(List<Integer> responseTimes) {
 
 		int avg = 0, acc = 0, ictr = 0, tctr=0;
 		if ( responseTimes == null || responseTimes.size() == 0 ) { }
@@ -84,7 +84,7 @@ public class AnyClass {
 		return tctr;
 	}
 
-	public static void reversaList( ) {
+	private static void reversaList( ) {
 
 		String[] strs = "M,A,R,T,I,N, ,G,E,O,R,G,E".split(",");
 		List<String> list = Arrays.asList(strs);
@@ -96,7 +96,7 @@ public class AnyClass {
 		System.out.println();
 	}
 
-	public static void regexXMLs( ) {
+	private static void regexXMLs( ) {
 
 		String[] xmls = { "<h1>Nayeem loves counseling</h1>",
 			"<h1><h1>Sanjay has no watch</h1></h1><par>So wait for a while</par>",
@@ -113,7 +113,7 @@ public class AnyClass {
 		if ( matcher.matches() ) { System.out.println("matcher.matches!"); }
 	}
 
-	public static void regexIpv4( ) {
+	private static void regexIpv4( ) {
 
 		/* "https://cs.lmu.edu/~ray/notes/regex/"
 			\b - is a word delimiter
@@ -138,7 +138,7 @@ public class AnyClass {
 		if ( matcher.matches() ) { System.out.println("matcher.matches!"); }
 	}
 
-	public static void regexValid( ) {
+	private static void regexValid( ) {
 
 		String[] regexVals = null;
 		// ""new String[]{ "([A-Z])(.+)", "[AZ[a-z](a-z)", "batcatpat(nat" };
@@ -164,7 +164,7 @@ public class AnyClass {
 		System.out.println(txtLine);
 	}
 
-	public static String showTime( ) {
+	private static String showTime( ) {
 
 		LocalDateTime localDateTime = LocalDateTime.now();
 		String txtLine = ISO_DATE_TIME.format(localDateTime);
