@@ -15,8 +15,12 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.IntStream;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
+import static java.util.Collections.reverseOrder;
+import static utils.UtilityMain.EOL;
 
 public class AnyClass {
+
+	public static final String TAB = "\t";
 
 	public static final String regexIpv4 = "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\."
 			+ "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\."
@@ -29,7 +33,8 @@ public class AnyClass {
 
 	public static void main(String[] args) {
 
-		extras();
+		System.out.println(reversaList());
+
 		System.out.println("DONE");
 	}
 
@@ -85,16 +90,31 @@ public class AnyClass {
 		return tctr;
 	}
 
-	private static void reversaList() {
+	private static String reversaList() {
+
+		StringBuilder sb = new StringBuilder();
 
 		String[] strs = "M,A,R,T,I,N, ,G,E,O,R,G,E".split(",");
-		List<String> list = Arrays.asList(strs);
-		List<String> lost = List.copyOf(list);
-		Collections.reverse(list);
-		lost.forEach(x -> System.out.print(x));
-		System.out.println();
-		list.forEach(System.out::print);
-		System.out.println();
+		List<String> last = Arrays.asList(strs);
+		List<String> lest = new ArrayList<>(last);
+		List<String> list = new ArrayList<>(last);
+		List<String> lost = new ArrayList<>(last);
+		List<String> lust = new ArrayList<>(last);
+
+		Collections.sort(last);
+		Collections.sort(list, reverseOrder());
+		Collections.reverse(lest);
+		Collections.rotate(lost, 1);
+		Collections.shuffle(lust);
+
+		last.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
+		list.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
+		lest.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
+		lost.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
+		lust.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
+		//list.forEach(System.out::print);
+
+		return sb.toString();
 	}
 
 	private static void regexXMLs() {
