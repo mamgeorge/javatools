@@ -340,7 +340,7 @@ class DBaseTest {
 		assertNotNull(stringBuilder);
 	}
 
-	@Test void client_mongoDB( ) {
+	@Test @Disabled( DISABLED_FOR_AVAIL ) void client_mongoDB( ) {
 		//
 		// https://docs.mongodb.com/drivers/java/sync/current/fundamentals/connection/connect/
 		// mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.1.9
@@ -376,7 +376,7 @@ class DBaseTest {
 		assertTrue(txtLines.split(EOL).length > 1);
 	}
 
-	@Test void client_hikariDB( ) {
+	@Test @Disabled( DISABLED_FOR_AVAIL ) void client_hikariDB( ) {
 
 		// CP: Connection Pooling
 		String dbURL = "jdbc:mysql://localhost:3306/mydb";

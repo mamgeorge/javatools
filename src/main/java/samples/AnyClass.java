@@ -33,19 +33,22 @@ public class AnyClass {
 
 	public static void main(String[] args) {
 
-		System.out.println(reversaList());
+		System.out.println(extras());
 
 		System.out.println("DONE");
 	}
 
-	private static void extras() {
+	private static String extras() {
 
-		System.out.println("time: " + Instant.now().toString());
+		StringBuilder sb = new StringBuilder();
+		sb.append(Instant.now().toString()).append(EOL);
+		return sb.toString();
 	}
 
 	//############
-	private static void responseTime() {
+	private static String responseTime() {
 
+		StringBuilder sb = new StringBuilder();
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			int responseTimesCount = Integer.parseInt(br.readLine().trim());
@@ -61,11 +64,11 @@ public class AnyClass {
 					.toList();
 
 			int result = AnyClass.countResponseTimeRegressions(responseTimes);
-			System.out.println(result);
+			sb.append(" result: ").append(result);
 			br.close();
-		} catch (IOException ex) {
-			System.out.println("ERROR: " + ex.getMessage());
 		}
+		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		return sb.toString();
 	}
 
 	private static int countResponseTimeRegressions(List<Integer> responseTimes) {
@@ -196,8 +199,9 @@ public class AnyClass {
 
 	private static String showTime() {
 
+		StringBuilder sb = new StringBuilder();
 		LocalDateTime localDateTime = LocalDateTime.now();
-		String txtLine = ISO_DATE_TIME.format(localDateTime);
-		return txtLine;
+		sb.append(ISO_DATE_TIME.format(localDateTime));
+		return sb.toString();
 	}
 }

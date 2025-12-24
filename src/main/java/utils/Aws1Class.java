@@ -51,19 +51,21 @@ public class Aws1Class {
 	private static final String ROLE_SESS = ROLE_SESSIONNAME_LIST[ACCESS_INT];
 	private static final String ACCESS = ACCESS_LIST[ACCESS_INT];
 
-	public static final String[] BUCKET_NAMES = { "mamgeorgebucket1", "mlg-s3-events", "mlg-s3-sample" };
+	public static final String[] BUCKET_NAMES = { "mlg-s3-events", "mlg-s3-sample" };
 	public static final String[] KEYFILE_NAMES =
-		{ "humor_properTea.txt", "coffee.jpg", "images/01_Gen0617_Flood3_DelugeTablet_Utnapishtim_t.jpg" };
-	public static final int intVal = 2;
+		{ "coffee.jpg", "images/01_Gen0617_Flood3_DelugeTablet_Utnapishtim_t.jpg" };
+	public static final int intVal = 1;
 	public static final String EOL = "\n";
 	public static final int MAX_DISPLAY = 80;
 
 	public Aws1Class( ) {
 
 		String txtLines = "#### AwsClass ####" + EOL;
-		ProfileCredentialsProvider PCP = new ProfileCredentialsProvider();
-		AWSCredentials awsCredentials = PCP.getCredentials();
-
+		ProfileCredentialsProvider PCP = new ProfileCredentialsProvider("dev");
+		AWSCredentials awsCredentials = null;
+		try { awsCredentials = PCP.getCredentials(); }
+		catch( SdkClientException ex )
+		{ System.out.println( "ERROR: " + ex.getMessage() ); }
 		String awsAccessKeyId = awsCredentials.getAWSAccessKeyId();
 		String awsSecretKey = awsCredentials.getAWSSecretKey();
 

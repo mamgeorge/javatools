@@ -26,6 +26,46 @@
 		<spring-version>3.2.5</spring-version><!-- 2.4.2, 3.1.4 -->
 	</properties>
 
+	<!-- summary
+
+	db	org.springframework.boot	spring-boot-starter-jdbc	${spring-version}
+	db	org.xerial					sqlite-jdbc					3.45.3.0
+	db	mysql						mysql-connector-java		8.0.33
+	db	com.oracle.database.jdbc	ojdbc11						21.6.0.0.1
+	db	com.microsoft.sqlserver		mssql-jdbc					10.2.1.jre11
+	db	org.mongodb					mongo-java-driver			3.12.11
+	db	com.h2database				h2							2.2.224
+	db	org.hsqldb					hsqldb						2.7.2
+	db	org.apache.derby			derby						10.17.1.0
+	db	com.amazonaws				aws-java-sdk-s3				1.12.716
+	db	com.amazonaws				aws-java-sdk-sts			1.12.221
+	db	software.amazon.awssdk		s3							2.17.191
+	db	com.zaxxer					HikariCP					5.0.1
+	db	com.hazelcast				hazelcast					5.4.0
+
+	fr	org.projectlombok			lombok						1.18.32
+	fr	com.fasterxml.jackson.core	jackson-core				2.17.1
+	fr	com.fasterxml.jackson.dataformat jackson-dataformat-yaml		2.17.1
+	fr	com.jayway.jsonpath			json-path					2.9.0
+	fr	com.networknt				json-schema-validator		1.4.0
+
+	ms	org.apache.kafka			kafka-clients				3.9.1
+	ms	org.apache.kafka			kafka-streams				3.7.0
+	ms	com.rabbitmq				amqp-client					5.21.0
+
+	sp	org.springframework			spring-beans				6.0.13
+	sp	org.apache.httpcomponents	httpclient					4.5.13
+	sp	com.opencsv					opencsv						5.9
+	sp	net.sf.phat					sphinx4-core				5prealpha
+	sp	net.sf.phat					sphinx4-data				5prealpha
+
+	ts	org.springframework.boot	spring-boot-starter-test	test
+	ts	org.junit.jupiter			junit-jupiter-api			5.7.0
+	ts	org.junit.jupiter			junit-jupiter-engine		5.7.0
+	ts	org.mockito					mockito-core				2.7.1
+	ts	org.powermock				powermock-api-mockito2		2.0.9
+	-->
+
 	<dependencies>
 
 		<!-- database -->
@@ -56,7 +96,7 @@
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
-			<version>10.2.1.jre11</version>
+			<version>13.2.1.jre11</version>
 		</dependency>
 
 		<dependency>
@@ -148,13 +188,19 @@
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>3.9.1</version>
+			<version>4.1.1</version><!-- 3.9.1 -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-streams</artifactId>
-			<version>3.7.0</version>
+			<version>4.1.1</version><!-- 3.7.0 -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>2.0.17</version>
 		</dependency>
 
 		<dependency>

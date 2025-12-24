@@ -15,6 +15,7 @@ import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -89,9 +90,10 @@ public class KafkaHandlerTests {
 		int ictr = 0;
 		String FRMT = "%d: topic: %s, partition: %s, offset: %d, key: %s, value: %s\n";
 		String txtRecord;
+		Duration duration = Duration.ofMillis(100);
 		while ( true ) {
 			ConsumerRecords<String, String> consumerRecords;
-			consumerRecords = kafkaConsumer.poll(100);
+			consumerRecords = kafkaConsumer.poll(duration);
 			for ( ConsumerRecord<String, String> consumerRecord : consumerRecords ) {
 				//
 				txtRecord = String.format(FRMT,
