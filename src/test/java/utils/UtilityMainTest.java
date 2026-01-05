@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.PathResource;
 import org.springframework.util.ResourceUtils;
-import samples.AnyObject;
+import objects.AnyObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 import static com.fasterxml.jackson.core.util.DefaultIndenter.SYS_LF;
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
-import static utils.DbProfile.DLM;
+import static utils.UtilityMain.DLM;
 
 public class JsonTasks {
 

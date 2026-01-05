@@ -1,11 +1,8 @@
 package utils;
 
-import com.rabbitmq.utility.Utility;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -13,8 +10,8 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 import org.springframework.test.util.ReflectionTestUtils;
-import samples.AnyException;
-import samples.AnyObject;
+import objects.AnyException;
+import objects.AnyObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

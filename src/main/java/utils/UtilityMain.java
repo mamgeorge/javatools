@@ -46,6 +46,7 @@ public class UtilityMain {
 	public static final String RESET = "\u001b[0m";
 	public static final String TAB = "\t";
 	public static final String EOL = "\n";
+	public static final String DLM = "\t";
 	public static final int MAXLEN = 60;
 
 	public static final String PATHFILE_LOCAL = "src/test/resources/"; // "C:/Users/mamge/Kerberos/config/"

@@ -12,8 +12,7 @@ import com.networknt.schema.ValidationMessage;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import org.junit.jupiter.api.Test;
-import samples.AnyException;
-import samples.BooksCatalog;
+import objects.BooksCatalog;
 
 import java.io.FileInputStream;
 import java.io.IOException;
