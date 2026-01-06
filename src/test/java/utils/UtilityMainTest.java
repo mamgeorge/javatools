@@ -1,11 +1,11 @@
 package utils;
 
+import objects.AnyObject;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.PathResource;
 import org.springframework.util.ResourceUtils;
-import objects.AnyObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,41 +14,16 @@ import java.lang.management.RuntimeMXBean;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static utils.UtilityMain.EOL;
-import static utils.UtilityMain.MAXLEN;
-import static utils.UtilityMain.TAB;
-import static utils.UtilityMain.getRandomString;
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.UtilityMain.*;
 
 public class UtilityMainTest {
 
@@ -57,19 +32,47 @@ public class UtilityMainTest {
 	public static final String ASSERT_MSG = "ASSERT_MSG";
 	public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z' EEE"; // 'Z' shows UTC
 
+	//#### proposed statics
+	public static String lineChunker(String txtLine, int intChunk, String DLM) {
+
+		String txtLines;
+		String[] lineChunks = txtLine.split("(?<=\\G.{" + intChunk + "})");
+
+		StringBuilder stringBuilder = new StringBuilder();
+		AtomicInteger aint = new AtomicInteger();
+		Arrays.stream(lineChunks).forEach(lineChunk -> stringBuilder.append(
+				String.format("%02d %s" + DLM, aint.incrementAndGet(), lineChunk)));
+		txtLines = stringBuilder.toString();
+		return txtLines;
+	}
+
 	//#### basics
-	@Test void template( ) {
-		//
-		//
-		//
-		String txtLines = "template"
-			//
-			;
+	@Test
+	void template() {
+
+		String txtLines = "template";
 		System.out.println("txtLines: " + txtLines);
 		assertTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
 	}
 
-	@Test void booleans( ) {
+	@Test
+	void getClass_Val() {
+
+		UtilityMainTest UMT = new UtilityMainTest();
+		StringBuilder sb = new StringBuilder();
+		sb.append(String.format("descriptorString %s\n", UMT.getClass().descriptorString()));
+		sb.append(String.format("getTypeName..... %s\n", UMT.getClass().getTypeName()));
+		sb.append(String.format("getPackageName.. %s\n", UMT.getClass().getPackageName()));
+		sb.append(String.format("getCanonicalName %s\n", UMT.getClass().getCanonicalName()));
+		sb.append(String.format("getName......... %s\n", UMT.getClass().getName()));
+		sb.append(String.format("getSimpleName... %s\n", UMT.getClass().getSimpleName()));
+
+		System.out.println(sb);
+		assertTrue(sb.toString().split(EOL).length >= 1, ASSERT_MSG);
+	}
+
+	@Test
+	void booleans() {
 		//
 		String txtLines = EOL;
 		//
@@ -85,14 +88,16 @@ public class UtilityMainTest {
 		assertNotNull(txtLines, ASSERT_MSG);
 	}
 
-	@Test void showSysEnv( ) {
+	@Test
+	void showSysEnv() {
 
 		String txtLines = UtilityMain.showSysEnv();
 		System.out.println(txtLines);
 		assertNotNull(txtLines);
 	}
 
-	@Test void showSysProp( ) {
+	@Test
+	void showSysProp() {
 
 		Properties properties = System.getProperties();
 
@@ -100,7 +105,9 @@ public class UtilityMainTest {
 		AtomicInteger aint = new AtomicInteger();
 		properties.keySet().stream().sorted().forEach((key) -> {
 			String val = System.getProperty(key.toString());
-			if ( val.length() > MAXLEN ) { val = val.substring(0, MAXLEN) + "..."; }
+			if (val.length() > MAXLEN) {
+				val = val.substring(0, MAXLEN) + "...";
+			}
 			sb.append(String.format("\t%03d %-30s | %s%n", aint.incrementAndGet(), key, val));
 		});
 
@@ -108,7 +115,8 @@ public class UtilityMainTest {
 		assertNotNull(sb);
 	}
 
-	@Test void showJvmArgs( ) {
+	@Test
+	void showJvmArgs() {
 
 		RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
 		List<String> listArgs = runtimeMXBean.getInputArguments();
@@ -116,13 +124,14 @@ public class UtilityMainTest {
 		StringBuilder sb = new StringBuilder();
 		AtomicInteger aint = new AtomicInteger();
 		listArgs.stream().sorted()
-			.forEach(args -> sb.append(String.format("\t%03d %s%n", aint.incrementAndGet(), args)));
+				.forEach(args -> sb.append(String.format("\t%03d %s%n", aint.incrementAndGet(), args)));
 
 		System.out.println("size: " + sb.toString().split(EOL).length + EOL + sb);
 		assertNotNull(sb);
 	}
 
-	@Test void showAppYml( ) {
+	@Test
+	void showAppYml() {
 
 		String pathYml = "classpath:application.yml";
 		String propName = "spring.application.id";
@@ -138,15 +147,15 @@ public class UtilityMainTest {
 			Properties properties = YPFB.getObject();
 			assert properties != null;
 			propValue = properties.getProperty(propName);
-		}
-		catch (FileNotFoundException ex) {
+		} catch (FileNotFoundException ex) {
 			System.out.println("ERROR: " + ex.getMessage());
 		}
 		System.out.println(EOL + propName + ": " + propValue);
 		assertNotNull(propValue);
 	}
 
-	@Test void showTimes( ) {
+	@Test
+	void showTimes() {
 
 		String showTimes = UtilityMain.showTimes();
 		//
@@ -156,7 +165,8 @@ public class UtilityMainTest {
 		assertTrue(showTimesLen > 4, ASSERT_MSG);
 	}
 
-	@Test void stream_sort( ) throws SocketException {
+	@Test
+	void stream_sort() throws SocketException {
 		//
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -168,25 +178,25 @@ public class UtilityMainTest {
 		assertTrue(set.size() >= 7, ASSERT_MSG);
 	}
 
-	@Test void stream_filter( ) throws SocketException {
+	@Test
+	void stream_filter() throws SocketException {
 		//
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
 		//
 		List<NetworkInterface> listMain = Collections.list(enums);
 		List<NetworkInterface> listFilt =
-			listMain.stream()
-				.filter(nifc -> {
-					int mtu = 0;
-					try {
-						mtu = nifc.getMTU();
-					}
-					catch (Exception ex) {
-						LOGGER.info(ex.getMessage());
-					}
-					return mtu > 1 && !nifc.getDisplayName().startsWith("VMware");
-				})
-				.toList();
+				listMain.stream()
+						.filter(nifc -> {
+							int mtu = 0;
+							try {
+								mtu = nifc.getMTU();
+							} catch (Exception ex) {
+								LOGGER.info(ex.getMessage());
+							}
+							return mtu > 1 && !nifc.getDisplayName().startsWith("VMware");
+						})
+						.toList();
 		//
 		listFilt.forEach(nifc -> set.add(TAB + nifc.getDisplayName()));
 		//
@@ -195,7 +205,8 @@ public class UtilityMainTest {
 		assertTrue(set.size() >= 5, ASSERT_MSG);
 	}
 
-	@Test void stream_Collections( ) throws SocketException {
+	@Test
+	void stream_Collections() throws SocketException {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -208,7 +219,8 @@ public class UtilityMainTest {
 		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
-	@Test void stream_Iterator( ) throws SocketException {
+	@Test
+	void stream_Iterator() throws SocketException {
 
 		// better for larger numbers
 		StringBuilder stringBuilder = new StringBuilder();
@@ -216,7 +228,7 @@ public class UtilityMainTest {
 		//
 		stringBuilder.append("Iterator Stream" + EOL);
 		Stream<NetworkInterface> stream = StreamSupport.stream(
-			Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
+				Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
 		stream.forEach(nifc -> stringBuilder.append(nifc.getDisplayName()).append(EOL));
 		//
 		System.out.println(stringBuilder);
@@ -224,7 +236,8 @@ public class UtilityMainTest {
 	}
 
 	//#### files
-	@Test void getFileLines( ) {
+	@Test
+	void getFileLines() {
 
 		String txtLines = UtilityMain.getFileLines(PATHFILE_LOCAL + "structured/battles.csv", "");
 		//
@@ -232,7 +245,8 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() > 12, ASSERT_MSG);
 	}
 
-	@Test void getFileLocal( ) {
+	@Test
+	void getFileLocal() {
 
 		String txtLines = UtilityMain.getFileLocal(PATHFILE_LOCAL + "structured/booksCatalog.json");
 		//
@@ -240,18 +254,19 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
-	@Test void getFileLocals( ) {
+	@Test
+	void getFileLocals() {
 		//
 		StringBuilder stringBuilder = new StringBuilder();
 		String[] fileNames =
-			{ "structured/booksCatalog.html", "structured/booksCatalog.json", "structured/booksCatalog.xml", "booksXml2Html.xslt" };
+				{"structured/booksCatalog.html", "structured/booksCatalog.json", "structured/booksCatalog.xml", "booksXml2Html.xslt"};
 		//
 		AtomicInteger idx = new AtomicInteger();
 		Arrays.stream(fileNames).sequential().forEach(flnm -> {
 			String fileName = PATHFILE_LOCAL + flnm;
 			String txtLines = UtilityMain.getFileLocal(fileName);
 			stringBuilder.append(
-				String.format("\t%02d %s\tsize: %d \n", idx.incrementAndGet(), flnm, txtLines.length()));
+					String.format("\t%02d %s\tsize: %d \n", idx.incrementAndGet(), flnm, txtLines.length()));
 		});
 		//
 		int countFiles = stringBuilder.toString().split(EOL).length;
@@ -261,14 +276,16 @@ public class UtilityMainTest {
 	}
 
 	//#### reflection
-	@Test void getField( ) {
+	@Test
+	void getField() {
 		//
 		String results = UtilityMain.getField(new AnyObject(), "gamma");
 		System.out.println("results: " + results);
 		assertEquals("GIMMEL", results, ASSERT_MSG);
 	}
 
-	@Test void getMethod( ) {
+	@Test
+	void getMethod() {
 
 		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma");
 		String results = object.toString();
@@ -276,7 +293,8 @@ public class UtilityMainTest {
 		assertEquals("GIMMEL", results, ASSERT_MSG);
 	}
 
-	@Test void exposeObject( ) {
+	@Test
+	void exposeObject() {
 		//
 		AnyObject anyObject = new AnyObject();
 		String txtLines = UtilityMain.exposeObject(anyObject);
@@ -284,7 +302,8 @@ public class UtilityMainTest {
 		assertNotNull(txtLines, ASSERT_MSG);
 	}
 
-	@Test void putObject( ) {
+	@Test
+	void putObject() {
 		//
 		AnyObject anyObject = new AnyObject();
 		UtilityMain.putObject(anyObject, "gamma", "STUFF");
@@ -294,7 +313,8 @@ public class UtilityMainTest {
 	}
 
 	// special
-	@Test void lineChunker( ) {
+	@Test
+	void lineChunker() {
 
 		String txtLines;
 		String txtLine = "123456789012345678901234567890123456789012345678901234567890";
@@ -310,7 +330,8 @@ public class UtilityMainTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test void checkDates( ) {
+	@Test
+	void checkDates() {
 
 		StringBuilder sb = new StringBuilder();
 		SimpleDateFormat SDF = new SimpleDateFormat(ISO_FORMAT);
@@ -360,20 +381,6 @@ public class UtilityMainTest {
 
 		System.out.println(sb);
 		assertNotNull(sb);
-	}
-
-	//#### proposed statics
-	public static String lineChunker(String txtLine, int intChunk, String DLM) {
-
-		String txtLines;
-		String[] lineChunks = txtLine.split("(?<=\\G.{" + intChunk + "})");
-
-		StringBuilder stringBuilder = new StringBuilder();
-		AtomicInteger aint = new AtomicInteger();
-		Arrays.stream(lineChunks).forEach(lineChunk -> stringBuilder.append(
-			String.format("%02d %s" + DLM, aint.incrementAndGet(), lineChunk)));
-		txtLines = stringBuilder.toString();
-		return txtLines;
 	}
 }
 //----

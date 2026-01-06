@@ -35,7 +35,7 @@ public class KafkaZookeeper {
 	private final static String[] TOPIC_NAMES = { "quickstart-events" };
 	private final static String[] HOSTS = { "localhost" }; // BROKER_1, BROKER_2
 	private final static String[] PORTS = { "9092" }; // 9092, 9093
-	//
+
 	private final static String GROUP_ID = "test";
 	private final static String APACHE_PRFX = "org.apache.kafka.common.serialization.";
 	private final static String EOL = "\n";
@@ -43,6 +43,7 @@ public class KafkaZookeeper {
 	private final static boolean testingProducer = false;
 	private final static boolean testingConsumer = true;
 
+	//
 	public static void main(String[] args) {
 		//
 		String topicName = TOPIC_NAMES[0];
