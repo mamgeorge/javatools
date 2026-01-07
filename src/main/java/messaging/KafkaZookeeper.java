@@ -1,6 +1,5 @@
 package messaging;
 
-import lombok.NonNull;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -13,16 +12,14 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
-import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
-import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static utils.UtilityMain.getRandomLine;
+import static utils.UtilityMain.getRandomString;
 
 /*
 	see "kafka_info.md"
@@ -31,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 */
 public class KafkaZookeeper {
 
-	private final static String[] CLUSTER_NAMES = { "" };
-	private final static String[] TOPIC_NAMES = { "quickstart-events" };
-	private final static String[] HOSTS = { "localhost" }; // BROKER_1, BROKER_2
-	private final static String[] PORTS = { "9092" }; // 9092, 9093
+	private final static String[] CLUSTER_NAMES = {""};
+	private final static String[] TOPIC_NAMES = {"quickstart-events"};
+	private final static String[] HOSTS = {"localhost"}; // BROKER_1, BROKER_2
+	private final static String[] PORTS = {"9092"}; // 9092, 9093
 
 	private final static String GROUP_ID = "test";
 	private final static String APACHE_PRFX = "org.apache.kafka.common.serialization.";
@@ -49,8 +46,12 @@ public class KafkaZookeeper {
 		String topicName = TOPIC_NAMES[0];
 		//
 		System.out.println("Subscribed to topic " + topicName);
-		if ( testingProducer ) { producer(topicName); }
-		if ( testingConsumer ) { consumer(topicName); }
+		if (testingProducer) {
+			producer(topicName);
+		}
+		if (testingConsumer) {
+			consumer(topicName);
+		}
 		//
 		System.out.println("DONE");
 	}
@@ -67,9 +68,9 @@ public class KafkaZookeeper {
 		//
 		String txtKey;
 		String txtVal;
-		for ( int ictr = 0; ictr < 20; ictr++ ) {
+		for (int ictr = 0; ictr < 20; ictr++) {
 			txtKey = Integer.toString(ictr);
-			txtVal = getRandomLine();
+			txtVal = getRandomLine(10);
 			producerRecord = new ProducerRecord<>(topicName, txtKey, txtVal);
 			kafkaProducer.send(producerRecord);
 		}
@@ -92,18 +93,18 @@ public class KafkaZookeeper {
 		String FRMT = "%d: topic: %s, partition: %s, offset: %d, key: %s, value: %s\n";
 		String txtRecord;
 		Duration duration = Duration.ofMillis(100);
-		while ( true ) {
+		while (true) {
 			ConsumerRecords<String, String> consumerRecords;
 			consumerRecords = kafkaConsumer.poll(duration);
-			for ( ConsumerRecord<String, String> consumerRecord : consumerRecords ) {
+			for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
 				//
 				txtRecord = String.format(FRMT,
-					ictr++,
-					consumerRecord.topic(),
-					consumerRecord.partition(),
-					consumerRecord.offset(),
-					consumerRecord.key(),
-					consumerRecord.value()
+						ictr++,
+						consumerRecord.topic(),
+						consumerRecord.partition(),
+						consumerRecord.offset(),
+						consumerRecord.key(),
+						consumerRecord.value()
 				);
 				System.out.print(txtRecord);
 			}
@@ -158,28 +159,4 @@ public class KafkaZookeeper {
 		properties.put("session.timeout.ms", "30000");
 		return properties;
 	}
-
-	public static String getRandomLine( ) {
-		//
-		StringBuilder txtLine = new StringBuilder();
-		String txtRandom = getRandomString(16);
-		//
-		txtLine.append(Instant.now().toString()).append(" / ");
-		txtLine.append(txtRandom);
-		return txtLine.toString();
-	}
-
-	public static String getRandomString(int num) {
-		//
-		StringBuilder txtRandom = new StringBuilder();
-		Random random = new Random();
-		char[] chars =
-				( "1234567890abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWZYZ" ).toCharArray();
-		double dbl = Math.round(Math.random() * 10000D * 10000D);
-		for ( int ictr = 0; ictr < num; ictr++ ) {
-			txtRandom.append(chars[random.nextInt(chars.length)]);
-		}
-		return txtRandom.toString();
-	}
-
 }

@@ -382,5 +382,15 @@ public class UtilityMain {
 		}
 		return txtRandom.toString();
 	}
+
+	public static String getRandomLine(int num) {
+		//
+		StringBuilder txtLine = new StringBuilder();
+		String txtRandom = getRandomString(num);
+		//
+		txtLine.append(Instant.now().toString()).append(" / ");
+		txtLine.append(txtRandom);
+		return txtLine.toString();
+	}
 }
 //----
