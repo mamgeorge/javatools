@@ -79,5 +79,4 @@ public class JsonTasks {
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		return txtLines;
 	}
-
 }

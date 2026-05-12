@@ -1,6 +1,7 @@
 package utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
@@ -11,8 +12,12 @@ import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.jupiter.api.Test;
 import objects.BooksCatalog;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,6 +26,7 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static utils.JsonTasks.getJsonFromObject;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.getFileLocal;
 import static utils.UtilityMainTest.ASSERT_MSG;
@@ -40,6 +47,35 @@ import static utils.UtilityMainTest.PATHFILE_LOCAL;
 class JsonTaskTests {
 
 	private static final Logger LOGGER = Logger.getLogger(JsonTaskTests.class.getName());
+
+	@Test void testMapping() {
+
+		Person person = Person.createPerson();
+		Student student = Student.createStudent();
+		System.out.println("person: " + getJsonFromObject(person));
+		System.out.println("student: " + getJsonFromObject(student));
+
+		// BeanUtils
+		BeanUtils.copyProperties(person, student);
+		System.out.println("studentBU: " + getJsonFromObject(student));
+
+		// ObjectMapper
+		ObjectMapper objectMapper = new ObjectMapper();
+		Student studentOM = Student.createStudent();
+		try { objectMapper.updateValue(studentOM, person); }
+		catch (JsonMappingException ex) { System.out.println("ERROR: " + ex.getMessage()); }
+		System.out.println("studentOM: " + getJsonFromObject(studentOM));
+
+		// ModelMapper
+		ModelMapper modelMapper = new ModelMapper();
+		Student studentMM = Student.createStudent();
+		modelMapper.map(person, studentMM);
+		System.out.println("studentMM: " + getJsonFromObject(studentMM));
+
+		assertEquals(student.getName(),person.getName());
+		assertEquals(studentOM.getName(),person.getName());
+		assertEquals(studentMM.getName(),person.getName());
+	}
 
 	@Test void getJsonSchema_validate( ) { // not working
 
@@ -272,5 +308,38 @@ class JsonTaskTests {
 		try { Files.writeString(Paths.get(PATHFILE_REMOTE + "battles.html"), html); }
 		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 		assertNotNull(html);
+	}
+}
+
+@Getter @Setter class Person {
+
+	private String name;
+	private String address;
+	private String phone;
+	private Date birthdate;
+	private List<String> family;
+
+	public static Person createPerson(){
+
+		Person person = new Person();
+		person.setName("Joe Shmoe");
+		person.setAddress("1234 AnyStreet");
+		person.setPhone("555-1234");
+		person.setFamily(List.of("Jane Schmoe", "John Schmoe"));
+		return person;
+	}
+}
+
+@Getter @Setter class Student extends Person{
+
+	private String studentId;
+	private String major;
+
+	public static Student createStudent(){
+
+		Student student = new Student();
+		student.setStudentId("ABC1234");
+		student.setMajor("Mechanical Engineering");
+		return student;
 	}
 }
