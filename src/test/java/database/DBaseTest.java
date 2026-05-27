@@ -67,7 +67,7 @@ import static utils.UtilityMain.exposeObject;
 class DBaseTest {
 
 	public static final String DISABLED_FOR_TIME = "Disabled for time";
-	public static final String DISABLED_FOR_AVAIL = "Disabled for availability";
+	public static final String DISABLED_FOR_AVAIL = "Not available";
 
 	@BeforeAll static void initJdbcLogging( ) {
 
@@ -369,6 +369,7 @@ class DBaseTest {
 		txtLines += "sb.toString(): " + stringBuilder + EOL;
 		txtLines += "document.toString(): " + document.toString() + EOL;
 		txtLines += "document.toJson()  : " + document.toJson() + EOL;
+		mongoClient.close();
 		System.out.println(txtLines);
 		assertTrue(txtLines.split(EOL).length > 1);
 	}
