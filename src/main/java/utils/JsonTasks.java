@@ -48,7 +48,7 @@ public class JsonTasks {
 		return json;
 	}
 
-	public static Object getObjectFromJson(Class clazz, String json) {
+	public static Object getObjectFromJson(Class<?> clazz, String json) {
 		//
 		Object object = null;
 		try {

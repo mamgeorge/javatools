@@ -301,6 +301,9 @@ class JsonTaskTests {
 			});
 			html = getFileLocal(PATHFILE_LOCAL + "structured/header.html");
 			html = html.replaceAll("battleData", stringBuilder.toString());
+		
+			csvReader.close();
+			reader.close();	
 		}
 		catch (IOException | CsvException ex) { System.out.println("ERROR: " + ex.getMessage()); }
 

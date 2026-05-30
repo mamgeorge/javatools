@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -30,8 +31,13 @@ public class ToolAstro {
 		"AND ANT APS AQL AQR ARA ARI AUR BOO CAE CAM CAP CAR CAS CEN CEP CET CHA CIR CMA CMI CNC COL COM CRA CRB CRT CRU CRV CVN CYG DEL DOR DRA EQU ERI FOR GEM GRU HER HOR HYA HYI IND LAC LEO LEP LIB LMI LUP LYN LYR MEN MIC MON MUS NOR OCT OPH ORI PAV PEG PER PHE PIC PSA PSC PUP PYX RET SCL SCO SCT "
 			+ "SERCD SERCP SEX SGE SGR TAU TEL TRA TRI TUC UMA UMI VEL VIR VOL VUL";
 	private static final String[] STR_CONS = TXT_CONS.split(" ");
-	private static final String TXT_PATH_ASTRO = "C:/Martin/5Personal/Astronomy/icons/";
+	private static final String TXT_PATH_ASTRO = "/5Personal/Astronomy/icons/";
 	private static final String TXT_URL = "http://www.iau.org/static/public/constellations/";
+
+	public static void showCons() {
+		
+		System.out.println("constellations:" + String.join(", ", STR_CONS));
+	}
 
 	public static void writeConsGifFromUrl(final String[] strings) {
 		//
@@ -45,7 +51,7 @@ public class ToolAstro {
 			for ( String string : strings ) {
 				//
 				txtIMG = txtURLPrefix + string.toUpperCase() + "." + IMG_GIF;
-				url = new URL(txtIMG);
+				url = URI.create(txtIMG).toURL();
 				bufferedImage = ImageIO.read(url);
 				file = new File(TXT_PATH_ASTRO + string.toUpperCase() + "." + IMG_GIF);
 				ImageIO.write(bufferedImage, IMG_GIF, file);
@@ -73,7 +79,7 @@ public class ToolAstro {
 			for ( String string : strings ) {
 				//
 				txtIMG = txtURLPrefix + string.toUpperCase() + "." + IMG_GIF;
-				url = new URL(txtIMG);
+				url = URI.create(txtIMG).toURL();
 				bufferedImage = ImageIO.read(url);
 				file = new File(TXT_PATH_ASTRO + string.toUpperCase() + "." + IMG_PNG);
 				fos = new FileImageOutputStream(file);

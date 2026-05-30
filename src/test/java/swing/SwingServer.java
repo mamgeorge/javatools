@@ -71,6 +71,12 @@ public class SwingServer extends JFrame {
 					jTextArea.append("Sum returned: " + sum + "\n\n");
 					DOS.writeInt(sum); // DOS.writeUTF(txtSum);
 				}
+				serverSocket.close();
+				SocketConnection.close();
+				inputStream.close();
+				outputStream.close();
+				DIS.close();
+				DOS.close();
 			}
 			catch (IOException ex) {
 				connected = false;

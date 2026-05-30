@@ -8,8 +8,8 @@ import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,8 +35,7 @@ public class SpecialParse {
 
 		StringBuilder sb = new StringBuilder();
 		try {
-			URL url = new URL(textUrl);
-			InputStream inputStream = url.openStream();
+			URL url = URI.create(textUrl).toURL();
 			InputStreamReader ISR = new InputStreamReader(url.openStream(), UTF_8);
 			BufferedReader buffRead = new BufferedReader(ISR);
 

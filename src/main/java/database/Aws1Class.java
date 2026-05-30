@@ -171,15 +171,12 @@ public class Aws1Class {
 			S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
 
 			InputStreamReader ISR = new InputStreamReader(s3ObjectInputStream, UTF_8);
-			stringBuilder.append( new BufferedReader(ISR).lines().collect(Collectors.joining(EOL)) );
+			BufferedReader bufferedReader = new BufferedReader(ISR);
+			stringBuilder.append( bufferedReader.lines().collect(Collectors.joining(EOL)) );
 			s3ObjectInputStream.close();
 		}
-		catch (AmazonServiceException ex) {
-			System.err.println(ex.getErrorMessage());
-		}
-		catch (IOException ex) {
-			System.err.println(ex.getMessage());
-		}
+		catch (AmazonServiceException ex) { System.err.println(ex.getErrorMessage()); }
+		catch (IOException ex) { System.err.println(ex.getMessage()); }
 		String txtLines = stringBuilder.toString();
 		if (txtLines.length() > MAX_DISPLAY ) {
 			txtLines = "[ " +txtLines.substring(0, MAX_DISPLAY) + " ]";

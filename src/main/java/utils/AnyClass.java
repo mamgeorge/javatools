@@ -1,22 +1,13 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.IntStream;
-
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
-import static java.util.Collections.reverseOrder;
-import static utils.UtilityMain.EOL;
 
 public class AnyClass {
 
@@ -33,96 +24,16 @@ public class AnyClass {
 
 	public static void main(String[] args) {
 
-		System.out.println(extras());
-
+		regexXMLs();
+		regexIpv4();
+		regexValid();
+		System.out.println("Current time: " + showTime());	
 		System.out.println("DONE");
 	}
-
-	private static String extras() {
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(Instant.now().toString()).append(EOL);
-		return sb.toString();
-	}
-
-	//############
-	private static String responseTime() {
-
-		StringBuilder sb = new StringBuilder();
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			int responseTimesCount = Integer.parseInt(br.readLine().trim());
-			List<Integer> responseTimes = IntStream.range(0, responseTimesCount).mapToObj(i -> {
-						try {
-							return br.readLine().replaceAll("\\s+$", "");
-						} catch (IOException ex) {
-							throw new RuntimeException(ex);
-						}
-					})
-					.map(String::trim)
-					.map(Integer::parseInt)
-					.toList();
-
-			int result = AnyClass.countResponseTimeRegressions(responseTimes);
-			sb.append(" result: ").append(result);
-			br.close();
-		}
-		catch (IOException ex) { System.out.println("ERROR: " + ex.getMessage()); }
-		return sb.toString();
-	}
-
-	private static int countResponseTimeRegressions(List<Integer> responseTimes) {
-
-		int avg = 0, acc = 0, ictr = 0, tctr = 0;
-		if (responseTimes == null || responseTimes.size() == 0) {
-		} else {
-			for (int responseTime : responseTimes) {
-
-				++ictr;
-				acc += responseTime;
-				avg = acc / ictr;
-				if (ictr == 1) {
-				} else {
-
-					if (responseTime > avg) {
-						++tctr;
-					}
-				}
-			}
-		}
-		return tctr;
-	}
-
-	private static String reversaList() {
-
-		StringBuilder sb = new StringBuilder();
-
-		String[] strs = "M,A,R,T,I,N, ,G,E,O,R,G,E".split(",");
-		List<String> last = Arrays.asList(strs);
-		List<String> lest = new ArrayList<>(last);
-		List<String> list = new ArrayList<>(last);
-		List<String> lost = new ArrayList<>(last);
-		List<String> lust = new ArrayList<>(last);
-
-		Collections.sort(last);
-		Collections.sort(list, reverseOrder());
-		Collections.reverse(lest);
-		Collections.rotate(lost, 1);
-		Collections.shuffle(lust);
-
-		last.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
-		list.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
-		lest.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
-		lost.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
-		lust.forEach(x -> sb.append(x).append(" ")); sb.append(EOL);
-		//list.forEach(System.out::print);
-
-		return sb.toString();
-	}
-
+	
 	private static void regexXMLs() {
 
-		String[] xmls = {"<h1>Nayeem loves counseling</h1>",
+		String[] xmls = {"<h1>They loves counseling</h1>",
 				"<h1><h1>Sanjay has no watch</h1></h1><par>So wait for a while</par>",
 				"<Amee>safat codes like a ninja</amee>",
 				"<SA premium>Imtiaz has a secret crush</SA premium>"};
@@ -172,9 +83,7 @@ public class AnyClass {
 
 	private static void regexValid() {
 
-		String[] regexVals = null;
-		// ""new String[]{ "([A-Z])(.+)", "[AZ[a-z](a-z)", "batcatpat(nat" };
-		//
+		String[] regexVals = { "([A-Z])(.+)", "[AZ[a-z](a-z)", "batcatpat(nat" };
 		int lena = regexVals.length;
 		int ictr = 0;
 		String message = "";
@@ -186,10 +95,10 @@ public class AnyClass {
 			try {
 				Pattern pattern = Pattern.compile(regex);
 				Matcher matcher = pattern.matcher(regex);
+				System.out.println(regex + " / " + matcher.matches());
 			} catch (PatternSyntaxException ex) {
 				message = "Invalid";
 			}
-			//System.out.println("regex: " + regex);
 			list.add(message);
 			lena--;
 		}

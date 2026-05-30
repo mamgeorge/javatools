@@ -18,8 +18,6 @@ import static java.awt.Color.BLUE;
 import static java.awt.Color.GREEN;
 import static java.awt.Color.WHITE;
 import static swing.SwingConsole.ACTION_EXIT;
-import static swing.SwingConsole.ACTION_TIME;
-import static swing.SwingConsole.COLOR_GRN;
 import static swing.SwingConsole.COLOR_PUR;
 import static swing.SwingConsole.COLOR_RED;
 import static swing.SwingConsole.getJButton;
@@ -29,7 +27,6 @@ public class SwingMove {
 	JFrame jFrame;
 	private final AnyJComponent ANYJCOMPONENT = new AnyJComponent();
 	private JButton jButton_EXIT = null;
-	private JButton jButton_TIME = null;
 	private JButton jButton_L = null;
 	private JButton jButton_R = null;
 	private JButton jButton_U = null;
@@ -44,7 +41,6 @@ public class SwingMove {
 	private final int minHth = 7;
 	private final int ballx = 6;
 	private final int bally = 6;
-	private final int timer = 1;
 	private final int inc = 10;
 
 	public static void main(String... strings) {
@@ -58,7 +54,6 @@ public class SwingMove {
 		jFrame.getContentPane();
 		//
 		jButton_EXIT = getJButton("X", COLOR_RED, DIMENSION_SMLR, ACTION_EXIT);
-		jButton_TIME = getJButton("T", COLOR_GRN, DIMENSION_SMLR, ACTION_TIME);
 		jButton_L = getJButton("<", COLOR_PUR, DIMENSION_SMLR, null);
 		jButton_U = getJButton("^", COLOR_PUR, DIMENSION_SMLR, null);
 		jButton_D = getJButton("V", COLOR_PUR, DIMENSION_SMLR, null);
@@ -134,17 +129,6 @@ public class SwingMove {
 				ANYJCOMPONENT.repaint();
 			}
 			// if ( actionEvent.getSource( ) instanceof JComponent ) { ANYJCOMPONENT.repaint(); }
-		}
-
-		private void lesser( ) {
-			oneX = oneX - 1;
-			try {
-				Thread.sleep(50);
-			}
-			catch (InterruptedException ex) {
-				System.out.println(ex.getMessage());
-			}
-			// System.out.println( ictr );
 		}
 	}
 }

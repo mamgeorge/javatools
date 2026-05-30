@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -156,7 +157,7 @@ public class UtilityMain {
 
 		String txtLines;
 		try {
-			URL url = new URL(link);
+			URL url = URI.create(link).toURL();
 			HttpURLConnection HUC = (HttpURLConnection) url.openConnection();
 			HUC.setRequestMethod("GET");
 			HUC.setRequestProperty(USER_AGENT, USER_AGENT_VAL);
@@ -191,7 +192,7 @@ public class UtilityMain {
 		// http://zetcode.com/java/getpostrequest/
 		String txtLines = "";
 		try {
-			URL url = new URL(link);
+			URL url = URI.create(link).toURL();
 			HttpURLConnection HUC = (HttpURLConnection) url.openConnection();
 			HUC.setDoOutput(true);
 			HUC.setRequestMethod("POST");

@@ -4,15 +4,13 @@ import objects.AnyObject;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
-import org.springframework.core.io.PathResource;
-import org.springframework.util.ResourceUtils;
-
-import java.io.File;
-import java.io.FileNotFoundException;
+import org.springframework.core.io.FileSystemResource;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -136,20 +134,18 @@ public class UtilityMainTest {
 		String pathYml = "classpath:application.yml";
 		String propName = "spring.application.id";
 		String propValue = "";
-		try {
-			File file = ResourceUtils.getFile(pathYml);
-			PathResource pathResource = new PathResource(file.toPath());
 
-			YamlPropertiesFactoryBean YPFB = new YamlPropertiesFactoryBean();
-			YPFB.setResources(pathResource);
-			YPFB.afterPropertiesSet();
+		Path path = Paths.get(pathYml);
+		FileSystemResource pathResource = new FileSystemResource(path.toFile());	
 
-			Properties properties = YPFB.getObject();
-			assert properties != null;
-			propValue = properties.getProperty(propName);
-		} catch (FileNotFoundException ex) {
-			System.out.println("ERROR: " + ex.getMessage());
-		}
+		YamlPropertiesFactoryBean YPFB = new YamlPropertiesFactoryBean();
+		YPFB.setResources(pathResource);
+		YPFB.afterPropertiesSet();
+
+		Properties properties = YPFB.getObject();
+		assert properties != null;
+		propValue = properties.getProperty(propName);
+	
 		System.out.println(EOL + propName + ": " + propValue);
 		assertNotNull(propValue);
 	}

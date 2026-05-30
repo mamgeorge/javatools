@@ -42,15 +42,13 @@ public class RabbitMQHandler {
 	private static final String EXCHANGE_QUEUE = "queue_sample";
 	private static final String MQ_HOST = "localhost";
 	private static final int MQ_PORT = 5672;
-	private static final String MQ_USER = "username";
-	private static final String MQ_PASS = "password";
 	private static final boolean isExchanged = false;
 
 	private static Channel channel = null;
 	private static Connection connection = null;
 
 	public static void main(String[] args) {
-		//
+	
 		if ( connectionBuild(MQ_HOST, MQ_PORT) ) {
 			messagesSend(10);
 			//connectionClose();
@@ -59,6 +57,7 @@ public class RabbitMQHandler {
 			messagesRead();
 			//connectionClose();
 		}
+		connectionClose();
 		System.out.println("DONE");
 	}
 
