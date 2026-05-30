@@ -18,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.UtilityMainTest.ASSERT_MSG;
 import static utils.UtilityMainTest.PATHFILE_LOCAL;
 
-class SpecialTests {
-
+class SphinxTests {
 
 	//#### statics
 	private static Configuration getSphinxConfig() {

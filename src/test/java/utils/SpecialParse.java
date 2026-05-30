@@ -16,7 +16,7 @@ import java.util.Collections;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class SpecialParse {
+public class SpecialParse { // jsoup
 
 	public static final String EOL = System.lineSeparator();
 	private static final String[] TXT_URL = { "https://docs.google.com/document/d/e/2PACX-1vTMOmshQe8YvaRXi6gEPKKlsC6UpFJSMAk4mQjLm_u1gmHdVVTaeh7nBNFBRlui0sTZ-snGwZM4DBCT/pub",

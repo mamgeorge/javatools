@@ -71,9 +71,9 @@ public class UtilityMainTest {
 
 	@Test
 	void booleans() {
-		//
+
 		String txtLines = EOL;
-		//
+
 		txtLines += String.format("\t true & true \t %s \n", true);
 		txtLines += String.format("\t true | false\t %s \n", true);
 		txtLines += String.format("\t true | true \t %s \n", true);
@@ -81,7 +81,7 @@ public class UtilityMainTest {
 		txtLines += String.format("\t false | false\t %s \n", false);
 		txtLines += String.format("\t true & true & false\t %s \n", false);
 		txtLines += String.format("\t true && true && false\t %s \n", false);
-		//
+
 		System.out.println("txtLines: " + txtLines);
 		assertNotNull(txtLines, ASSERT_MSG);
 	}
@@ -154,7 +154,7 @@ public class UtilityMainTest {
 	void showTimes() {
 
 		String showTimes = UtilityMain.showTimes();
-		//
+
 		int showTimesLen = showTimes.split(EOL).length;
 		System.out.println("showTimes: " + showTimes);
 		System.out.println("showTimesLen: " + showTimesLen);
@@ -163,12 +163,12 @@ public class UtilityMainTest {
 
 	@Test
 	void stream_sort() throws SocketException {
-		//
+
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
-		//
+
 		Collections.list(enums).forEach(nifc -> set.add(TAB + nifc.getDisplayName()));
-		//
+
 		System.out.println("Stream & sort" + TAB + "size: " + set.size());
 		set.forEach(System.out::println);
 		assertTrue(set.size() >= 7, ASSERT_MSG);
@@ -176,10 +176,10 @@ public class UtilityMainTest {
 
 	@Test
 	void stream_filter() throws SocketException {
-		//
+
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
-		//
+
 		List<NetworkInterface> listMain = Collections.list(enums);
 		List<NetworkInterface> listFilt =
 				listMain.stream()
@@ -193,9 +193,9 @@ public class UtilityMainTest {
 							return mtu > 1 && !nifc.getDisplayName().startsWith("VMware");
 						})
 						.toList();
-		//
+
 		listFilt.forEach(nifc -> set.add(TAB + nifc.getDisplayName()));
-		//
+
 		System.out.println("Stream & filter" + TAB + "size: " + set.size());
 		set.forEach(System.out::println);
 		assertTrue(set.size() >= 5, ASSERT_MSG);
@@ -203,14 +203,14 @@ public class UtilityMainTest {
 
 	@Test
 	void stream_Collections() throws SocketException {
-		//
+
 		StringBuilder stringBuilder = new StringBuilder();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
 		// stringBuilder.delete(0, stringBuilder.length()).append("Iterator Stream" + EOL);
-		//
+
 		stringBuilder.append("Collections Stream" + EOL);
 		Collections.list(enums).forEach(nifc -> stringBuilder.append(nifc.getDisplayName()).append(EOL));
-		//
+
 		System.out.println(stringBuilder);
 		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
@@ -221,12 +221,12 @@ public class UtilityMainTest {
 		// better for larger numbers
 		StringBuilder stringBuilder = new StringBuilder();
 		Iterator<NetworkInterface> iterator = NetworkInterface.getNetworkInterfaces().asIterator();
-		//
+
 		stringBuilder.append("Iterator Stream" + EOL);
 		Stream<NetworkInterface> stream = StreamSupport.stream(
 				Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
 		stream.forEach(nifc -> stringBuilder.append(nifc.getDisplayName()).append(EOL));
-		//
+
 		System.out.println(stringBuilder);
 		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
@@ -236,7 +236,7 @@ public class UtilityMainTest {
 	void getFileLines() {
 
 		String txtLines = UtilityMain.getFileLines(PATHFILE_LOCAL + "structured/battles.csv", "");
-		//
+
 		LOGGER.info(txtLines); // System.out.println(txtLines);
 		assertTrue(txtLines.length() > 12, ASSERT_MSG);
 	}
@@ -245,18 +245,18 @@ public class UtilityMainTest {
 	void getFileLocal() {
 
 		String txtLines = UtilityMain.getFileLocal(PATHFILE_LOCAL + "structured/booksCatalog.json");
-		//
+
 		LOGGER.info(txtLines); // System.out.println(txtLines);
 		assertTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
 	@Test
 	void getFileLocals() {
-		//
+
 		StringBuilder stringBuilder = new StringBuilder();
 		String[] fileNames =
 				{"structured/booksCatalog.html", "structured/booksCatalog.json", "structured/booksCatalog.xml", "booksXml2Html.xslt"};
-		//
+
 		AtomicInteger idx = new AtomicInteger();
 		Arrays.stream(fileNames).sequential().forEach(flnm -> {
 			String fileName = PATHFILE_LOCAL + flnm;
@@ -264,7 +264,7 @@ public class UtilityMainTest {
 			stringBuilder.append(
 					String.format("\t%02d %s\tsize: %d \n", idx.incrementAndGet(), flnm, txtLines.length()));
 		});
-		//
+
 		int countFiles = stringBuilder.toString().split(EOL).length;
 		System.out.println("countFiles: " + countFiles);
 		System.out.println(stringBuilder);
@@ -274,7 +274,7 @@ public class UtilityMainTest {
 	//#### reflection
 	@Test
 	void getField() {
-		//
+
 		String results = UtilityMain.getField(new AnyObject(), "gamma");
 		System.out.println("results: " + results);
 		assertEquals("GIMMEL", results, ASSERT_MSG);
@@ -291,7 +291,7 @@ public class UtilityMainTest {
 
 	@Test
 	void exposeObject() {
-		//
+
 		AnyObject anyObject = new AnyObject();
 		String txtLines = UtilityMain.exposeObject(anyObject);
 		System.out.println(txtLines);
@@ -300,7 +300,7 @@ public class UtilityMainTest {
 
 	@Test
 	void putObject() {
-		//
+
 		AnyObject anyObject = new AnyObject();
 		UtilityMain.putObject(anyObject, "gamma", "STUFF");
 		String results = UtilityMain.getField(anyObject, "gamma");

@@ -8,7 +8,7 @@ import static utils.UtilityMain.urlPost;
 
 class ConnectTests {
 
-	private static final String URL_VAL = "https://mamgeorge.altervista.org";
+	private static final String URL_VAL = "https://dummyjson.com/users/1";
 
 	@Test void test_urlGet( ) {
 
