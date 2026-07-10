@@ -45,16 +45,14 @@ public class UtilityMainTest {
 	}
 
 	//#### basics
-	@Test
-	void template() {
+	@Test void template() {
 
 		String txtLines = "template";
 		System.out.println("txtLines: " + txtLines);
 		assertTrue(txtLines.split(EOL).length >= 1, ASSERT_MSG);
 	}
 
-	@Test
-	void getClass_Val() {
+	@Test void getClass_Val() {
 
 		UtilityMainTest UMT = new UtilityMainTest();
 		StringBuilder sb = new StringBuilder();
@@ -69,8 +67,7 @@ public class UtilityMainTest {
 		assertTrue(sb.toString().split(EOL).length >= 1, ASSERT_MSG);
 	}
 
-	@Test
-	void booleans() {
+	@Test void booleans() {
 
 		String txtLines = EOL;
 
@@ -86,16 +83,14 @@ public class UtilityMainTest {
 		assertNotNull(txtLines, ASSERT_MSG);
 	}
 
-	@Test
-	void showSysEnv() {
+	@Test void showSysEnv() {
 
 		String txtLines = UtilityMain.showSysEnv();
 		System.out.println(txtLines);
 		assertNotNull(txtLines);
 	}
 
-	@Test
-	void showSysProp() {
+	@Test void showSysProp() {
 
 		Properties properties = System.getProperties();
 
@@ -113,8 +108,7 @@ public class UtilityMainTest {
 		assertNotNull(sb);
 	}
 
-	@Test
-	void showJvmArgs() {
+	@Test void showJvmArgs() {
 
 		RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
 		List<String> listArgs = runtimeMXBean.getInputArguments();
@@ -128,8 +122,7 @@ public class UtilityMainTest {
 		assertNotNull(sb);
 	}
 
-	@Test
-	void showAppYml() {
+	@Test void showAppYml() {
 
 		String pathYml = "classpath:application.yml";
 		String propName = "spring.application.id";
@@ -150,8 +143,7 @@ public class UtilityMainTest {
 		assertNotNull(propValue);
 	}
 
-	@Test
-	void showTimes() {
+	@Test void showTimes() {
 
 		String showTimes = UtilityMain.showTimes();
 
@@ -161,8 +153,7 @@ public class UtilityMainTest {
 		assertTrue(showTimesLen > 4, ASSERT_MSG);
 	}
 
-	@Test
-	void stream_sort() throws SocketException {
+	@Test void stream_sort() throws SocketException {
 
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -174,8 +165,7 @@ public class UtilityMainTest {
 		assertTrue(set.size() >= 7, ASSERT_MSG);
 	}
 
-	@Test
-	void stream_filter() throws SocketException {
+	@Test void stream_filter() throws SocketException {
 
 		Set<String> set = new TreeSet<>();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -201,8 +191,7 @@ public class UtilityMainTest {
 		assertTrue(set.size() >= 5, ASSERT_MSG);
 	}
 
-	@Test
-	void stream_Collections() throws SocketException {
+	@Test void stream_Collections() throws SocketException {
 
 		StringBuilder stringBuilder = new StringBuilder();
 		Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
@@ -215,8 +204,7 @@ public class UtilityMainTest {
 		assertTrue(stringBuilder.toString().split(EOL).length >= 7, ASSERT_MSG);
 	}
 
-	@Test
-	void stream_Iterator() throws SocketException {
+	@Test void stream_Iterator() throws SocketException {
 
 		// better for larger numbers
 		StringBuilder stringBuilder = new StringBuilder();
@@ -232,8 +220,7 @@ public class UtilityMainTest {
 	}
 
 	//#### files
-	@Test
-	void getFileLines() {
+	@Test void getFileLines() {
 
 		String txtLines = UtilityMain.getFileLines(PATHFILE_LOCAL + "structured/battles.csv", "");
 
@@ -241,8 +228,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() > 12, ASSERT_MSG);
 	}
 
-	@Test
-	void getFileLocal() {
+	@Test void getFileLocal() {
 
 		String txtLines = UtilityMain.getFileLocal(PATHFILE_LOCAL + "structured/booksCatalog.json");
 
@@ -250,8 +236,7 @@ public class UtilityMainTest {
 		assertTrue(txtLines.length() > 20, ASSERT_MSG);
 	}
 
-	@Test
-	void getFileLocals() {
+	@Test void getFileLocals() {
 
 		StringBuilder stringBuilder = new StringBuilder();
 		String[] fileNames =
@@ -272,16 +257,14 @@ public class UtilityMainTest {
 	}
 
 	//#### reflection
-	@Test
-	void getField() {
+ 	@Test void getField() {
 
 		String results = UtilityMain.getField(new AnyObject(), "gamma");
 		System.out.println("results: " + results);
 		assertEquals("GIMMEL", results, ASSERT_MSG);
 	}
 
-	@Test
-	void getMethod() {
+	@Test void getMethod() {
 
 		Object object = UtilityMain.getMethod(AnyObject.class, "getGamma");
 		String results = object.toString();
@@ -289,8 +272,7 @@ public class UtilityMainTest {
 		assertEquals("GIMMEL", results, ASSERT_MSG);
 	}
 
-	@Test
-	void exposeObject() {
+	@Test void exposeObject() {
 
 		AnyObject anyObject = new AnyObject();
 		String txtLines = UtilityMain.exposeObject(anyObject);
@@ -298,8 +280,7 @@ public class UtilityMainTest {
 		assertNotNull(txtLines, ASSERT_MSG);
 	}
 
-	@Test
-	void putObject() {
+	@Test void putObject() {
 
 		AnyObject anyObject = new AnyObject();
 		UtilityMain.putObject(anyObject, "gamma", "STUFF");
@@ -309,8 +290,7 @@ public class UtilityMainTest {
 	}
 
 	// special
-	@Test
-	void lineChunker() {
+	@Test void lineChunker() {
 
 		String txtLines;
 		String txtLine = "123456789012345678901234567890123456789012345678901234567890";
@@ -326,8 +306,7 @@ public class UtilityMainTest {
 		assertNotNull(txtLines);
 	}
 
-	@Test
-	void checkDates() {
+	@Test void checkDates() {
 
 		StringBuilder sb = new StringBuilder();
 		SimpleDateFormat SDF = new SimpleDateFormat(ISO_FORMAT);

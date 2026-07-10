@@ -1,9 +1,6 @@
 package database;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -30,13 +27,15 @@ import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMain.PATHFILE_LOCAL;
 
-@Getter @Setter @EqualsAndHashCode @NoArgsConstructor
+@Data 
 public class DbProfile {
 	/*
 		Normally DriverManager creates the connection and can be fed properties.
 		When DataSource (or DriverManagerDataSource, JdbcTemplate) are used,
 		the connection may be made based on the settings in app.props.
 	*/
+	public DbProfile() {}
+	
 	public enum DBTYPE {sqlite, mysql, oracle, oracleTns, mssql, mongodb}
 
 	public enum DBASES {

@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.6
      http://maven.apache.org/maven-v4_0_6.xsd">
-	<modelVersion>4.0.6</modelVersion>
+	<modelVersion>4.1.0</modelVersion>
 	<groupId>org.example</groupId>
 	<artifactId>javatools</artifactId>
 	<packaging>jar</packaging>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.6</version>
+		<version>4.1.0</version>
 	</parent>
 
 	<properties>
@@ -66,9 +66,21 @@
 	ts	org.powermock				powermock-api-mockito2		2.0.9
 	-->
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.junit</groupId>
+				<artifactId>junit-bom</artifactId>
+				<version>5.12.0</version> <!-- Use your preferred stable version -->
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 
-		<!-- database -->
+		<!-- DATABASE -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
@@ -78,7 +90,7 @@
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.45.3.0</version>
+			<!-- <version>3.45.3.0</version> -->
 		</dependency>
 
 		<dependency>
@@ -90,13 +102,13 @@
 		<dependency>
 			<groupId>com.oracle.database.jdbc</groupId>
 			<artifactId>ojdbc11</artifactId>
-			<version>21.6.0.0.1</version>
+			<!-- <version>21.6.0.0.1</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
-			<version>13.2.1.jre11</version>
+			<!-- <version>13.2.1.jre11</version> -->
 		</dependency>
 
 		<dependency>
@@ -108,19 +120,19 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>2.2.224</version>
+			<!-- <version>2.2.224</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.7.2</version>
+			<!-- <version>2.7.2</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
-			<version>10.17.1.0</version>
+			<!-- <version>10.17.1.0</version> -->
 		</dependency>
 
 		<dependency>
@@ -144,38 +156,38 @@
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
-			<version>5.0.1</version>
+			<!-- <version>5.0.1</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
-			<version>5.4.0</version>
+			<!-- <version>5.4.0</version> -->
 		</dependency>
 
-		<!-- lombok, formats -->
+		<!-- CONFIGS: lombok, formats -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.32</version>
+			<version>1.18.38</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.21.1</version>
+			<!-- <version>2.21.1</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-yaml</artifactId>
-			<version>2.17.1</version>
+			<!-- <version>2.17.1</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
-			<version>2.9.0</version>
+			<!-- <version>2.9.0</version> -->
 		</dependency>
 
 		<dependency>
@@ -184,38 +196,32 @@
 			<version>1.4.0</version>
 		</dependency>
 
-		<!-- messaging (kafka) -->
+		<!-- MESSAGING: kafka -->
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>4.1.2</version><!-- 3.9.1 -->
+			<!-- <version>4.1.2</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-streams</artifactId>
-			<version>4.1.1</version><!-- 3.7.0 -->
+			<!-- <version>4.1.1</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>2.0.17</version>
+			<!-- <version>2.0.17</version> -->
 		</dependency>
-
-<!--		<dependency>-->
-<!--			<groupId>org.slf4j</groupId>-->
-<!--			<artifactId>slf4j-simple</artifactId>-->
-<!--			<version>2.0.17</version>-->
-<!--		</dependency>-->
 
 		<dependency>
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>
-			<version>5.21.0</version>
+			<!-- <version>5.21.0</version> -->
 		</dependency>
 
-		<!-- objects: security, csv, sphinx -->
+		<!-- SPECIAL: objects, security, csv, sphinx -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -232,7 +238,7 @@
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>3.2.6</version>
-			<scope>compile</scope>
+			<!-- <scope>compile</scope> -->
 		</dependency>
 
 		<dependency>
@@ -245,7 +251,7 @@
 		<dependency><!-- for app props read -->
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
-			<version>6.2.10</version>
+			<!-- <version>6.2.10</version> -->
 		</dependency>
 
 		<dependency>
@@ -260,7 +266,19 @@
 			<version>5prealpha</version>
 		</dependency>
 
-		<!-- Testing: jupiter, etc -->
+	    <dependency>
+			<groupId>org.languagetool</groupId>
+			<artifactId>languagetool</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.languagetool</groupId>
+			<artifactId>language-en</artifactId>
+			<version>6.6</version>
+		</dependency>
+
+		<!-- TESTING: jupiter, etc -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -270,27 +288,27 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.7.0</version>
+			<!-- <version>5.7.0</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.7.0</version>
+			<!-- <version>5.7.0</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.7.1</version><!-- 4.5.1 -->
+			<!-- <version>2.7.1</version> -->
 		</dependency>
 
 		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito2</artifactId>
-			<version>2.0.9</version>
+			<groupId>com.intuit.karate</groupId>
+			<artifactId>karate-junit5</artifactId>
+			<version>1.4.1</version>
+			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -298,6 +316,28 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+		<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.5.2</version> 
+			</plugin>
+
+		<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
+				<configuration>
+					<annotationProcessorPaths>
+						<!-- This binds Lombok to the Maven compile lifecycle -->
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.38</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
 			</plugin>
 
 			<!-- BEG -->

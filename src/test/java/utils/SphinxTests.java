@@ -34,8 +34,7 @@ class SphinxTests {
 		return configuration;
 	}
 
-	@Test
-	void test_error() {
+	@Test void test_error() {
 		//
 		int intVal = 0;
 		try {
@@ -59,9 +58,7 @@ class SphinxTests {
 		assertTrue(intVal > -1);
 	}
 
-	@Test
-	@Disabled("too slow")
-	void test_sphinx4_STT() {
+	@Test @Disabled("too slow") void test_sphinx4_STT() {
 		//
 		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
 		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
@@ -84,9 +81,7 @@ class SphinxTests {
 		assertNotNull(speechResult, ASSERT_MSG);
 	}
 
-	@Test
-	@Disabled("too slow")
-	void test_sphinx4_TTS_SS() {
+	@Test @Disabled("too slow") void test_sphinx4_TTS_SS() {
 		//
 		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
 		String pathFile = PATHFILE_LOCAL + "hal9000.wav";
@@ -111,9 +106,7 @@ class SphinxTests {
 		assertNotNull(speechResultSS, ASSERT_MSG);
 	}
 
-	@Test
-	@Disabled("too slow")
-	void test_sphinx4_TTS_LS() {
+	@Test @Disabled("too slow") void test_sphinx4_TTS_LS() {
 		//
 		// https://cmusphinx.github.io/wiki/tutorialsphinx4/
 		// String pathFile = PATHFILE_LOCAL + "hal9000.wav";
@@ -138,8 +131,7 @@ class SphinxTests {
 		assertNotNull(speechResultLS, ASSERT_MSG);
 	}
 
-	@Test
-	void listFiles() {
+	@Test void listFiles() {
 
 		// C:\Users\mamge\OneDrive\Documents\5Personal\History\images_levant_extra
 		String folderPath = "C:/Users/mamge/OneDrive/Documents/"

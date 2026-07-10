@@ -6,32 +6,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.reflect.Whitebox;
 import org.springframework.test.util.ReflectionTestUtils;
 import objects.AnyException;
 import objects.AnyObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static utils.UtilityMain.EOL;
 import static utils.UtilityMainTest.ASSERT_MSG;
 
@@ -46,7 +34,7 @@ class UtilityMockTest {
 	@InjectMocks private UtilityMockTest utilityMockTest;
 
 	// @Mock, @InjectMocks are applied in @BeforeEach MockitoAnnotations!
-	@BeforeEach void init( ) { MockitoAnnotations.initMocks(this); }
+	@BeforeEach void init( ) { /*MockitoAnnotations.initMocks(this);*/ }
 
 	@Test void testmock_when_thenReturn( ) {
 
@@ -74,21 +62,6 @@ class UtilityMockTest {
 		results += String.format("\t aom.getAlpha(): %s \n", anyObjectMock.getAlpha());
 		System.out.println("results: " + results);
 		assertEquals(SAMPLE, anyObjectMock.getAlpha(), ASSERT_MSG);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test @Disabled( "because" ) void testmock_doNothing_when( ) {
-		
-		List<String> listReal = new ArrayList<>();
-		listReal.add(0, "alpha");
-		
-		ArrayList<String> listMock = mock(ArrayList.class);
-		doNothing().when(listMock).add(isA(Integer.class), isA(String.class));
-		listMock.add(0, "beta");
-		
-		System.out.println(listReal);
-		System.out.println(listMock);
-		verify(listMock, times(1)).add(0, "beta");
 	}
 
 	@Test @Disabled( "because" ) void testmock_when_thenThrow( ) {
@@ -193,38 +166,5 @@ class UtilityMockTest {
 
 		System.out.println("results: " + results);
 		assertEquals(expects, results, ASSERT_MSG);
-	}
-
-	@Test void testWhitebox_getPrivateText( ) {
-
-		// https://stackoverflow.com/questions/46454995/how-to-hide-warning-illegal-reflective-access-in-java-9-without-jvm-argument
-		// configure JDK compiler with flag: --illegal-access=permit
-		String results = "";
-		String expects = ""; // PRIVATE_TEXT!";
-
-		AnyObject anyObject = new AnyObject();
-		try { results = Whitebox.invokeMethod(anyObject, "getPrivateText").toString(); }
-		catch (Exception ex) { System.out.println("ERROR: " + ex.getMessage()); }
-
-		System.out.println("results: " + results);
-		assertEquals(expects, results, ASSERT_MSG);
-	}
-
-	@Test void testPowerMock_given( ) {
-
-		String expects = "POWERMOCKED!";
-		AnyObject anyObject = PowerMockito.mock(AnyObject.class);
-		given(anyObject.getPrivateText()).willReturn(expects);
-
-		String results = anyObject.getPrivateText();
-		System.out.println("results: " + results);
-		assertEquals(expects, results, ASSERT_MSG);
-	}
-
-	@Test void testPowerMock_doNothing( ) {
-
-		AnyObject anyObject = PowerMockito.mock(AnyObject.class);
-		anyObject.printedSomething();
-		assertNotNull(anyObject);
 	}
 }

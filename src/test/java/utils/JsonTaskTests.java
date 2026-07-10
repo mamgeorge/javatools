@@ -12,8 +12,9 @@ import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.junit.jupiter.api.Test;
 import objects.BooksCatalog;
 import org.modelmapper.ModelMapper;
@@ -314,7 +315,7 @@ class JsonTaskTests {
 	}
 }
 
-@Getter @Setter class Person {
+@Data class Person {
 
 	private String name;
 	private String address;
@@ -333,7 +334,7 @@ class JsonTaskTests {
 	}
 }
 
-@Getter @Setter class Student extends Person{
+@Data @EqualsAndHashCode(callSuper=false) class Student extends Person{
 
 	private String studentId;
 	private String major;
