@@ -56,11 +56,12 @@ class SpecialTest {
 
 		Value values = getBpodValues(jsCode);
 		int bpods = (int) values.getArraySize();
-		System.out.println("bpods: " + bpods);
-
 		TreeSet<String> treeSet = getErrors(exclusionList, values, bpods, true);
-		System.out.println(treeSet.toString());
 
+		// results
+		System.out.println(treeSet.toString());
+		System.out.println("-".repeat(40));
+		System.out.println("bpods: " + bpods + ", errs: " + treeSet.size() );
 		System.out.println(getSeconds(timeBeg));
 		assertTrue(treeSet.size() > 0);
 	}
@@ -148,14 +149,22 @@ class SpecialTest {
 	private static TreeSet<String> getErrors(List<String> exclusionList, 
 			Value values, int bpods, boolean isSingle) {
 
+		String[] errs = {"apparently", "Neriglissar", "great grandson", 
+			"great uncle", "?", "[", "]", ",", "(", ")", "+0069" };
 		TreeSet<String> treeSet = new TreeSet<>();
 		Value value = null;
-		String txt = "";
+		String txt, err = "";
+
 		for (int ictr = 0; ictr < bpods; ictr++) {
 			value = values.getArrayElement(ictr).getArrayElement(4);
 			txt = String.valueOf(value).replaceAll("\\s+", " ");
-			// System.out.println(ictr + ": " + txt + EOL);
-			treeSet.add(getSpellCheck(txt, exclusionList, isSingle).toString());
+			err = getSpellCheck(txt, exclusionList, isSingle).toString();
+			if (
+				err!= null 
+				&& err.trim().length() > 1
+				&& !Arrays.stream(errs).anyMatch(err::contains)
+				&& !err.codePoints().anyMatch(cp -> cp > 127)
+			) { treeSet.add(err); }
 		}
 		return treeSet;
 	}
