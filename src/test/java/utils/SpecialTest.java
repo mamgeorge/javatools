@@ -1,7 +1,5 @@
 package utils;
 
-import static utils.UtilityMain.EOL;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +26,9 @@ import objects.Bpod;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
+
+import static org.junit.Assert.assertTrue;
+import static utils.UtilityMain.EOL;
 
 class SpecialTest {
 
@@ -60,13 +61,10 @@ class SpecialTest {
 		TreeSet<String> treeSet = getErrors(exclusionList, values, bpods, true);
 		System.out.println(treeSet.toString());
 
-		// time
-		Instant timeEnd = Instant.now();
-		double seconds = Duration.between(timeBeg, timeEnd).toMillis() / 1000.0;
-		System.out.println("timeBeg: " + timeBeg);
-		System.out.println("timeEnd: " + timeEnd);
-		System.out.println("time: " + seconds + " seconds");
+		System.out.println(getSeconds(timeBeg));
+		assertTrue(treeSet.size() > 0);
 	}
+
 	// statics
 	private static String getJsCodeFile(String pathFile) {
 
@@ -160,6 +158,17 @@ class SpecialTest {
 			treeSet.add(getSpellCheck(txt, exclusionList, isSingle).toString());
 		}
 		return treeSet;
+	}
+
+	private static StringBuilder getSeconds(Instant timeBeg) {
+
+		StringBuilder sb = new StringBuilder();
+		Instant timeEnd = Instant.now();
+		double seconds = Duration.between(timeBeg, timeEnd).toMillis() / 1000.0;
+		sb.append("timeBeg: " + timeBeg + EOL);
+		sb.append("timeEnd: " + timeEnd + EOL);
+		sb.append("time: " + seconds + " seconds" + EOL);
+		return sb;
 	}
 
 	@SuppressWarnings("unused")
