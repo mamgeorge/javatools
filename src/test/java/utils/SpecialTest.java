@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 import java.lang.ExceptionInInitializerError;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 import org.languagetool.JLanguageTool;
@@ -45,8 +47,9 @@ class SpecialTest {
 		assert (sb.toString().contains("ERROR"));
 	}
 
-	@Test void test_checkJsFile() {
+	@Test void test_checkJsFile() { // 2026/07/12 exclusions at 4335!
 
+		Instant timeBeg = Instant.now();
 		String jsCode = getJsCodeFile(PATH_BPOD + "bibleTxt.js");
 		List<String> exclusionList = getExclusionFileList(PATH_EXCL + "exclusions.txt");
 
@@ -56,6 +59,13 @@ class SpecialTest {
 
 		TreeSet<String> treeSet = getErrors(exclusionList, values, bpods, true);
 		System.out.println(treeSet.toString());
+
+		// time
+		Instant timeEnd = Instant.now();
+		double seconds = Duration.between(timeBeg, timeEnd).toMillis() / 1000.0;
+		System.out.println("timeBeg: " + timeBeg);
+		System.out.println("timeEnd: " + timeEnd);
+		System.out.println("time: " + seconds + " seconds");
 	}
 	// statics
 	private static String getJsCodeFile(String pathFile) {
