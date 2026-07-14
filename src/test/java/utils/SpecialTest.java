@@ -27,6 +27,7 @@ import objects.Bpod;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static utils.UtilityMain.EOL;
 
@@ -46,6 +47,28 @@ class SpecialTest {
 		StringBuilder sb = getSpellCheck(TEXTFILE, EXCLUSIONS, false);
 		System.out.println(sb.toString());
 		assert (sb.toString().contains("ERROR"));
+	}
+
+	@Test void test_checkJsBpod() { 
+
+		String jsCode = getJsCodeFile(PATH_BPOD + "bibleTxt.js");
+		List<String> exclusionList = getExclusionFileList(PATH_EXCL + "exclusions.txt");
+
+		int estDupeCorrection = 0; 
+		int bpod = 400 - estDupeCorrection;
+		Value value = getBpodValues(jsCode);
+		Value valueItem = value.getArrayElement(bpod);
+		String err = getError(exclusionList, value, bpod);
+
+		// results
+		System.out.println("-".repeat(40));
+		System.out.println("bpods: " + value.getArraySize() + ", uncorrected bpod: " + bpod);
+		System.out.println("txt: " 
+			+ valueItem.getArrayElement(0) + " | " 
+			+ valueItem.getArrayElement(1) + " | " 
+			+ valueItem.getArrayElement(3));
+		System.out.println("err: " + err);			
+		assertNotNull(err);
 	}
 
 	@Test void test_checkJsFile() { // 2026/07/12 exclusions at 4335!
@@ -144,6 +167,16 @@ class SpecialTest {
 			}
 		}
 		return sb;
+	}
+
+	private static String getError(List<String> exclusionList, 
+			Value value, int bpod) {
+
+		Value valueDesc = value.getArrayElement(bpod).getArrayElement(4);
+		String txt = String.valueOf(valueDesc).replaceAll("\\s+", " ");
+		String err = getSpellCheck(txt, exclusionList, false).toString();
+
+		return err;
 	}
 
 	private static TreeSet<String> getErrors(List<String> exclusionList, 
